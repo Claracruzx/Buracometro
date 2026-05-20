@@ -1,0 +1,113 @@
+:root {
+    --espacamanto-conteudo: 50px;
+}
+
+header {
+    background-color: black;   
+    padding: 3px 30px;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header #logo {
+    max-width: 115px;
+}
+
+main {
+    display: flex;
+}
+
+main #barra-lateral {
+    padding-top: var(--espacamanto-conteudo);
+    background-color: blue;
+    /* padding-left: 30px; */
+    /* margin-left: 30px; */
+    border-right: 1px solid black;
+    width: 15%;
+    min-height: 100vh;
+    color: white;
+}
+
+main #barra-lateral #lista-botoes {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+main #barra-lateral #lista-botoes button {
+    width: 100%;
+    background-color: inherit;
+    border: none;
+    padding: 10px 0;
+    padding-left: 30px;
+    text-align: left;
+    color: inherit;
+}
+
+main #barra-lateral #lista-botoes button:hover {
+    background-color: rgb(31, 31, 164);
+} 
+
+main #barra-lateral #lista-botoes button:active {
+    background-color: rgb(22, 22, 66) !important;
+}
+
+main #conteudo {
+    padding-top: var(--espacamanto-conteudo);
+    width: 85%;
+}
+
+#btnPerfil {
+    color: white;
+    font-size: 35px;
+}
+
+#btnPerfil:hover {
+    color: rgb(202, 202, 202);
+}
+
+#btnPerfil:active {
+    color: gray;
+}
+
+#btnDeslogar {
+    color: red;
+}
+
+#lista-perfil li:hover {
+    background-color: #dadada;
+}
+
+#lista-perfil li:active {
+    background-color: gray !important;
+}
+
+#lista-perfil li button {
+    background: inherit;
+    border: none;
+    padding: 12px 6px;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.btn-icon {
+    padding: 0;
+    display: flex;
+    background-color: inherit;
+}
+
+.btn-icon.no-bordered {
+    border: none;
+}
+
+.dropdown-toggle.no-toggle::after {
+    display: none;
+}
+
+ul.no-decoration {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}

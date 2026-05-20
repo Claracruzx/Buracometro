@@ -1,0 +1,177 @@
+#formularioCadastroBuracos {
+    /* border: 1px solid red; */
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+#formularioCadastroBuracos > .content {
+    display: flex;
+}
+
+#formularioCadastroBuracos > .content > .area-itens {
+    width: 70%;
+    padding: 20px;
+}
+
+#formularioCadastroBuracos > .content > .area-imagem {
+    width: 30%;
+    padding: 20px;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#formularioCadastroBuracos > .content > .area-imagem .area-foto {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #cacaca;
+    background-color: #dadada;
+    
+    display: flex;
+    /* justify-content: center; */
+    /* align-items: center; */
+
+    flex-direction: column;
+}
+
+#formularioCadastroBuracos > .content > .area-imagem .area-foto > .content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#formularioCadastroBuracos > .content > .area-imagem .area-foto > .content .icone {
+    font-size: 35px;
+    /* top: 48%; */
+    /* position: relative; */
+}
+
+#formularioCadastroBuracos > .content > .area-imagem .area-botoes {
+    /* height: 20%; */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    
+    position: relative;
+    top: -30px;
+    padding-right: 3px;
+    /* left: -3px; */
+}
+
+#btnMaximizarImagem:hover {
+    background-color: rgba(0, 0, 0, 0.292);
+}
+
+#btnMaximizarImagem:active {
+    background-color: rgba(0, 0, 0, 0.39);
+}
+
+div#areaMapaOculto {
+    /* width: 1200px;
+    height: 500px;
+    position: absolute;
+    outline-style: none;
+    left: 0;
+    border: 1px solid red; */
+
+    position: relative;
+    outline-style: none;
+    z-index: 150;
+    top: -600px;
+}
+
+#mapa {
+    width: 100%;
+    background: green;
+    height: 500px;
+}
+
+#fundoEscuro {
+    background-color: rgba(0, 0, 0, 0.589);
+    position: absolute;
+    width: 100%;
+    height: 125%;
+    z-index: 100;
+    left: 0;
+    top: 0;
+}
+
+#btnCancelarFundoEscuro {
+    font-size: 40px;
+    z-index: 1200;
+    padding: 6px 11px;
+    background-color: transparent;
+    border: none;
+    left: 222px;
+}
+
+#btnAvancarLocal {
+    position: relative;
+    z-index: 1200;
+}
+
+#btnCancelarFundoEscuro:hover {
+    background-color: rgba(255, 255, 255, 0.199);
+}
+
+
+#btnCancelarFundoEscuro i {
+    color: white;
+}
+
+@media (max-width: 1670px) {
+    .container {
+        max-width: 1670px;
+        padding: 0 85px;
+    }
+
+    #iptEscolherArquivo {
+        scale: .9;
+    }
+}
+
+@media (max-width: 1250px) {
+    #formularioCadastroBuracos > .content > .area-itens {
+        width: 60%;
+    }
+    
+    #formularioCadastroBuracos > .content > .area-imagem {
+        width: 40%;
+    }
+}
+
+@media (max-width: 1130px) {
+    #formularioCadastroBuracos > .content {
+        flex-direction: column-reverse;
+    }
+
+    #formularioCadastroBuracos > .content > .area-itens,
+    #formularioCadastroBuracos > .content > .area-imagem    
+    {
+        width: 100%;
+    }
+
+    #formularioCadastroBuracos > .content > .area-imagem .area-foto {
+        width: 280px;
+        height: 280px;
+    }
+}
+
+@media (max-width: 900px) {
+    .container {
+        padding: 0 20px;
+    }
+
+    .content-title {
+        padding-left: 50px;
+    }
+
+    #btnVoltarPrincipal {
+        top: -4px;
+        left: -15px;
+    }
+}

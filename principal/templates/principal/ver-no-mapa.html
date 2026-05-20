@@ -1,0 +1,95 @@
+{% extends 'principal/principal.html' %}
+{% load static %}
+
+{% block title %}
+Ver no mapa
+{% endblock %}
+
+{% block content %}
+<style>
+    #map {
+        height: 400px;
+        width: 100%;
+    }
+</style>
+<h1>Clique no mapa para pegar as coordenadas</h1>
+<div id="map"></div>
+<p>Coordenadas: <span id="coords">Nenhuma coordenada selecionada</span></p>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map').setView([-2.5184, -44.2054], 16);
+    
+    // Adicionar a camada de tiles do OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Evento de clique no mapa
+    map.on('click', function(e) {
+        var lat = e.latlng.lat; // Latitude
+        var lng = e.latlng.lng; // Longitude
+
+        // if (marker) {
+        //     map.removeLayer(marker);
+        // }
+
+        // // Adiciona um novo marcador na posição clicada
+        // marker = L.marker(e.latlng).addTo(map);
+
+        // Atualiza o texto com as coordenadas
+        document.getElementById('coords').innerText = 'Latitude: ' + lat + ', Longitude: ' + lng;
+
+        // Adiciona um marcador no local clicado
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup('Coordenadas: ' + lat.toFixed(4) + ', ' + lng.toFixed(4))
+            .openPopup();
+    });
+
+    // Definir a coordenada onde a imagem será adicionada
+    var coordenadas = [-2.5184, -44.2054]; // Exemplo de coordenadas (Latitude, Longitude)
+
+    // Definir a imagem a ser usada como ícone
+    // var imagemIcone = L.icon({
+    //     // iconUrl: 'https://example.com/sua-imagem.png',  // URL da imagem
+    //     iconUrl: "{% static 'imgs/boneco.png' %}",
+    //     iconSize: [50, 50],  // Tamanho da imagem (ajuste conforme necessário)
+    //     iconAnchor: [25, 50], // Posição do ponto de ancoragem (ajuste conforme necessário)
+    //     popupAnchor: [0, -50] // Posição do popup (ajuste conforme necessário)
+    // });
+
+    // Adicionar o marcador com a imagem como ícone na coordenada
+    L.marker(coordenadas, { icon: imagemIcone }).addTo(map)
+        .bindPopup("Este é o local com a imagem!")
+        .openPopup();
+
+    // var bounds = [
+    //     [-2.4025, -43.8717], // Coordenada sudoeste
+    //     [-2.8044, -44.5679]  // Coordenada nordeste
+    // ];
+
+    // // Definir os limites do mapa (exemplo: uma região ao redor de São Paulo)
+    // var bounds = L.latLngBounds(
+    //     L.latLng(-23.8, -46.9), // Sudoeste
+    //     L.latLng(-23.3, -46.3)  // Nordeste
+    // );
+
+    // var bounds = L.latLngBounds(
+    //     L.latLng(-2.4025, -43.8717),
+    //     L.latLng(-2.8044, -44.5679)
+    // );
+
+    // Aplicar os limites ao mapa
+    // map.setMaxBounds(bounds);
+
+    // Opcional: Evitar que o usuário saia da área ao dar zoom out
+    // map.options.minZoom = 10;
+
+    // map.setMaxBounds(bounds);
+
+    // // Configuração de zoom para garantir que o zoom não ultrapasse o nível desejado
+    map.on('drag', function() {
+        map.panInsideBounds(bounds);
+    });
+</script>
+{% endblock %}

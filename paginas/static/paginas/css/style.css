@@ -1,0 +1,215 @@
+body{
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #050505;
+    color:rgb(245, 245, 245);
+    display:flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 3px 30px;
+    z-index: 1000;
+    border-bottom: 2px rgba(252, 252, 252, 0) solid;
+    backdrop-filter: blur(8px);
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 190px;
+    transition: all 0.3s ease;
+}
+
+.navbar ul li {
+    display: inline;
+    transition: all 0.3s ease;
+}
+
+.navbar ul li:hover{
+    transform: scale(1.1);
+}
+
+.navbar ul li a {
+    font-family:'Verdana', Geneva, Tahoma, sans-serif;
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+}
+
+
+.logo {
+    height: 60px; /* Ajuste o tamanho conforme necessário */
+    margin-right: 80px;
+}
+
+html {
+    scroll-behavior: smooth; /* Faz a transição suave ao rolar */
+}
+
+#inicio {
+    position: relative;
+    background-image: url('../imgs/inicio.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 100px 50px;
+    min-height: 80vh;
+    color:whitesmoke;
+    z-index: 1;
+    overflow: hidden;
+}
+
+#inicio::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.274); /* Preto translúcido */
+    z-index: -1; /* Coloca a camada atrás do conteúdo */
+}
+
+h1 {
+    font-size: 48px;
+    font-family: 'Arial', sans-serif;
+}
+
+p{
+    font-size: 23px;
+    font-family: 'Verdana', sans-serif;
+    text-align: justify;
+    max-width: 800px; 
+}
+
+.btn {
+    background-color: rgba(112, 101, 5, 0.753); /* Fundo translúcido */
+    border: 1px solid rgba(170, 159, 5, 0.11); /* Borda branca */
+    color: white; /* Texto branco */
+    font-size: 18px; /* Tamanho da fonte */
+    padding: 10px 20px; /* Espaçamento interno */
+    border-radius: 25px; /* Botão arredondado */
+    cursor: pointer; /* Cursor de "mãozinha" */
+    transition: all 0.3s ease; /* Animação suave ao passar o mouse */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Efeito ao passar o mouse no botão */
+.btn:hover {
+    background-color: white; /* Fundo branco */
+    color: black; /* Texto preto */
+    transform: scale(1.1); /* Aumenta ligeiramente o botão */
+}
+
+
+#trabalhos{
+    padding: 80px 50px;
+    background-color: #ffffff; /* Fundo branco para destacar */
+   
+}
+
+#trabalhos h1 {
+    font-size: 35px;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.trabalho-container{
+    display:flex;
+    justify-content: center;
+    gap:40px;
+    flex-wrap: wrap;
+}
+
+.trabalho-imgs{
+    width: 290px; /* Largura do retângulo */
+    height: 420px; /* Altura do retângulo */
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px; /* Bordas arredondadas */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.445); /* Sombra suave */
+    overflow: hidden; /* Garante que a imagem não ultrapasse o retângulo */
+    transition: all 0.9s ease;
+}
+
+.trabalho-imgs:hover {
+    transform: scale(1.1); /* Aumenta ligeiramente o botão */
+}
+
+.trabalho-imgs img {
+    width: 250%; /* Faz a imagem ocupar toda a largura do retângulo */
+    height: auto;
+}
+
+#sobre {
+    padding: 100px 50px;
+    background-color:  #f4f4f4;
+    text-align: justify;
+    text-align: center; /* Centraliza o texto */
+    min-height: 70vh;
+}
+
+#sobre h1 {
+    font-size: 35px; 
+    color: #333; 
+    margin-bottom: 100px; /* Espaço abaixo do título */
+}
+
+#sobre p {
+    font-size: 18px; /* Tamanho do texto */
+    color: #555; /* Cor do texto */
+    max-width: 800px; /* Largura máxima do texto */
+    margin: 0 auto; /* Centraliza na tela */
+    line-height: 1.6; /* Espaçamento entre linhas */
+    text-align: justify; /* Justifica o texto */
+}
+
+
+#contatos {
+    text-align: center;
+    padding: 105px 80px;
+    background-color: #ffffff;
+}
+
+#contatos h1 {
+    font-size: 35px; 
+    color: #333; 
+    margin-bottom: 70px;
+}
+
+.contato-info {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.contato-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(241, 241, 241, 0.836);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 20px 20px rgba(0, 0, 0, 0.466);
+    transition: all 0.6s ease;
+}
+
+.contato-item:hover {
+    transform: scale(1.1); /* Aumenta ligeiramente o botão */
+}
+
+.contato-item img {
+    width: 35px;
+    height: 30px;
+}

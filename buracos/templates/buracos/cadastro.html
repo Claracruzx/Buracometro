@@ -1,0 +1,121 @@
+{% extends 'buracos/template.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static '/css/cadastro.css' %}">
+{% endblock %}
+
+{% block title %}
+Cadastro de buracos
+{% endblock %}
+
+{% block content %}
+<h1 class="content-title">Cadastro de buracos</h1>
+<form 
+    id="formularioCadastroBuracos" 
+    action="{% url 'cadastroStore' %}" 
+    enctype="multipart/form-data" 
+    method="post">
+    {% csrf_token %} 
+    <div class="top">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message|safe }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="content">
+        <div class="area-itens">
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input 
+                    id="iptTitulo" 
+                    class="form-control" 
+                    name="titulo" 
+                    type="text" 
+                    value="{{titulo}}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Descricao</label>
+                <textarea 
+                    id="iptDescricao" 
+                    class="form-control" 
+                    name="descricao">{{descricao}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Local</label>
+                <button 
+                    id="btnSelecionarLocal"
+                    type="button" 
+                    class="btn btn-def">
+                    <!-- href="{% url 'cadastroSelecionarLocalView' %}"> -->
+                    Selecionar local
+                </button>
+                <span>{{endereco}}</span>
+                <input 
+                    id="iptCoordenadas" 
+                    type="hidden" 
+                    name="coordenadas" 
+                    value="{{coordenadas}}">
+                <input 
+                    id="iptEndereco" 
+                    type="hidden" 
+                    name="endereco"    
+                    value="{{endereco}}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tamanho do buraco</label>
+                <input
+                    id="iptTamanho" 
+                    type="range" 
+                    name="tamanho" 
+                    value="{{tamanho}}" 
+                    class="form-range" 
+                    min="1" 
+                    max="4" 
+                    step="1" 
+                    id="customRange3">
+            </div>
+        </div>
+        <div class="area-imagem">
+            <div class="mb-3">
+                <label class="form-label">Inserir imagem</label>
+                <div id="area-foto" class="area-foto">
+                    <div class="content">
+                        <i class="icone custom-size fa-solid fa-image"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input 
+                    id="iptEscolherArquivo" 
+                    type="file" 
+                    class="btn btn-def" 
+                    name="imagem"
+                    accept="image/*" 
+                    value="Procurar">
+            </div>
+        </div>
+    </div>
+    <div>
+        <button 
+            id="btnEnviar" 
+            class="btn btn-primary btn-large centered" 
+            type="button"
+            >Enviar</button>
+    </div>
+</form>
+<form id="formPassandoDados" action="{% url 'cadastroSelecionarLocalView' %}" method="post">
+    {% csrf_token %}
+    <input id="iptHiddenTitulo"    name="titulo"    type="hidden">
+    <input id="iptHiddenDescricao" name="descricao" type="hidden">
+    <input id="iptHiddenTamanho"   name="tamanho"   type="hidden">
+</form>
+<!-- <img src="C:/xampp/htdocs/buracometro/buracometro/image/pagina7_20250306175237.jpg" alt="teste"> -->
+{% endblock %}
+
+{% block js %}
+<script type="module" src="{% static '/js/cadastro-buracos.js'%}"></script>
+{% endblock %}

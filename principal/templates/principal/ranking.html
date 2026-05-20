@@ -1,0 +1,31 @@
+{% extends 'principal/principal.html' %}
+{% load static %}
+
+{% block title %}
+Ranking
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/ranking.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Ranking dos Maiores Buracos</h1>
+    <ol class="ranking-list">
+        {% for buraco in buracos %}
+            <li class="ranking-item">
+
+                <img src="{%static '/image-users/' %}{{buraco.url_imagem}}" alt="Imagem do buraco" class="buraco-img">
+                <h2>#{{ forloop.counter }} - {{ buraco.titulo }}</h2>
+                <p>{{ buraco.descricao }}</p>
+                <p>{{ buraco.endereco }}</p>
+
+                <span class="tamanho">Tamanho: {{ buraco.tamanho }} metros</span>
+            </li>
+        {% endfor %}
+    </ol>
+</div>
+
+{% endblock %}
