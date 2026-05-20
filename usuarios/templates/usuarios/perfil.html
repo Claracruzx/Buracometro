@@ -12,12 +12,12 @@ Perfil
     <div class="perfil-header">
 
         <div class="perfil-avatar">
-            {{ usuario.username|slice:":1" }}
+            {{ usuario_perfil.username|slice:":1" }}
         </div>
 
         <div>
-            <h1>{{ usuario.name|default:usuario.username }}</h1>
-            <p>@{{ usuario.username }}</p>
+            <h1>{{ usuario_perfil.name|default:usuario.username }}</h1>
+            <p>@{{ usuarioperfil.username }}</p>
 
             {% if usuario.date_of_birth %}
                 <span>

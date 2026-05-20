@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import LoginView, RegisterView, registerStore, loginAction, logoutAction, perfilView
+from .views import LoginView, RegisterView, registerStore, loginAction, logoutAction, perfilView, perfilPublicoView
 
 urlpatterns = [
     # path('', IndexView.as_view(), name='inicio'),
@@ -9,4 +9,5 @@ urlpatterns = [
     path('cadastro/cadastrar', registerStore, name='registerStore'),
     path('logout/', logoutAction, name='logout'),
     path('perfil/', perfilView, name='perfilView'),
+    path('perfil/<str:username>/', perfilPublicoView, name='perfilPublicoView'),
 ]

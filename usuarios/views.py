@@ -94,3 +94,15 @@ def perfilView(request):
     })
 
     return render(request, 'usuarios/perfil.html', variaveis)
+
+from django.shortcuts import get_object_or_404
+
+def perfilPublicoView(request, username):
+    usuario_perfil = get_object_or_404(CustomUser, username=username)
+
+    buracos = Buraco.objects.filter(usuario=usuario_perfil).order_by('-created_at')
+
+    return render(request, 'usuarios/perfil_publico.html', {
+        'usuario_perfil': usuario_perfil,
+        'buracos': buracos,
+    })

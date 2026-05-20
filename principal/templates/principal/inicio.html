@@ -12,47 +12,57 @@ Início
 
     {% for buraco in buracos %}
         <div class="post-card">
-    <div class="post-header">
-        <div class="avatar">
-            {% if buraco.usuario %}
-                {{ buraco.usuario.username|slice:":1"|upper }}
-            {% else %}
-                ?
+            <div class="post-header">
+                <div class="avatar">
+                    {% if buraco.usuario %}
+                        {{ buraco.usuario.username|slice:":1"|upper }}
+                    {% else %}
+                        ?
+                    {% endif %}
+                </div>
+
+                <div>
+                    {% if buraco.usuario %}
+                        <h2>
+                            <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
+                                {{ buraco.usuario.name|default:buraco.usuario.username }}
+                            </a>
+                        </h2>
+
+                        <p>
+                            <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
+                                @{{ buraco.usuario.username }}
+                            </a>
+                            • {{ buraco.endereco }}
+                        </p>
+                    {% else %}
+                        <h2>Usuário desconhecido</h2>
+                        <p>{{ buraco.endereco }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if buraco.imagem %}
+                <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco">
+            {% elif buraco.url_imagem %}
+                <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco">
             {% endif %}
+
+            <div class="post-body">
+                <h3>{{ buraco.titulo }}</h3>
+                <p>{{ buraco.descricao }}</p>
+
+                <div class="post-info">
+                    <span>Tamanho: {{ buraco.tamanho }}</span>
+                    <span>{{ buraco.created_at|date:"d/m/Y H:i" }}</span>
+                </div>
+
+                <div class="post-actions">
+                    <button type="button">❤️ Curtir</button>
+                    <button type="button">💬 Comentar</button>
+                </div>
+            </div>
         </div>
-
-        <div>
-            {% if buraco.usuario %}
-                <h2>{{ buraco.usuario.name|default:buraco.usuario.username }}</h2>
-                <p>@{{ buraco.usuario.username }} • {{ buraco.endereco }}</p>
-            {% else %}
-                <h2>Usuário desconhecido</h2>
-                <p>{{ buraco.endereco }}</p>
-            {% endif %}
-        </div>
-    </div>
-
-    {% if buraco.imagem %}
-        <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco">
-    {% elif buraco.url_imagem %}
-        <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco">
-    {% endif %}
-
-    <div class="post-body">
-        <h3>{{ buraco.titulo }}</h3>
-        <p>{{ buraco.descricao }}</p>
-
-        <div class="post-info">
-            <span>Tamanho: {{ buraco.tamanho }}</span>
-            <span>{{ buraco.created_at|date:"d/m/Y H:i" }}</span>
-        </div>
-
-        <div class="post-actions">
-            <button type="button">❤️ Curtir</button>
-            <button type="button">💬 Comentar</button>
-        </div>
-    </div>
-</div>
     {% empty %}
         <p class="empty-feed">Ainda não existem buracos cadastrados.</p>
     {% endfor %}

@@ -1,0 +1,100 @@
+{% extends 'principal/principal.html' %}
+{% load static %}
+
+{% block title %}
+Perfil de {{ usuario_perfil.username }}
+{% endblock %}
+
+{% block content %}
+
+<div class="perfil-container">
+
+    <div class="perfil-header">
+        <div class="perfil-avatar">
+            {{ usuario_perfil.username|slice:":1"|upper }}
+        </div>
+
+        <div class="perfil-info">
+            <h1>
+                {{ usuario_perfil.name|default:usuario_perfil.username }}
+            </h1>
+
+            <p>
+                @{{ usuario_perfil.username }}
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <h2 class="perfil-subtitle">
+        Buracos cadastrados
+    </h2>
+
+    <div class="feed-container">
+
+        {% for buraco in buracos %}
+            <div class="post-card">
+
+                <div class="post-header">
+
+                    <div class="avatar">
+                        {{ usuario_perfil.username|slice:":1"|upper }}
+                    </div>
+
+                    <div>
+                        <h2>
+                            {{ usuario_perfil.name|default:usuario_perfil.username }}
+                        </h2>
+
+                        <p>
+                            @{{ usuario_perfil.username }}
+                            •
+                            {{ buraco.endereco }}
+                        </p>
+                    </div>
+
+                </div>
+
+                {% if buraco.imagem %}
+                    <img class="post-image"
+                         src="{{ buraco.imagem.url }}"
+                         alt="Imagem do buraco">
+
+                {% elif buraco.url_imagem %}
+                    <img class="post-image"
+                         src="{% static 'image-users/' %}{{ buraco.url_imagem }}"
+                         alt="Imagem do buraco">
+                {% endif %}
+
+                <div class="post-body">
+
+                    <h3>{{ buraco.titulo }}</h3>
+
+                    <p>{{ buraco.descricao }}</p>
+
+                    <div class="post-info">
+                        <span>Tamanho: {{ buraco.tamanho }}</span>
+
+                        <span>
+                            {{ buraco.created_at|date:"d/m/Y H:i" }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <p class="empty-feed">
+                Esse usuário ainda não cadastrou buracos.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

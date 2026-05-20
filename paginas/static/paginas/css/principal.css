@@ -267,3 +267,13 @@ ul.no-decoration {
 .titulo-postagens {
     margin-bottom: 25px;
 }
+
+.post-header a {
+    color: #222;
+    text-decoration: none;
+}
+
+.post-header a:hover {
+    color: #cf621e;
+    text-decoration: underline;
+}
