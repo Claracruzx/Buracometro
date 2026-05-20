@@ -10,9 +10,11 @@ from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
 from datetime import datetime
 from .models import Buraco
+from django.contrib.auth.decorators import login_required
 
 # class CadastroView(TemplateView):
 #     template_name = "buracos/cadastro.html"
+
 
 def cadastroView(request):
     titulo = request.GET.get('titulo', '')
@@ -82,6 +84,7 @@ def passarLocalParaCadastroView(request):
 
     return redirect(url)
 
+@login_required
 def cadastroStore(request):
     if request.method == "POST":
         titulo = request.POST.get("titulo")
@@ -90,7 +93,6 @@ def cadastroStore(request):
         endereco = request.POST.get("endereco")
         tamanho = request.POST.get("tamanho")
         imagem = request.FILES["imagem"]
-        usuario=request.user,
 
         caminho_pasta = os.path.join(settings.BASE_DIR, 'paginas/static/paginas/image-users')  # Pasta de destino
         nome_arquivo = imagem.name
@@ -113,6 +115,7 @@ def cadastroStore(request):
                 endereco = endereco,
                 tamanho = tamanho,
                 url_imagem = nome_arquivo,
+                usuario=request.user,
             )
 
             buraco.save()

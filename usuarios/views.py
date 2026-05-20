@@ -7,6 +7,8 @@ from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
 from django.urls import reverse
 from .models import CustomUser
+from django.contrib.auth.decorators import login_required
+from buracos.models import Buraco
 
 class LoginView(TemplateView):
     template_name = "usuarios/login.html"
@@ -79,18 +81,16 @@ def logoutAction(request):
     logout(request)
     return redirect("login")
 
-from buracos.models import Buraco
 
-
+@login_required
 def perfilView(request):
-
     usuario = request.user
 
-    buracos = Buraco.objects.filter(usuario=request.user).order_by('-created_at')
+    buracos = Buraco.objects.filter(usuario=usuario).order_by('-created_at')
 
-    variaveis = {
+    return render(request, 'usuarios/perfil.html', {
         'usuario': usuario,
         'buracos': buracos,
-    }
+    })
 
     return render(request, 'usuarios/perfil.html', variaveis)
