@@ -187,3 +187,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         gap: 0;
     }
 }
+
+input[type="date"] {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1px solid #cfd8d3;
+    border-radius: 14px;
+    outline: none;
+    font-size: 1rem;
+    background: #f9fbfa;
+    color: #293d33;
+}
+
+input[type="date"]:focus {
+    border-color: #2d6a4f;
+    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15);
+    background: #ffffff;
+}

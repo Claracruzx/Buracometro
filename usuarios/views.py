@@ -78,3 +78,19 @@ def loginAction(request):
 def logoutAction(request):
     logout(request)
     return redirect("login")
+
+from buracos.models import Buraco
+
+
+def perfilView(request):
+
+    usuario = request.user
+
+    buracos = Buraco.objects.filter(usuario=request.user).order_by('-created_at')
+
+    variaveis = {
+        'usuario': usuario,
+        'buracos': buracos,
+    }
+
+    return render(request, 'usuarios/perfil.html', variaveis)

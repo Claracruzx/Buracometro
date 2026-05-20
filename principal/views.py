@@ -8,8 +8,14 @@ from django.db import IntegrityError
 from buracos.models import Buraco
 
 
-class InicioView(TemplateView):
-    template_name = "principal/inicio.html"
+def inicioView(request):
+    buracos = Buraco.objects.all().order_by('-created_at')
+
+    variaveis = {
+        'buracos': buracos,
+    }
+
+    return render(request, 'principal/inicio.html', variaveis)
 
 #class RankingView(TemplateView):
   #  template_name = "principal/ranking.html"

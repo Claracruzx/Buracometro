@@ -90,6 +90,7 @@ def cadastroStore(request):
         endereco = request.POST.get("endereco")
         tamanho = request.POST.get("tamanho")
         imagem = request.FILES["imagem"]
+        usuario=request.user,
 
         caminho_pasta = os.path.join(settings.BASE_DIR, 'paginas/static/paginas/image-users')  # Pasta de destino
         nome_arquivo = imagem.name

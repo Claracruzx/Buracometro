@@ -1,0 +1,96 @@
+{% extends 'principal/principal.html' %}
+{% load static %}
+
+{% block title %}
+Perfil
+{% endblock %}
+
+{% block content %}
+
+<div class="perfil-container">
+
+    <div class="perfil-header">
+
+        <div class="perfil-avatar">
+            {{ usuario.username|slice:":1" }}
+        </div>
+
+        <div>
+            <h1>{{ usuario.name|default:usuario.username }}</h1>
+            <p>@{{ usuario.username }}</p>
+
+            {% if usuario.date_of_birth %}
+                <span>
+                    Nascimento: {{ usuario.date_of_birth }}
+                </span>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="perfil-stats">
+
+        <div class="stat-card">
+            <h2>{{ buracos.count }}</h2>
+            <p>Buracos cadastrados</p>
+        </div>
+
+    </div>
+
+    <h2 class="titulo-postagens">
+        Minhas postagens
+    </h2>
+
+    {% for buraco in buracos %}
+
+        <div class="post-card">
+
+            <div class="post-header">
+
+                <div class="avatar">
+                    {{ usuario.username|slice:":1" }}
+                </div>
+
+                <div>
+                    <h2>{{ buraco.titulo }}</h2>
+                    <p>{{ buraco.endereco }}</p>
+                </div>
+
+            </div>
+
+            {% if buraco.imagem %}
+                <img 
+                    class="post-image"
+                    src="{{ buraco.imagem.url }}"
+                    alt="Imagem do buraco">
+            {% endif %}
+
+            <div class="post-body">
+
+                <p>{{ buraco.descricao }}</p>
+
+                <div class="post-info">
+                    <span>
+                        Tamanho: {{ buraco.tamanho }}
+                    </span>
+
+                    <span>
+                        {{ buraco.created_at|date:"d/m/Y" }}
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <p>
+            Você ainda não cadastrou nenhum buraco.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
