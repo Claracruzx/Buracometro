@@ -112,8 +112,13 @@ def editarPerfilView(request):
     if request.method == "POST":
         nome = request.POST.get("nome")
         foto = request.FILES.get("foto")
+        remover_foto = request.POST.get("remover_foto")
 
         request.user.name = nome
+
+        if remover_foto:
+            request.user.foto.delete()
+            request.user.foto = None
 
         if foto:
             request.user.foto = foto

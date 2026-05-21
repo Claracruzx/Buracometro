@@ -18,6 +18,11 @@ Editar perfil
         <label>Foto de perfil</label>
         <input type="file" name="foto" accept="image/*">
 
+        {% if request.user.foto %}
+        <label class="checkbox-remover">
+            <input type="checkbox" name="remover_foto">Remover foto atual</label>
+        {% endif %}
+
         <button type="submit">Salvar</button>
     </form>
 </div>

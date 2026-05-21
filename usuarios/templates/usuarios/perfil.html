@@ -22,9 +22,13 @@ Perfil
         <div>
             <h1>@{{ usuario.username }}</h1>
             <p>{{ usuario.name }}</p>
+            <p>
+                Perfil criado em {{ usuario.date_joined|date:"d/m/Y" }}
+            </p>
             <a href="{% url 'editarPerfilView' %}" class="btn-editar-perfil">
                 Editar perfil
             </a>
+
         </div>
 
   

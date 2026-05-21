@@ -517,3 +517,17 @@ main #conteudo {
     object-fit: cover;
     border-radius: 50%;
 }
+
+.perfil-data {
+    color: #777;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.checkbox-remover {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 14px;
+}
