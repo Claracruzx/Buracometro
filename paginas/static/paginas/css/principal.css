@@ -1,11 +1,30 @@
+*{
+    font-family: "Poppins", sans-serif;
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 :root {
+    /* cores */
     --espacamanto-conteudo: 50px;
+    --body-color:#f0f3fa;
+    --sidebar-color: #ffffff;
+    --primary-color: #ff9900;
+    --primary-color-light: #f6f5ff;
+    --togle-color:#DDDD;
+    --text-color: #707070;
+
+    /* transições */
+    --tran-03: all 0.2s ease;
+    --tran-03: all 0.3s ease;
+    --tran-04: all 0.4s ease;
+    --tran-05: all 0.5s ease;
 }
 
 header {
     background-color: black;   
     padding: 3px 30px;
-    
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -17,46 +36,76 @@ header #logo {
 
 main {
     display: flex;
+    min-height: 100vh;
 }
 
+body{
+    height: 100vh;
+    background-color: var(--body-color);
+}
+
+
 main #barra-lateral {
-    padding-top: var(--espacamanto-conteudo);
-    background-color: #cf621e;
-    /* padding-left: 30px; */
-    /* margin-left: 30px; */
-    border-right: 1px solid black;
-    width: 15%;
-    min-height: 100vh;
-    color: white;
+    position: sticky;
+    top: 0;
+
+    width: 260px;
+    height: 100vh;
+
+    background-color: #ffffff;
+    border-right: 1px solid #ddd;
+
+    padding: 28px 12px;
+    color: #222;
+
+    overflow-y: auto;
 }
 
 main #barra-lateral #lista-botoes {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
     margin: 0;
 }
 
+main #barra-lateral #lista-botoes li {
+    width: 100%;
+}
+
 main #barra-lateral #lista-botoes button {
     width: 100%;
-    background-color: inherit;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding: 12px 18px;
+    margin-bottom: 6px;
+
     border: none;
-    padding: 10px 0;
-    padding-left: 30px;
+    border-radius: 10px;
+
+    background-color: transparent;
+    color: #333;
+
     text-align: left;
-    color: inherit;
+    font-size: 15px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition: 0.2s;
 }
 
 main #barra-lateral #lista-botoes button:hover {
-    background-color: rgb(255, 166, 0);
-} 
+    background-color: #f1f3f5;
+}
 
 main #barra-lateral #lista-botoes button:active {
-    background-color: rgb(22, 22, 66) !important;
+    background-color: #e2e6ea;
 }
 
 main #conteudo {
+    flex: 1;
     padding-top: var(--espacamanto-conteudo);
-    width: 85%;
 }
 
 #btnPerfil {
@@ -276,4 +325,112 @@ ul.no-decoration {
 .post-header a:hover {
     color: #cf621e;
     text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+    }
+
+    main #barra-lateral {
+        position: sticky;
+        top: 0;
+
+        width: 100%;
+        height: auto;
+        min-height: auto;
+
+        padding-top: 10px;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+
+        z-index: 10;
+    }
+
+    main #barra-lateral #lista-botoes {
+        padding: 10px;
+    }
+
+
+    main #barra-lateral #lista-botoes button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 14px 18px;
+        border: none;
+        border-radius: 12px;
+        background-color: transparent;
+        color: var(--text-color);
+        text-align: left;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--tran-03);
+        margin-bottom: 8px;
+    }
+
+    main #conteudo {
+        width: 100%;
+        padding-top: 20px;
+    }
+}
+
+.barra-pesquisa {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    width: 420px;
+    max-width: 50%;
+}
+
+.barra-pesquisa input {
+    width: 100%;
+    padding: 10px 14px;
+
+    border: none;
+    border-radius: 999px;
+
+    outline: none;
+    background-color: #f1f3f5;
+}
+
+.barra-pesquisa button {
+    width: 42px;
+    height: 42px;
+
+    border: none;
+    border-radius: 50%;
+
+    background-color: var(--primary-color);
+    color: white;
+
+    cursor: pointer;
+}
+
+.resultado-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    background-color: white;
+    padding: 16px;
+
+    border-radius: 16px;
+    margin-bottom: 14px;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.resultado-card h3 {
+    margin: 0;
+}
+
+.resultado-card a {
+    color: #222;
+    text-decoration: none;
+}
+
+.resultado-card a:hover {
+    color: var(--primary-color);
 }

@@ -1,0 +1,67 @@
+{% extends 'principal/principal.html' %}
+{% load static %}
+
+{% block title %}
+Pesquisa
+{% endblock %}
+
+{% block content %}
+
+<div class="feed-container">
+    <h1 class="feed-title">Resultado para "{{ termo }}"</h1>
+
+    <h2 class="resultado-titulo">Usuários</h2>
+
+    {% for usuario in usuarios %}
+        <div class="resultado-card">
+            <div class="avatar">
+                {{ usuario.username|slice:":1"|upper }}
+            </div>
+
+            <div>
+                <h3>
+                    <a href="{% url 'perfilPublicoView' usuario.username %}">
+                        {{ usuario.name|default:usuario.username }}
+                    </a>
+                </h3>
+
+                <p>@{{ usuario.username }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p class="empty-feed">Nenhum usuário encontrado.</p>
+    {% endfor %}
+
+    <h2 class="resultado-titulo">Buracos</h2>
+
+    {% for buraco in buracos %}
+        <div class="post-card">
+            <div class="post-header">
+                <div class="avatar">
+                    {% if buraco.usuario %}
+                        {{ buraco.usuario.username|slice:":1"|upper }}
+                    {% else %}
+                        ?
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h2>{{ buraco.titulo }}</h2>
+                    <p>{{ buraco.endereco }}</p>
+                </div>
+            </div>
+
+            {% if buraco.url_imagem %}
+                <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco">
+            {% endif %}
+
+            <div class="post-body">
+                <p>{{ buraco.descricao }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p class="empty-feed">Nenhum buraco encontrado.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

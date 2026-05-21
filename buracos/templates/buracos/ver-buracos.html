@@ -6,11 +6,11 @@
 {% endblock%}
 
 {% block content %}
-<div>
-    <input id="iptPesquisar" type="text">
+
+   <div class="topo-pesquisa">
+    <input id="iptPesquisar" type="text" placeholder="Pesquisar buracos...">
     <button id="btnPesquisar">Pesquisar</button>
 </div>
-<div class="row buracos">
     {% for row in rows %}
         <div class="card" style="width: 18rem;">
             <img src="{% static '/image-users/' %}{{row.url_imagem}}" class="card-img-top" alt="...">
@@ -33,7 +33,9 @@
                     <span>Publicado em: </span>
                     <span>{{row.data_atual}}</span>
                 </div>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+                <a href="#" class="btn btn-primary">
+                    Ver detalhes
+                </a>
             </div>
         </div>
     {% empty %}
