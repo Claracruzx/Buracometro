@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 class CustomUser(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
+    foto = models.ImageField(upload_to='perfis/', null=True, blank=True)
 
     # AJUSTE: Linha obrigatória para que o create_user criptografe a senha
     objects = UserManager() 

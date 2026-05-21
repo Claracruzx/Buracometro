@@ -192,13 +192,21 @@ ul.no-decoration {
 .avatar {
     width: 48px;
     height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+
+    flex-shrink: 0;
+
     background-color: #ff9900;
     color: white;
     font-weight: bold;
     border-radius: 50%;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    overflow: hidden;
 }
 
 .post-header h2 {
@@ -332,7 +340,7 @@ ul.no-decoration {
         flex-direction: column;
     }
 
-    main #barra-lateral {
+main #barra-lateral {
         position: sticky;
         top: 0;
 
@@ -345,14 +353,14 @@ ul.no-decoration {
         border-bottom: 1px solid #ddd;
 
         z-index: 10;
-    }
+}
 
-    main #barra-lateral #lista-botoes {
+main #barra-lateral #lista-botoes {
         padding: 10px;
-    }
+}
 
 
-    main #barra-lateral #lista-botoes button {
+main #barra-lateral #lista-botoes button {
         width: 100%;
         display: flex;
         align-items: center;
@@ -367,9 +375,9 @@ ul.no-decoration {
         cursor: pointer;
         transition: var(--tran-03);
         margin-bottom: 8px;
-    }
+}
 
-    main #conteudo {
+main #conteudo {
         width: 100%;
         padding-top: 20px;
     }
@@ -379,6 +387,7 @@ ul.no-decoration {
     display: flex;
     align-items: center;
     gap: 8px;
+
 
     width: 420px;
     max-width: 50%;
@@ -398,7 +407,7 @@ ul.no-decoration {
 .barra-pesquisa button {
     width: 42px;
     height: 42px;
-
+    flex-shrink: 0;
     border: none;
     border-radius: 50%;
 
@@ -433,4 +442,78 @@ ul.no-decoration {
 
 .resultado-card a:hover {
     color: var(--primary-color);
+}
+
+.perfil-avatar img, .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.btn-editar-perfil {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-editar-perfil:hover {
+    background-color: #cf621e;
+}
+
+.editar-perfil-container {
+    max-width: 520px;
+    margin: 60px auto;
+    background: white;
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.editar-perfil-container h1 {
+    margin-bottom: 24px;
+}
+
+.form-editar-perfil {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-editar-perfil label {
+    font-weight: 600;
+}
+
+.form-editar-perfil input {
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    outline: none;
+}
+
+.form-editar-perfil button {
+    margin-top: 12px;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form-editar-perfil button:hover {
+    background-color: #cf621e;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }

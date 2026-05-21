@@ -1,0 +1,25 @@
+{% extends 'principal/principal.html' %}
+
+{% block title %}
+Editar perfil
+{% endblock %}
+
+{% block content %}
+
+<div class="editar-perfil-container">
+    <h1>Editar perfil</h1>
+
+    <form class="form-editar-perfil" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label>Nome</label>
+        <input type="text" name="nome" value="{{ request.user.name }}">
+
+        <label>Foto de perfil</label>
+        <input type="file" name="foto" accept="image/*">
+
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+
+{% endblock %}

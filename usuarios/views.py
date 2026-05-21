@@ -106,3 +106,20 @@ def perfilPublicoView(request, username):
         'usuario_perfil': usuario_perfil,
         'buracos': buracos,
     })
+
+@login_required
+def editarPerfilView(request):
+    if request.method == "POST":
+        nome = request.POST.get("nome")
+        foto = request.FILES.get("foto")
+
+        request.user.name = nome
+
+        if foto:
+            request.user.foto = foto
+
+        request.user.save()
+
+        return redirect("perfilView")
+
+    return render(request, "usuarios/editar_perfil.html")

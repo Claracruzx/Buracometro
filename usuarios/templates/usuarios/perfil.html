@@ -12,19 +12,22 @@ Perfil
     <div class="perfil-header">
 
         <div class="perfil-avatar">
-            {{ usuario_perfil.username|slice:":1" }}
+            {% if usuario.foto %}
+                <img src="{{ usuario.foto.url }}" alt="Foto de perfil">
+            {% else %}
+                {{ usuario.username|slice:":1"|upper }}
+            {% endif %}
         </div>
 
         <div>
-            <h1>{{ usuario_perfil.name|default:usuario.username }}</h1>
-            <p>@{{ usuarioperfil.username }}</p>
-
-            {% if usuario.date_of_birth %}
-                <span>
-                    Nascimento: {{ usuario.date_of_birth }}
-                </span>
-            {% endif %}
+            <h1>@{{ usuario.username }}</h1>
+            <p>{{ usuario.name }}</p>
+            <a href="{% url 'editarPerfilView' %}" class="btn-editar-perfil">
+                Editar perfil
+            </a>
         </div>
+
+  
 
     </div>
 

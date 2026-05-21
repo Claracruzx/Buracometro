@@ -14,7 +14,9 @@ Início
         <div class="post-card">
             <div class="post-header">
                 <div class="avatar">
-                    {% if buraco.usuario %}
+                    {% if buraco.usuario.foto %}
+                        <img src="{{ buraco.usuario.foto.url }}" alt="Foto de perfil">
+                    {% elif buraco.usuario %}
                         {{ buraco.usuario.username|slice:":1"|upper }}
                     {% else %}
                         ?
@@ -60,6 +62,7 @@ Início
                 <div class="post-actions">
                     <button type="button">❤️ Curtir</button>
                     <button type="button">💬 Comentar</button>
+                    <button type="button">⚠️ Reportar</button>
                 </div>
             </div>
         </div>
