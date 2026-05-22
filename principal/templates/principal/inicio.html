@@ -8,8 +8,7 @@ Início
 {% block content %}
 
 <div class="feed-container">
-    <h1 class="feed-title">Postagens recentes</h1>
-
+    
     {% for buraco in buracos %}
         <div class="post-card">
             <div class="post-header">
@@ -51,7 +50,6 @@ Início
             {% endif %}
 
             <div class="post-body">
-                <h3>{{ buraco.titulo }}</h3>
                 <p>{{ buraco.descricao }}</p>
 
                 <div class="post-info">

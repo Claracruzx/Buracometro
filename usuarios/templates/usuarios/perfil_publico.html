@@ -11,7 +11,11 @@ Perfil de {{ usuario_perfil.username }}
 
     <div class="perfil-header">
         <div class="perfil-avatar">
-            {{ usuario_perfil.username|slice:":1"|upper }}
+            {% if usuario_perfil.foto %}
+                <img src="{{ usuario_perfil.foto.url }}" alt="Foto de perfil">
+            {% else %}
+                {{ usuario_perfil.username|slice:":1"|upper }}
+            {% endif %}
         </div>
 
         <div class="perfil-info">
@@ -21,6 +25,9 @@ Perfil de {{ usuario_perfil.username }}
 
             <p>
                 @{{ usuario_perfil.username }}
+                <p class="perfil-data">
+                    Perfil criado em {{ usuario_perfil.date_joined|date:"d/m/Y" }}
+                </p>
             </p>
         </div>
     </div>
@@ -39,7 +46,11 @@ Perfil de {{ usuario_perfil.username }}
                 <div class="post-header">
 
                     <div class="avatar">
-                        {{ usuario_perfil.username|slice:":1"|upper }}
+                        {% if usuario_perfil.foto %}
+                            <img src="{{ usuario_perfil.foto.url }}" alt="Foto de perfil">
+                        {% else %}
+                            {{ usuario_perfil.username|slice:":1"|upper }}
+                        {% endif %}
                     </div>
 
                     <div>
@@ -69,7 +80,6 @@ Perfil de {{ usuario_perfil.username }}
 
                 <div class="post-body">
 
-                    <h3>{{ buraco.titulo }}</h3>
 
                     <p>{{ buraco.descricao }}</p>
 

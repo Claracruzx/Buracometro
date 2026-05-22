@@ -55,11 +55,14 @@ Perfil
             <div class="post-header">
 
                 <div class="avatar">
-                    {{ usuario.username|slice:":1" }}
-                </div>
+                        {% if usuario.foto %}
+                            <img src="{{ usuario.foto.url }}" alt="Foto de perfil">
+                        {% else %}
+                            {{ usuario.username|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
 
                 <div>
-                    <h2>{{ buraco.titulo }}</h2>
                     <p>{{ buraco.endereco }}</p>
                 </div>
 

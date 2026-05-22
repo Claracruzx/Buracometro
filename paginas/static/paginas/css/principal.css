@@ -8,7 +8,7 @@
 :root {
     /* cores */
     --espacamanto-conteudo: 50px;
-    --body-color:#f0f3fa;
+    --body-color:#ffffff;
     --sidebar-color: #ffffff;
     --primary-color: #ff9900;
     --primary-color-light: #f6f5ff;
@@ -24,14 +24,14 @@
 
 header {
     background-color: black;   
-    padding: 3px 30px;
+    padding: 15px 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 header #logo {
-    max-width: 115px;
+    max-width: 120px;
 }
 
 main {
@@ -49,13 +49,13 @@ main #barra-lateral {
     position: sticky;
     top: 0;
 
-    width: 260px;
+    width: 340px;
     height: 100vh;
 
     background-color: #ffffff;
     border-right: 1px solid #ddd;
 
-    padding: 28px 12px;
+    padding: 60px 12px;
     color: #222;
 
     overflow-y: auto;
@@ -72,11 +72,13 @@ main #barra-lateral #lista-botoes li {
 }
 
 main #barra-lateral #lista-botoes button {
+    
     width: 100%;
 
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    gap: 12px;
 
     padding: 12px 18px;
     margin-bottom: 6px;
@@ -88,11 +90,15 @@ main #barra-lateral #lista-botoes button {
     color: #333;
 
     text-align: left;
-    font-size: 15px;
+    font-size: 25px;
     font-weight: 500;
 
     cursor: pointer;
     transition: 0.2s;
+}
+
+main #barra-lateral #lista-botoes .sair{
+    color:rgba(252, 88, 88, 0.918);
 }
 
 main #barra-lateral #lista-botoes button:hover {
@@ -103,52 +109,13 @@ main #barra-lateral #lista-botoes button:active {
     background-color: #e2e6ea;
 }
 
+main #barra-lateral #lista-botoes i {
+    font-size: 40px;
+}
+
 main #conteudo {
     flex: 1;
     padding-top: var(--espacamanto-conteudo);
-}
-
-#btnPerfil {
-    color: white;
-    font-size: 35px;
-}
-
-#btnPerfil:hover {
-    color: rgb(202, 202, 202);
-}
-
-#btnPerfil:active {
-    color: gray;
-}
-
-#btnDeslogar {
-    color: red;
-}
-
-#lista-perfil li:hover {
-    background-color: #dadada;
-}
-
-#lista-perfil li:active {
-    background-color: gray !important;
-}
-
-#lista-perfil li button {
-    background: inherit;
-    border: none;
-    padding: 12px 6px;
-    width: 100%;
-    white-space: nowrap;
-}
-
-.btn-icon {
-    padding: 0;
-    display: flex;
-    background-color: inherit;
-}
-
-.btn-icon.no-bordered {
-    border: none;
 }
 
 .dropdown-toggle.no-toggle::after {
@@ -164,11 +131,12 @@ ul.no-decoration {
 .feed-container {
     max-width: 720px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 1px;
 }
 
 .feed-title {
-    font-size: 28px;
+    font-family: "Poppins", sans-serif;
+    font-size: 32px;
     margin-bottom: 25px;
     color: #222;
 }

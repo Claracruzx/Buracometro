@@ -3,7 +3,7 @@
 }
 
 header {
-    background-color: black;   
+    background-color: rgb(0, 0, 0);   
     padding: 3px 30px;
     
     display: flex;
@@ -12,25 +12,9 @@ header {
 }
 
 header #logo {
-    max-width: 115px;
+    max-width: 130px;
 }
 
-#btnPerfil {
-    color: white;
-    font-size: 35px;
-}
-
-#btnPerfil:hover {
-    color: rgb(202, 202, 202);
-}
-
-#btnPerfil:active {
-    color: gray;
-}
-
-#btnDeslogar {
-    color: red;
-}
 
 #lista-perfil li:hover {
     background-color: #dadada;

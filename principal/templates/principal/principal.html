@@ -33,45 +33,68 @@
     <main>
         <div id="barra-lateral">
             <ul id="lista-botoes">
-    <li>
-        <form action="{% url 'inicioView' %}">
-            <button type="submit">Início</button>
-        </form>
-    </li>
+                <li>
+                    <form action="{% url 'inicioView' %}">
+                        <button><i class='bx bx-home'></i>
+                            <span>Início</span>
+                        </button>
+                    </form>
+                </li>
 
-    <li> <button>Mais curtidos</button> </li>
+               <li>
+                    <button><i class='bx bx-trending-up'></i>
+                        <span>Popular</span>
+                    </button>
+               </li>
 
-    <li>
-        <form action="{% url 'verBuracosView' %}">
-            <button type="submit">Ver buracos</button>
-        </form>
-    </li>
+               <li>
+                    <form action="{% url 'verBuracosView' %}">
+                        <button><i class='bx bx-compass'></i>
+                            <span>Explorar</span>
+                        </button>
+                    </form>
+                </li>
 
-    <li>
-        <form action="{% url 'cadastrarView' %}">
-            <button type="submit">Adicionar buraco</button>
-        </form>
-    </li>
+                <li>
+                    <form action="{% url 'verNoMapaView' %}">
+                        <button><i class="bx bx-map"></i>
+                            <span>Ver no mapa</span>
+                        </button>
+                    </form>
+                </li>
 
-    <li>
-        <form action="{% url 'verNoMapaView' %}">
-            <button type="submit">Ver no mapa</button>
-        </form>
-    </li>
+                <li>
+                    <form action="{% url 'cadastrarView' %}">
+                        <button><i class='bx bx-plus'></i>
+                            <span>Adiconar buraco</span>
+                        </button>
+                    </form>
+                </li>
 
-    <li>
-        <form action="{% url 'perfilView' %}">
-            <button type="submit">Ver perfil</button>
-        </form>
-    </li>
+                <li>
+                    <button><i class='bx bx-heart'></i>
+                        <span>Notificações</span>
+                    </button>
+                </li>
 
-    <li>
-        <form action="{% url 'deslogar' %}">
-            <button id="btnDeslogar" type="submit">Sair</button>
-        </form>
-    </li>
-</ul>
+                <li>
+                    <form action="{% url 'perfilView' %}">
+                        <button><i class="bx bx-user"></i>
+                            <span>Perfil</span>
+                        </button>
+                    </form>
+                </li>
+
+                <li>
+                    <form action="{% url 'deslogar' %}">
+                        <button class="sair"><i class="bx bx-exit"></i>
+                            <span>Sair</span>
+                        </button>
+                    </form>
+                </li>
+            </ul>
         </div>
+
         <div id="conteudo" class="container">
             {% block content %}{% endblock %}
         </div>
