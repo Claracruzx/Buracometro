@@ -1,4 +1,4 @@
-{% extends 'buracos/template.html' %}
+{% extends 'principal/principal.html' %}
 {% load static %}
 
 {% block css %}
@@ -28,6 +28,12 @@ Cadastro de buracos
     </div>
     <div class="content">
         <div class="area-itens">
+
+            <input 
+                id="iptTitulo" 
+                name="titulo" 
+                type="hidden" 
+                value="Buraco registrado">
           
             <div class="mb-3">
                 <label class="form-label">Descricao</label>
@@ -95,7 +101,7 @@ Cadastro de buracos
         <button 
             id="btnEnviar" 
             class="btn btn-primary btn-large centered" 
-            type="button"
+            type="submit"
             >Enviar</button>
     </div>
 </form>

@@ -9,4 +9,5 @@ urlpatterns = [
     path('/cadastrar/selecionar-local/selecionando', passarLocalParaCadastroView, name='passarLocalParaCadastroView'),
     path('/cadastrar/salvar', cadastroStore, name='cadastroStore'),
     path('/ver-buracos', verBuracosView, name='verBuracosView'),
+    path('detalhe/<int:id>/', detalheBuracoView, name='detalheBuracoView'),
 ]

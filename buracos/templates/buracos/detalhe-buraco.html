@@ -1,0 +1,47 @@
+{% extends 'principal/principal.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="feed-container">
+    <div class="post-card">
+
+        <div class="post-header">
+            <div class="avatar">
+                {% if buraco.usuario.foto %}
+                    <img src="{{ buraco.usuario.foto.url }}" alt="Foto de perfil">
+                {% elif buraco.usuario %}
+                    {{ buraco.usuario.username|slice:":1"|upper }}
+                {% else %}
+                    ?
+                {% endif %}
+            </div>
+
+            <div>
+                {% if buraco.usuario %}
+                    <h2>{{ buraco.usuario.name|default:buraco.usuario.username }}</h2>
+                    <p>@{{ buraco.usuario.username }} • {{ buraco.endereco }}</p>
+                {% else %}
+                    <h2>Usuário desconhecido</h2>
+                    <p>{{ buraco.endereco }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if buraco.url_imagem %}
+            <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco">
+        {% endif %}
+
+        <div class="post-body">
+            <p>{{ buraco.descricao }}</p>
+
+            <div class="post-info">
+                <span>Tamanho: {{ buraco.tamanho }}</span>
+                <span>{{ buraco.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

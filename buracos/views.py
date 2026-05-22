@@ -138,4 +138,11 @@ def cadastroStore(request):
         # print(imagem)
         # print(nome_arquivo)
 
-    return redirect('cadastrarView')    
+    return redirect('cadastrarView')   
+
+def detalheBuracoView(request, id):
+    buraco = Buraco.objects.get(id=id)
+
+    return render(request, 'buracos/detalhe-buraco.html', {
+        'buraco': buraco
+    }) 

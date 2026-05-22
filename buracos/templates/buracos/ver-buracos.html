@@ -1,49 +1,27 @@
-{% extends 'buracos/template.html' %}
+{% extends 'principal/principal.html' %}
 {% load static %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/ver-buracos.css' %}">
-{% endblock%}
+{% endblock %}
 
 {% block content %}
 
-   <div class="topo-pesquisa">
-    <input id="iptPesquisar" type="text" placeholder="Pesquisar buracos...">
-    <button id="btnPesquisar">Pesquisar</button>
-</div>
-    {% for row in rows %}
-        <div class="card" style="width: 18rem;">
-            <img src="{% static '/image-users/' %}{{row.url_imagem}}" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">{{row.titulo}}</h5>
-                <p class="card-text">{{row.descricao}}</p>
-                <div>
-                    <span>Tamanho: </span>
-                    {% if row.tamanho == 1 %}
-                        Pequeno
-                    {% elif row.tamanho == 2 %}
-                        Médio
-                    {% elif row.tamanho == 3 %}
-                        Grande
-                    {% elif row.tamanho == 4 %}
-                        Gigante
-                    {% endif %}
-                </div>
-                <div>
-                    <span>Publicado em: </span>
-                    <span>{{row.data_atual}}</span>
-                </div>
-                <a href="#" class="btn btn-primary">
-                    Ver detalhes
-                </a>
-            </div>
-        </div>
-    {% empty %}
-        Nenhum produto disponível
-    {% endfor %}
-</div>
-{% endblock%}
+<div class="explorar-container">
 
-{% block js %}
-<script type="module" src="{% static 'js/ver-buracos.js' %}"></script>
+    <div class="explorar-grid">
+        {% for row in rows %}
+            <a href="{% url 'detalheBuracoView' row.id %}" class="explorar-item">
+                <img src="{% static 'image-users/' %}{{ row.url_imagem }}" alt="{{ row.titulo }}">
+
+                    <div class="explorar-overlay">
+                        <span>Ver postagem</span>
+                    </div>
+            </a>
+        {% empty %}
+            <p>Nenhuma postagem disponível.</p>
+        {% endfor %}
+    </div>
+</div>
+
 {% endblock %}

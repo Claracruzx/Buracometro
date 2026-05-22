@@ -17,19 +17,17 @@
 </head>
 <body>
     <header>
-    <img id="logo" src="{% static 'imgs/Nosso buraco.png' %}" alt="Logo do site" class="logo">
+        <img id="logo" src="{% static 'imgs/Nosso buraco.png' %}" alt="Logo">
 
-    <form class="barra-pesquisa" action="{% url 'pesquisaView' %}" method="get">
-        <input 
-            type="text" 
-            name="q" 
-            placeholder="Pesquisar usuário ou bairro..."
-        >
-        <button type="submit">
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-    </form>
-</header>
+        <form class="search-container" action="{% url 'pesquisaView' %}" method="get">
+            <input type="text" name="q" placeholder="Pesquisar usuário ou bairro...">
+            <button type="submit">
+                <i class='bx bx-search'></i>
+            </button>
+        </form>
+
+    
+    </header>
     <main>
         <div id="barra-lateral">
             <ul id="lista-botoes">
@@ -103,4 +101,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://kit.fontawesome.com/bcdcf795f9.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+            {% block js %}{% endblock %}
 </html>
