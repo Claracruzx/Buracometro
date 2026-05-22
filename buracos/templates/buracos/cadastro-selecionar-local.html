@@ -10,74 +10,42 @@
     <link rel="stylesheet" href="{% static '/css/template.css' %}">
 </head>
 <body>
-    <style>
-        body {
-            padding: 20px;
-            padding-bottom: 200px;
-        }
-
-        #titulo {
-            margin-top: 40px;
-            margin-bottom: 30px;
-        }
-
-        #btnConfirmar {
-            margin-top: 30px;
-        }
-
-        #btnVoltarPrincipal {
-            background-color: transparent;
-            border: none;
-            border-radius: 50%;
-            padding: 11px 13px;
-            font-size: 30px;
-            transition: .2s;
-        }
-
-        #linha-endereco-selecionado {
-            display: flex;
-            padding: 20px 20px 20px 0;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .btn.btn-large {
-            padding: 10px 80px;
-            font-size: 18px;
-        }
-
-        .centered {
-            display: block;
-            margin: 0 auto;
-        }
-    </style>
+    <div class="mapa-container">
+        <div class="mapa-topo">
     <form action="{% url 'cadastrarView' %}">
-        <button id="btnVoltarPrincipal" class="btn-icon">
-            <i class="custom-size fa-solid fa-arrow-left"></i>
+        <button id="btnVoltarPrincipal" class="btn-voltar" type="submit">
+            <i class="fa-solid fa-arrow-left"></i>
         </button>
     </form>
-    <h1 id="titulo">Selecionar local no mapa</h1>
-    <div id="mapa" style="width: 100%; height: 600px;"></div>
-    <div id="linha-endereco-selecionado">
-        <h4 class="wmx">Endereço selecionado: </h4>
-        <div id="area-endereco">
-            <span id="spanEndereco">(Nenhum)</span>
-            <span id="statusCarregando" class="simple-loading oculto"></span>
+            <div>
+                <h1 id="titulo">Selecionar local</h1>
+                <p class="subtitulo-mapa">
+                    Clique no mapa para marcar o local do buraco
+                </p>
+            </div>
         </div>
-    </div>
-    
-    <form action="{% url 'passarLocalParaCadastroView' %}" method="post">
-        {% csrf_token %} 
-        <input id="iptHiddenTitulo"      name="titulo"      type="hidden" value="{{titulo}}">
-        <input id="iptHiddenDescricao"   name="descricao"   type="hidden" value="{{descricao}}">
-        <input id="iptHiddenTamanho"     name="tamanho"     type="hidden" value="{{tamanho}}">
-        <input id="iptHiddenCoordenadas" name="coordenadas" type="hidden">
-        <input id="iptHiddenEndereco"    name="endereco"    type="hidden">
-        <button 
-            id="btnConfirmar" 
-            class="btn btn-large btn-success centered" 
-            disabled>Confirmar</button>
-    </form>
+        <div id="mapa"></div>
+        <div id="linha-endereco-selecionado">
+            <h4 class="wmx">Endereço selecionado: </h4>
+            <div id="area-endereco">
+                <span id="spanEndereco">(Nenhum)</span>
+                <span id="statusCarregando" class="simple-loading oculto"></span>
+            </div>
+        </div>
+        
+        <form action="{% url 'passarLocalParaCadastroView' %}" method="post">
+            {% csrf_token %} 
+            <input id="iptHiddenTitulo"      name="titulo"      type="hidden" value="{{titulo}}">
+            <input id="iptHiddenDescricao"   name="descricao"   type="hidden" value="{{descricao}}">
+            <input id="iptHiddenTamanho"     name="tamanho"     type="hidden" value="{{tamanho}}">
+            <input id="iptHiddenCoordenadas" name="coordenadas" type="hidden">
+            <input id="iptHiddenEndereco"    name="endereco"    type="hidden">
+            <button 
+                id="btnConfirmar" 
+                class="btn btn-large btn-success centered" 
+                disabled>Confirmar</button>
+        </form>
+    </div>    
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://kit.fontawesome.com/bcdcf795f9.js" crossorigin="anonymous"></script>

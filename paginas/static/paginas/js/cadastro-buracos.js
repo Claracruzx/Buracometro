@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (validarCampos()) {
             form.submit();
         }
-    })
+    });
 
     // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -95,40 +95,59 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function validarCampos () {
-        let iptTitulo = document.getElementById('iptTitulo');
-        let iptCoordenadas = document.getElementById('iptCoordenadas');
-        let iptEndereco = document.getElementById('iptEndereco');
-        let iptTamanho  = document.getElementById('iptTamanho');
-        let iptImagem   = document.getElementById('iptEscolherArquivo');
+    let iptTitulo = document.getElementById('iptTitulo');
+    let iptCoordenadas = document.getElementById('iptCoordenadas');
+    let iptEndereco = document.getElementById('iptEndereco');
+    let iptTamanho  = document.getElementById('iptTamanho');
+    let iptImagem   = document.getElementById('iptEscolherArquivo');
 
-        let retorno = false;
-        let msg = '';
+    let titulo      = iptTitulo.value;
+    let coordenadas = iptCoordenadas.value;
+    let endereco    = iptEndereco.value;
+    let tamanho     = iptTamanho.value;
+    let imagem      = iptImagem.files[0];
 
-        let titulo      = iptTitulo.value;
-        let coordenadas = iptCoordenadas.value;
-        let endereco    = iptEndereco.value;
-        let tamanho     = iptTamanho.value;
-        let imagem      = iptImagem.value;
-
-        if (titulo.trim() == '') {
-            msg = 'O título não pode estar vazio!';
-        }
-        else if (coordenadas.trim() == '' || endereco.trim() == '') {
-            msg = 'Selecione um local antes de prosseguir!';
-        }
-        else if (!(parseInt(tamanho) >= 1 && parseInt(tamanho) <= 4)) {
-            msg = 'Tamanho inválido';
-        }
-        else if (imagem == '') {
-            msg = 'Selecione uma imagem antes';
-        }
-        else {
-            retorno = true;
-        }
-
-        if (retorno == false) 
-            alert(msg);
-
-        return retorno;
+    if (titulo.trim() == '') {
+        alert('O título não pode estar vazio!');
+        return false;
     }
+
+    if (coordenadas.trim() == '' || endereco.trim() == '') {
+        alert('Selecione um local antes de prosseguir!');
+        return false;
+    }
+
+    if (!(parseInt(tamanho) >= 1 && parseInt(tamanho) <= 4)) {
+        alert('Tamanho inválido!');
+        return false;
+    }
+
+    if (!imagem) {
+        alert('Selecione uma imagem antes!');
+        return false;
+    }
+
+    return true;
+}
+
+const inputImagem = document.getElementById("iptEscolherArquivo");
+const previewImagem = document.getElementById("previewImagem");
+
+if (inputImagem && previewImagem) {
+    inputImagem.addEventListener("change", function () {
+        const arquivo = this.files[0];
+
+        if (arquivo) {
+            const leitor = new FileReader();
+
+            leitor.onload = function (e) {
+                previewImagem.innerHTML = `
+                    <img src="${e.target.result}" alt="Prévia da imagem">
+                `;
+            };
+
+            leitor.readAsDataURL(arquivo);
+        }
+    });
+}
 });

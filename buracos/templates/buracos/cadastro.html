@@ -33,24 +33,21 @@ Cadastro de buracos
                 id="iptTitulo" 
                 name="titulo" 
                 type="hidden" 
-                value="Buraco registrado">
+                value="Buraco registrado" required>
           
             <div class="mb-3">
                 <label class="form-label">Descricao</label>
                 <textarea 
                     id="iptDescricao" 
                     class="form-control" 
-                    name="descricao">{{descricao}}</textarea>
+                    name="descricao" required>{{descricao}}</textarea>
             </div>
             <div class="mb-3">
-                <label class="form-label">Local</label>
-                <button 
-                    id="btnSelecionarLocal"
-                    type="button" 
-                    class="btn btn-def">
-                    <!-- href="{% url 'cadastroSelecionarLocalView' %}"> -->
+                <label class="form-label">Local: </label>
+                <button id="btnSelecionarLocal" type="button" class="btn-local">
                     Selecionar local
                 </button>
+
                 <span>{{endereco}}</span>
                 <input 
                     id="iptCoordenadas" 
@@ -78,31 +75,24 @@ Cadastro de buracos
             </div>
         </div>
         <div class="area-imagem">
-            <div class="mb-3">
-                <label class="form-label">Inserir imagem</label>
-                <div id="area-foto" class="area-foto">
-                    <div class="content">
-                        <i class="icone custom-size fa-solid fa-image"></i>
-                    </div>
+            <label class="upload-card" for="iptEscolherArquivo">
+                <div id="previewImagem" class="preview-imagem">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Escolher imagem</span>
                 </div>
-            </div>
-            <div>
-                <input 
-                    id="iptEscolherArquivo" 
-                    type="file" 
-                    class="btn btn-def" 
-                    name="imagem"
-                    accept="image/*" 
-                    value="Procurar">
-            </div>
+            </label>
+
+            <input 
+                id="iptEscolherArquivo" 
+                type="file" 
+                name="imagem"
+                accept="image/*" required>
         </div>
     </div>
     <div>
-        <button 
-            id="btnEnviar" 
-            class="btn btn-primary btn-large centered" 
-            type="submit"
-            >Enviar</button>
+        <button id="btnEnviar" class="btn-form btn-enviar" type="submit">
+            Enviar
+        </button>
     </div>
 </form>
 <form id="formPassandoDados" action="{% url 'cadastroSelecionarLocalView' %}" method="post">
