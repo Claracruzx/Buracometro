@@ -565,3 +565,117 @@ main #conteudo {
     color: #666;
     font-size: 14px;
 }
+
+.perfil-grid {
+    margin-top: 25px;
+}
+
+.perfil-container .explorar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+}
+
+.perfil-container .explorar-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background-color: #eee;
+    text-decoration: none;
+}
+
+.perfil-container .explorar-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.modal-post {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.75);
+}
+
+.modal-conteudo {
+    position: relative;
+    z-index: 10;
+
+    width: 80vw;
+    max-width: 900px;
+    height: 80vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-conteudo img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.fechar-modal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+
+    z-index: 20;
+
+    background: none;
+    border: none;
+
+    color: white;
+    font-size: 40px;
+
+    cursor: pointer;
+}
+
+.seta-modal {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+
+    z-index: 6000;
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: 50%;
+    border: none;
+
+    background-color: white;
+    color: #222;
+
+    font-size: 26px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seta-modal.esquerda {
+    left: 24px;
+}
+
+.seta-modal.direita {
+    right: 24px;
+}
+
+.oculto {
+    display: none !important;
+}

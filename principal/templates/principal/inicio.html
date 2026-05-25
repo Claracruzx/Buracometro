@@ -25,8 +25,14 @@ Início
                 <div>
                     {% if buraco.usuario %}
                         <h2>
-                            <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
-                                {{ buraco.usuario.name|default:buraco.usuario.username }}
+                            {% if request.user.id == buraco.usuario.id %}
+                                <a href="{% url 'perfilView' %}">
+                            {% else %}
+                                <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
+                            {% endif %}
+
+                                <h2>{{ buraco.usuario.username }}</h2>
+
                             </a>
                         </h2>
 

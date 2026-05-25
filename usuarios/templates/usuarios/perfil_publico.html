@@ -40,71 +40,108 @@ Perfil de {{ usuario_perfil.username }}
 
     <div class="feed-container">
 
-        {% for buraco in buracos %}
-            <div class="post-card">
+        <div class="explorar-grid perfil-grid">
+    {% for buraco in buracos %}
+        <a href="{% url 'detalheBuracoView' buraco.id %}" class="explorar-item" data-index="{{ forloop.counter0 }}">
+            <img src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="{{ buraco.titulo }}">
 
-                <div class="post-header">
-
-                    <div class="avatar">
-                        {% if usuario_perfil.foto %}
-                            <img src="{{ usuario_perfil.foto.url }}" alt="Foto de perfil">
-                        {% else %}
-                            {{ usuario_perfil.username|slice:":1"|upper }}
-                        {% endif %}
-                    </div>
-
-                    <div>
-                        <h2>
-                            {{ usuario_perfil.name|default:usuario_perfil.username }}
-                        </h2>
-
-                        <p>
-                            @{{ usuario_perfil.username }}
-                            •
-                            {{ buraco.endereco }}
-                        </p>
-                    </div>
-
-                </div>
-
-                {% if buraco.imagem %}
-                    <img class="post-image"
-                         src="{{ buraco.imagem.url }}"
-                         alt="Imagem do buraco">
-
-                {% elif buraco.url_imagem %}
-                    <img class="post-image"
-                         src="{% static 'image-users/' %}{{ buraco.url_imagem }}"
-                         alt="Imagem do buraco">
-                {% endif %}
-
-                <div class="post-body">
-
-
-                    <p>{{ buraco.descricao }}</p>
-
-                    <div class="post-info">
-                        <span>Tamanho: {{ buraco.tamanho }}</span>
-
-                        <span>
-                            {{ buraco.created_at|date:"d/m/Y H:i" }}
-                        </span>
-                    </div>
-
-                </div>
-
+            <div class="explorar-overlay">
+                <span> Ver postagem</span>
             </div>
-
-        {% empty %}
-
-            <p class="empty-feed">
-                Esse usuário ainda não cadastrou buracos.
-            </p>
-
-        {% endfor %}
+        </a>
+    {% empty %}
+        <p class="empty-feed">Esse usuário ainda não cadastrou buracos.</p>
+    {% endfor %}
+</div>
 
     </div>
 
 </div>
+
+<div id="modalPost" class="modal-post oculto">
+
+    <div class="modal-overlay"></div>
+
+    <button id="fecharModal" class="fechar-modal">
+        ✕
+    </button>
+
+    <button id="anteriorPost" class="seta-modal esquerda">
+        ❮
+    </button>
+
+    <div class="modal-conteudo">
+        <img id="modalImagem" src="" alt="Imagem">
+    </div>
+
+    <button id="proximoPost" class="seta-modal direita">
+        ❯
+    </button>
+
+</div>
+
+<script>
+const posts = document.querySelectorAll('.explorar-item');
+
+if (posts.length > 0) {
+    const modal = document.getElementById('modalPost');
+    const modalImg = document.getElementById('modalImagem');
+
+    const fechar = document.getElementById('fecharModal');
+    const overlay = document.querySelector('.modal-overlay');
+
+    const btnAnterior = document.getElementById('anteriorPost');
+    const btnProximo = document.getElementById('proximoPost');
+
+    let indexAtual = 0;
+
+    function abrirModal(index) {
+    indexAtual = index;
+
+    const img = posts[index].querySelector('img');
+    modalImg.src = img.src;
+
+    if (indexAtual === 0) {
+        btnAnterior.style.display = 'none';
+    } else {
+        btnAnterior.style.display = 'flex';
+    }
+
+    if (indexAtual === posts.length - 1) {
+        btnProximo.style.display = 'none';
+    } else {
+        btnProximo.style.display = 'flex';
+    }
+
+    modal.classList.remove('oculto');
+}
+
+    posts.forEach((post, index) => {
+        post.addEventListener('click', function(e) {
+            e.preventDefault();
+            abrirModal(index);
+        });
+    });
+
+    fechar.addEventListener('click', () => {
+        modal.classList.add('oculto');
+    });
+
+    overlay.addEventListener('click', () => {
+        modal.classList.add('oculto');
+    });
+
+    btnProximo.addEventListener('click', () => {
+    if (indexAtual < posts.length - 1) {
+        abrirModal(indexAtual + 1);
+    }
+    });
+    btnAnterior.addEventListener('click', () => {
+    if (indexAtual > 0) {
+        abrirModal(indexAtual - 1);
+    }
+    });
+}
+</script>
 
 {% endblock %}
