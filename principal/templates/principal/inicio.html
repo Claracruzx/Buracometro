@@ -63,6 +63,32 @@ Início
                     <span>{{ buraco.created_at|date:"d/m/Y H:i" }}</span>
                 </div>
 
+                <div class="comentarios-escondidos" id="comentarios-{{ buraco.id }}">
+                    {% for comentario in buraco.comentarios.all %}
+                        <div class="comentario-item">
+                            <div class="avatar comentario-avatar">
+                                {% if comentario.usuario.foto %}
+                                    <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
+                                {% else %}
+                                    {{ comentario.usuario.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p>
+                                    <strong>@{{ comentario.usuario.username }}</strong>
+                                    {{ comentario.texto }}
+                                </p>
+
+                                <span class="comentario-data">
+                                    {{ comentario.created_at|date:"d/m/Y H:i" }}
+                                </span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="sem-comentarios">Nenhum comentário ainda.</p>
+                    {% endfor %}
+                </div>
+
                 <div class="post-actions">
                     <button
                         class="btn-like {% if buraco.curtido %}curtido{% endif %}"
@@ -75,15 +101,15 @@ Início
                         </span>
                     </button>
 
-                    <form action="{% url 'comentarBuraco' buraco.id %}" method="post">
+                    <form class="form-comentario" action="{% url 'comentarBuraco' buraco.id %}" method="post">
                         {% csrf_token %}
-                        <input
-                            type="text"
-                            name="comentario"
-                            placeholder="Adicionar comentário..."
-                        >
-                        <button type="submit">
-                            Comentar
+                        <button 
+                            type="button" 
+                            class="btn-comentar"
+                            data-id="{{ buraco.id }}"
+                            data-url="{% url 'comentarBuraco' buraco.id %}">
+                            <i class="bx bx-message-dots"></i>
+                            <span>{{ buraco.comentarios.count }}</span>
                         </button>
                     </form>
 
@@ -93,7 +119,6 @@ Início
                             🚨 Reportar
                         </button>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -102,19 +127,37 @@ Início
     {% endfor %}
 </div>
 
-<script>
+<div id="modalComentarios" class="modal-comentarios oculto">
+    <div class="modal-comentarios-fundo"></div>
 
+    <div class="modal-comentarios-card">
+        <button id="fecharComentarios" class="fechar-comentarios">✕</button>
+
+        <h2>Comentários</h2>
+
+        <div id="listaComentariosModal"></div>
+
+        <form id="formComentarioModal" method="post">
+            {% csrf_token %}
+            <input 
+                type="text" 
+                name="comentario" 
+                placeholder="Adicionar comentário..."
+                required>
+            <button type="submit">Publicar</button>
+        </form>
+    </div>
+</div>
+
+<script>
 const likes = document.querySelectorAll('.btn-like');
 
 likes.forEach(botao => {
-
     botao.addEventListener('click', async () => {
-
         const url = botao.dataset.url;
 
         const response = await fetch(url, {
             method: 'POST',
-
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -136,11 +179,42 @@ likes.forEach(botao => {
         setTimeout(() => {
             botao.classList.remove('animando');
         }, 350);
-
     });
+});
+</script>
 
+<script>
+const botoesComentario = document.querySelectorAll('.btn-comentar');
+const modalComentarios = document.getElementById('modalComentarios');
+const listaComentariosModal = document.getElementById('listaComentariosModal');
+const formComentarioModal = document.getElementById('formComentarioModal');
+const fecharComentarios = document.getElementById('fecharComentarios');
+const fundoComentarios = document.querySelector('.modal-comentarios-fundo');
+
+function abrirModalComentarios(botao) {
+    const id = botao.dataset.id;
+    const comentarios = document.getElementById(`comentarios-${id}`);
+
+    listaComentariosModal.innerHTML = comentarios.innerHTML;
+    formComentarioModal.action = botao.dataset.url;
+
+    modalComentarios.classList.remove('oculto');
+    document.body.classList.add('modal-aberto');
+}
+
+function fecharModalComentarios() {
+    modalComentarios.classList.add('oculto');
+    document.body.classList.remove('modal-aberto');
+}
+
+botoesComentario.forEach(botao => {
+    botao.addEventListener('click', () => {
+        abrirModalComentarios(botao);
+    });
 });
 
+fecharComentarios.addEventListener('click', fecharModalComentarios);
+fundoComentarios.addEventListener('click', fecharModalComentarios);
 </script>
 
 {% endblock %}

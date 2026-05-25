@@ -170,6 +170,10 @@ body{
     background-color: var(--body-color);
 }
 
+body.modal-aberto {
+    overflow: hidden;
+}
+
 main #barra-lateral {
     position: fixed;
     top: 110px;
@@ -725,4 +729,223 @@ main #conteudo {
         transform: scale(1);
     }
 
+}
+
+.form-comentario {
+    display: flex;
+    gap: 8px;
+}
+
+.form-comentario input {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 9px 12px;
+    outline: none;
+}
+
+.form-comentario button {
+    border: none;
+    border-radius: 12px;
+    padding: 9px 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.comentarios-lista {
+    margin-top: 14px;
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+.comentarios-lista p {
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+.sem-comentarios {
+    color: #888;
+}
+
+.comentarios-escondidos {
+    display: none;
+}
+
+.modal-comentarios {
+    position: fixed;
+    inset: 0;
+    z-index: 7000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-comentarios-fundo {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+}
+
+.modal-comentarios-card {
+    position: relative;
+    z-index: 10;
+    width: 480px;
+    max-width: 90vw;
+    max-height: 80vh;
+    background: white;
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+.fechar-comentarios {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#listaComentariosModal {
+    margin-top: 20px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+#listaComentariosModal p {
+    margin-bottom: 10px;
+}
+
+#formComentarioModal {
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid #eee;
+    padding-top: 14px;
+    margin-top: 14px;
+}
+
+#formComentarioModal input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+#formComentarioModal button {
+    border: none;
+    border-radius: 12px;
+    background: var(--primary-color);
+    color: white;
+    padding: 10px 14px;
+    font-weight: 700;
+}
+
+.btn-comentar {
+    border: none;
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    cursor: pointer;
+    padding: 9px 10px;
+}
+
+.btn-comentar i {
+    font-size: 30px;
+    color: #111;
+    line-height: 1;
+}
+
+.btn-comentar span {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.btn-comentar:hover i {
+    transform: scale(1.12);
+}
+
+.modal-comentarios-card {
+    position: relative;
+    z-index: 10;
+    width: 520px;
+    max-width: 92vw;
+    height: 75vh;
+    background: white;
+    border-radius: 22px;
+    padding: 0;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-comentarios-card h2 {
+    padding: 18px 22px;
+    margin: 0;
+    border-bottom: 1px solid #eee;
+    font-size: 20px;
+}
+
+#listaComentariosModal {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 22px;
+}
+
+.comentario-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.comentario-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+}
+
+.comentario-item p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.comentario-data {
+    display: block;
+    margin-top: 4px;
+    color: #888;
+    font-size: 12px;
+}
+
+#formComentarioModal {
+    display: flex;
+    gap: 8px;
+    padding: 14px 18px;
+    border-top: 1px solid #eee;
+    margin: 0;
+}
+
+.explorar-overlay {
+    gap: 22px;
+}
+
+.explorar-overlay span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.explorar-overlay i {
+    font-size: 26px;
 }

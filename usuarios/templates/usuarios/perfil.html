@@ -57,9 +57,16 @@ Perfil
             {% endif %}
 
             <div class="explorar-overlay">
-                <span> Ver postagem</span>
+                <span>
+                    <i class='bx bx-heart'></i>
+                    {{ buraco.likes.count }}
+                </span>
+
+                <span>
+                    <i class='bx bx-message-dots'></i>
+                    {{ buraco.comentarios.count }}
+                </span>
             </div>
-        </a>
     {% empty %}
         <p class="empty-feed">Você ainda não cadastrou nenhum buraco.</p>
     {% endfor %}
