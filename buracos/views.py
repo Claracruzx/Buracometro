@@ -11,6 +11,10 @@ from django.db import IntegrityError
 from datetime import datetime
 from .models import Buraco
 from django.contrib.auth.decorators import login_required
+from .models import Buraco, Like, Comentario, Reporte
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 # class CadastroView(TemplateView):
 #     template_name = "buracos/cadastro.html"
@@ -146,3 +150,57 @@ def detalheBuracoView(request, id):
     return render(request, 'buracos/detalhe-buraco.html', {
         'buraco': buraco
     }) 
+
+@login_required
+def curtirBuracoView(request, buraco_id):
+    buraco = get_object_or_404(Buraco, id=buraco_id)
+
+    like, created = Like.objects.get_or_create(
+        usuario=request.user,
+        buraco=buraco
+    )
+
+    curtido = True
+
+    if not created:
+        like.delete()
+        curtido = False
+
+    return JsonResponse({
+        'likes': buraco.likes.count(),
+        'curtido': curtido
+    })
+    
+@login_required
+def reportarBuracoView(request, buraco_id):
+
+    buraco = get_object_or_404(Buraco, id=buraco_id)
+
+    reporte, created = Reporte.objects.get_or_create(
+        usuario=request.user,
+        buraco=buraco
+    )
+
+    if buraco.reportes.count() >= 5:
+        buraco.delete()
+
+    return redirect(request.META.get('HTTP_REFERER'))
+
+@login_required
+def comentarBuracoView(request, buraco_id):
+
+    if request.method == "POST":
+
+        buraco = get_object_or_404(Buraco, id=buraco_id)
+
+        texto = request.POST.get("comentario")
+
+        if texto.strip():
+
+            Comentario.objects.create(
+                usuario=request.user,
+                buraco=buraco,
+                texto=texto
+            )
+
+    return redirect(request.META.get('HTTP_REFERER'))

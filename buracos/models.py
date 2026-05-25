@@ -15,3 +15,49 @@ class Buraco(models.Model):
 
     def __str__(self):
         return self.titulo
+
+class Like(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    buraco = models.ForeignKey(
+        Buraco,
+        on_delete=models.CASCADE,
+        related_name="likes"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('usuario', 'buraco')
+
+
+class Comentario(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    buraco = models.ForeignKey(
+        Buraco,
+        on_delete=models.CASCADE,
+        related_name="comentarios"
+    )
+    texto = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Reporte(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    buraco = models.ForeignKey(
+        Buraco,
+        on_delete=models.CASCADE,
+        related_name="reportes"
+    )
+    motivo = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('usuario', 'buraco')

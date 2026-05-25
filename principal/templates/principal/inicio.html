@@ -64,9 +64,36 @@ Início
                 </div>
 
                 <div class="post-actions">
-                    <button type="button">❤️ Curtir</button>
-                    <button type="button">💬 Comentar</button>
-                    <button type="button">⚠️ Reportar</button>
+                    <button
+                        class="btn-like {% if buraco.curtido %}curtido{% endif %}"
+                        data-url="{% url 'curtirBuraco' buraco.id %}"
+                    >
+                        <i class='bx bx-heart'></i>
+
+                        <span class="like-count">
+                            {{ buraco.likes.count }}
+                        </span>
+                    </button>
+
+                    <form action="{% url 'comentarBuraco' buraco.id %}" method="post">
+                        {% csrf_token %}
+                        <input
+                            type="text"
+                            name="comentario"
+                            placeholder="Adicionar comentário..."
+                        >
+                        <button type="submit">
+                            Comentar
+                        </button>
+                    </form>
+
+                    <form action="{% url 'reportarBuraco' buraco.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">
+                            🚨 Reportar
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -74,5 +101,46 @@ Início
         <p class="empty-feed">Ainda não existem buracos cadastrados.</p>
     {% endfor %}
 </div>
+
+<script>
+
+const likes = document.querySelectorAll('.btn-like');
+
+likes.forEach(botao => {
+
+    botao.addEventListener('click', async () => {
+
+        const url = botao.dataset.url;
+
+        const response = await fetch(url, {
+            method: 'POST',
+
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const data = await response.json();
+
+        botao.querySelector('.like-count').innerText = data.likes;
+
+        if (data.curtido) {
+            botao.classList.add('curtido');
+        } else {
+            botao.classList.remove('curtido');
+        }
+
+        botao.classList.add('animando');
+
+        setTimeout(() => {
+            botao.classList.remove('animando');
+        }, 350);
+
+    });
+
+});
+
+</script>
 
 {% endblock %}

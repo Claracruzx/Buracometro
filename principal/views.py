@@ -1,17 +1,21 @@
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
-from django.contrib import messages
 from django.urls import reverse
 from django.contrib.auth import logout
-from django.contrib.auth.hashers import check_password
-from django.db import IntegrityError
-from buracos.models import Buraco
-from usuarios.models import CustomUser
 from django.db.models import Q
+
+from buracos.models import Buraco, Like
+from usuarios.models import CustomUser
 
 
 def inicioView(request):
     buracos = Buraco.objects.all().order_by('-created_at')
+
+    for buraco in buracos:
+        buraco.curtido = Like.objects.filter(
+            usuario=request.user,
+            buraco=buraco
+        ).exists()
 
     variaveis = {
         'buracos': buracos,
@@ -19,23 +23,25 @@ def inicioView(request):
 
     return render(request, 'principal/inicio.html', variaveis)
 
-#class RankingView(TemplateView):
-  #  template_name = "principal/ranking.html"
 
 def rankingView(request):
     buracos = Buraco.objects.order_by('-tamanho')
+
     variaveis = {
-        'buracos':buracos,
+        'buracos': buracos,
     }
+
     return render(request, 'principal/ranking.html', variaveis)
+
 
 class VerNoMapaView(TemplateView):
     template_name = "principal/ver-no-mapa.html"
 
-# def deslogar(request):
+
 def deslogar(request):
-    logout(request) 
-    return redirect(reverse('inicio'))
+    logout(request)
+    return redirect(reverse('login'))
+
 
 def pesquisaView(request):
     termo = request.GET.get('q', '')
