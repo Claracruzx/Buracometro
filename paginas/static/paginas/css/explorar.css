@@ -49,6 +49,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 24px;
 
     opacity: 0;
 
@@ -56,6 +57,10 @@
 }
 
 .explorar-overlay span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
     color: white;
 
     font-size: 20px;
@@ -64,6 +69,10 @@
     transform: translateY(10px);
 
    
+}
+
+.explorar-overlay i {
+    font-size: 28px;
 }
 
 .explorar-item:hover .explorar-overlay {

@@ -51,7 +51,14 @@ def cadastroSelecionarLocalView(request):
 
 
 def explorarView(request):
-    buracos = Buraco.objects.all()
+    buracos = Buraco.objects.all().order_by('-created_at')
+
+    for buraco in buracos:
+        buraco.curtido = request.user.is_authenticated and Like.objects.filter(
+            usuario=request.user,
+            buraco=buraco
+        ).exists()
+
     variaveis = {
         'rows': buracos,
     }

@@ -1,6 +1,10 @@
 {% extends 'principal/principal.html' %}
 {% load static %}
 
+{% block title %}
+Explorar
+{% endblock %}
+
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/explorar.css' %}">
 {% endblock %}
@@ -8,20 +12,376 @@
 {% block content %}
 
 <div class="explorar-container">
-
     <div class="explorar-grid">
         {% for row in rows %}
-            <a href="{% url 'detalheBuracoView' row.id %}" class="explorar-item">
-                <img src="{% static 'image-users/' %}{{ row.url_imagem }}" alt="{{ row.titulo }}">
+            <a
+                href="{% url 'detalheBuracoView' row.id %}"
+                class="explorar-item"
+                data-index="{{ forloop.counter0 }}"
+                data-id="{{ row.id }}"
+                data-titulo="{{ row.titulo }}"
+                data-descricao="{{ row.descricao }}"
+                data-likes="{{ row.likes.count }}"
+                data-comentarios="{{ row.comentarios.count }}"
+                data-curtido="{% if row.curtido %}true{% else %}false{% endif %}"
+                data-username="{{ row.usuario.username }}"
+                data-nome="{{ row.usuario.name }}"
+                data-foto-url="{% if row.usuario.foto %}{{ row.usuario.foto.url }}{% endif %}"
+                data-endereco="{{ row.endereco }}"
+                data-like-url="{% url 'curtirBuraco' row.id %}"
+                data-comentar-url="{% url 'comentarBuraco' row.id %}"
+                data-reportar-url="{% url 'reportarBuraco' row.id %}">
 
-                    <div class="explorar-overlay">
-                        <span>Ver postagem</span>
-                    </div>
+                {% if row.imagem %}
+                    <img src="{{ row.imagem.url }}" alt="{{ row.titulo }}">
+                {% elif row.url_imagem %}
+                    <img src="{% static 'image-users/' %}{{ row.url_imagem }}" alt="{{ row.titulo }}">
+                {% endif %}
+
+                <div class="explorar-overlay">
+                    <span>
+                        <i class='bx bx-heart'></i>
+                        {{ row.likes.count }}
+                    </span>
+
+                    <span>
+                        <i class='bx bx-message-dots'></i>
+                        {{ row.comentarios.count }}
+                    </span>
+                </div>
             </a>
+
+            <div class="comentarios-escondidos" id="comentarios-{{ row.id }}">
+                {% for comentario in row.comentarios.all %}
+                    <div class="comentario-item">
+                        <div class="avatar comentario-avatar">
+                            {% if comentario.usuario.foto %}
+                                <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
+                            {% else %}
+                                {{ comentario.usuario.username|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="comentario-conteudo">
+                            <p>
+                                <strong>@{{ comentario.usuario.username }}</strong>
+                                {{ comentario.texto }}
+                            </p>
+                            <span class="comentario-data">{{ comentario.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="sem-comentarios">Nenhum comentário ainda.</p>
+                {% endfor %}
+            </div>
         {% empty %}
-            <p>Nenhuma postagem disponível.</p>
+            <p class="empty-feed">Nenhuma postagem disponível.</p>
         {% endfor %}
     </div>
 </div>
+
+<div id="modalPost" class="modal-post oculto">
+    <div class="modal-overlay"></div>
+
+    <button id="fecharModal" class="fechar-modal">✕</button>
+    <button id="anteriorPost" class="seta-modal esquerda">❮</button>
+
+    <div class="modal-conteudo modal-postagem-detalhe">
+        <div class="modal-post-header">
+            <div id="modalAvatar" class="avatar"></div>
+
+            <div>
+                <h3 id="modalUsername"></h3>
+                <p id="modalEndereco"></p>
+            </div>
+        </div>
+
+        <div class="modal-area-imagem">
+            <img id="modalImagem" src="" alt="Imagem">
+        </div>
+
+        <div class="modal-area-info">
+            <div class="modal-descricao">
+                <strong id="modalNome"></strong>
+                <span id="modalDescricao"></span>
+            </div>
+
+            <div id="modalComentariosArea" class="modal-comentarios-area"></div>
+
+            <div class="modal-acoes">
+                <button type="button" id="btnLikeModal" class="btn-like-modal">
+                    <i class='bx bx-heart'></i>
+                    <span id="modalLikes"></span>
+                </button>
+
+                <button type="button" id="btnFocarComentarioModal" class="btn-comentar-modal">
+                    <i class='bx bx-message-dots'></i>
+                    <span id="modalComentarios"></span>
+                </button>
+
+                <button type="button" id="btnReportarModal" class="btn-reportar-modal">
+                    <i class='bx bx-error-circle'></i>
+                    <span>Reportar</span>
+                </button>
+            </div>
+
+            <form id="formComentarioPostModal" class="form-comentario-post-modal" method="post">
+                {% csrf_token %}
+                <input
+                    type="text"
+                    name="comentario"
+                    placeholder="Adicionar comentário..."
+                    required>
+                <button type="submit">Publicar</button>
+            </form>
+        </div>
+    </div>
+
+    <button id="proximoPost" class="seta-modal direita">❯</button>
+</div>
+
+<script>
+const posts = document.querySelectorAll('.explorar-item');
+
+if (posts.length > 0) {
+    const modal = document.getElementById('modalPost');
+    const modalImg = document.getElementById('modalImagem');
+    const modalAvatar = document.getElementById('modalAvatar');
+    const fechar = document.getElementById('fecharModal');
+    const overlay = document.querySelector('.modal-overlay');
+    const btnAnterior = document.getElementById('anteriorPost');
+    const btnProximo = document.getElementById('proximoPost');
+    const btnLikeModal = document.getElementById('btnLikeModal');
+    const btnFocarComentarioModal = document.getElementById('btnFocarComentarioModal');
+    const btnReportarModal = document.getElementById('btnReportarModal');
+    const formComentarioPostModal = document.getElementById('formComentarioPostModal');
+    const modalComentariosArea = document.getElementById('modalComentariosArea');
+
+    let indexAtual = 0;
+    let postAtualId = null;
+
+    function criarComentarioElemento(comentario) {
+        const item = document.createElement('div');
+        item.className = 'comentario-item';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar comentario-avatar';
+
+        if (comentario.foto_url) {
+            const img = document.createElement('img');
+            img.src = comentario.foto_url;
+            img.alt = 'Foto';
+            avatar.appendChild(img);
+        } else {
+            avatar.textContent = comentario.inicial || '?';
+        }
+
+        const conteudo = document.createElement('div');
+        conteudo.className = 'comentario-conteudo';
+
+        const texto = document.createElement('p');
+        const usuario = document.createElement('strong');
+        usuario.textContent = `@${comentario.username}`;
+
+        texto.appendChild(usuario);
+        texto.append(` ${comentario.texto}`);
+
+        const data = document.createElement('span');
+        data.className = 'comentario-data';
+        data.textContent = comentario.data;
+
+        conteudo.appendChild(texto);
+        conteudo.appendChild(data);
+
+        item.appendChild(avatar);
+        item.appendChild(conteudo);
+
+        return item;
+    }
+
+    function removerMensagemSemComentarios(container) {
+        const mensagem = container.querySelector('.sem-comentarios');
+
+        if (mensagem) {
+            mensagem.remove();
+        }
+    }
+
+    function preencherAvatar(post) {
+        modalAvatar.innerHTML = '';
+
+        if (post.dataset.fotoUrl) {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = post.dataset.fotoUrl;
+            avatarImg.alt = 'Foto de perfil';
+            modalAvatar.appendChild(avatarImg);
+        } else {
+            modalAvatar.textContent = post.dataset.username.slice(0, 1).toUpperCase();
+        }
+    }
+
+    function fecharPostModal() {
+        modal.classList.add('oculto');
+        document.body.classList.remove('modal-aberto');
+    }
+
+    function abrirModal(index) {
+        indexAtual = index;
+
+        const post = posts[index];
+        const img = post.querySelector('img');
+        const comentarios = document.getElementById(`comentarios-${post.dataset.id}`);
+
+        postAtualId = post.dataset.id;
+        modalImg.src = img.src;
+        preencherAvatar(post);
+
+        document.getElementById('modalUsername').innerText = post.dataset.username;
+        document.getElementById('modalNome').innerText = post.dataset.nome || post.dataset.username;
+        document.getElementById('modalEndereco').innerText = post.dataset.endereco;
+        document.getElementById('modalDescricao').innerText = post.dataset.descricao;
+        document.getElementById('modalLikes').innerText = post.dataset.likes;
+        document.getElementById('modalComentarios').innerText = post.dataset.comentarios;
+        modalComentariosArea.innerHTML = comentarios.innerHTML;
+        modalComentariosArea.scrollTop = 0;
+
+        formComentarioPostModal.action = post.dataset.comentarUrl;
+        formComentarioPostModal.reset();
+        btnLikeModal.dataset.url = post.dataset.likeUrl;
+        btnReportarModal.dataset.url = post.dataset.reportarUrl;
+        btnReportarModal.classList.remove('reportado');
+        btnReportarModal.querySelector('span').innerText = 'Reportar';
+
+        if (post.dataset.curtido === 'true') {
+            btnLikeModal.classList.add('curtido');
+        } else {
+            btnLikeModal.classList.remove('curtido');
+        }
+
+        btnAnterior.style.display = indexAtual === 0 ? 'none' : 'flex';
+        btnProximo.style.display = indexAtual === posts.length - 1 ? 'none' : 'flex';
+
+        modal.classList.remove('oculto');
+        document.body.classList.add('modal-aberto');
+    }
+
+    posts.forEach((post, index) => {
+        post.addEventListener('click', function(e) {
+            e.preventDefault();
+            abrirModal(index);
+        });
+    });
+
+    fechar.addEventListener('click', fecharPostModal);
+    overlay.addEventListener('click', fecharPostModal);
+
+    btnProximo.addEventListener('click', () => {
+        if (indexAtual < posts.length - 1) {
+            abrirModal(indexAtual + 1);
+        }
+    });
+
+    btnAnterior.addEventListener('click', () => {
+        if (indexAtual > 0) {
+            abrirModal(indexAtual - 1);
+        }
+    });
+
+    btnLikeModal.addEventListener('click', async () => {
+        const response = await fetch(btnLikeModal.dataset.url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const data = await response.json();
+        const post = posts[indexAtual];
+
+        post.dataset.likes = data.likes;
+        post.dataset.curtido = data.curtido ? 'true' : 'false';
+        document.getElementById('modalLikes').innerText = data.likes;
+
+        if (data.curtido) {
+            btnLikeModal.classList.add('curtido');
+        } else {
+            btnLikeModal.classList.remove('curtido');
+        }
+
+        const overlayLike = post.querySelector('.explorar-overlay span:first-child');
+        if (overlayLike) {
+            overlayLike.innerHTML = `<i class='bx bx-heart'></i> ${data.likes}`;
+        }
+    });
+
+    btnFocarComentarioModal.addEventListener('click', () => {
+        formComentarioPostModal.querySelector('input[name="comentario"]').focus();
+    });
+
+    btnReportarModal.addEventListener('click', async () => {
+        await fetch(btnReportarModal.dataset.url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        btnReportarModal.classList.add('reportado');
+        btnReportarModal.querySelector('span').innerText = 'Reportado';
+    });
+
+    formComentarioPostModal.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const input = formComentarioPostModal.querySelector('input[name="comentario"]');
+        const botaoEnviar = formComentarioPostModal.querySelector('button[type="submit"]');
+
+        if (!input.value.trim() || !postAtualId) {
+            return;
+        }
+
+        botaoEnviar.disabled = true;
+
+        try {
+            const response = await fetch(formComentarioPostModal.action, {
+                method: 'POST',
+                body: new FormData(formComentarioPostModal),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const comentario = await response.json();
+            const comentariosOriginais = document.getElementById(`comentarios-${postAtualId}`);
+            const post = posts[indexAtual];
+
+            removerMensagemSemComentarios(modalComentariosArea);
+            removerMensagemSemComentarios(comentariosOriginais);
+
+            modalComentariosArea.appendChild(criarComentarioElemento(comentario));
+            comentariosOriginais.appendChild(criarComentarioElemento(comentario));
+
+            post.dataset.comentarios = comentario.total_comentarios;
+            document.getElementById('modalComentarios').innerText = comentario.total_comentarios;
+
+            const overlayComentarios = post.querySelector('.explorar-overlay span:last-child');
+            if (overlayComentarios) {
+                overlayComentarios.innerHTML = `<i class='bx bx-message-dots'></i> ${comentario.total_comentarios}`;
+            }
+
+            input.value = '';
+            modalComentariosArea.scrollTop = modalComentariosArea.scrollHeight;
+        } finally {
+            botaoEnviar.disabled = false;
+            input.focus();
+        }
+    });
+}
+</script>
 
 {% endblock %}
