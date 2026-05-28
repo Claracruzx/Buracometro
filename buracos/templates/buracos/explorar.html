@@ -1,0 +1,27 @@
+{% extends 'principal/principal.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/explorar.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="explorar-container">
+
+    <div class="explorar-grid">
+        {% for row in rows %}
+            <a href="{% url 'detalheBuracoView' row.id %}" class="explorar-item">
+                <img src="{% static 'image-users/' %}{{ row.url_imagem }}" alt="{{ row.titulo }}">
+
+                    <div class="explorar-overlay">
+                        <span>Ver postagem</span>
+                    </div>
+            </a>
+        {% empty %}
+            <p>Nenhuma postagem disponível.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

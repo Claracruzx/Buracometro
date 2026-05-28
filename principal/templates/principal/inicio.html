@@ -190,21 +190,74 @@ const listaComentariosModal = document.getElementById('listaComentariosModal');
 const formComentarioModal = document.getElementById('formComentarioModal');
 const fecharComentarios = document.getElementById('fecharComentarios');
 const fundoComentarios = document.querySelector('.modal-comentarios-fundo');
+let comentarioAbertoId = null;
+
+function criarComentarioElemento(comentario) {
+    const item = document.createElement('div');
+    item.className = 'comentario-item';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar comentario-avatar';
+
+    if (comentario.foto_url) {
+        const img = document.createElement('img');
+        img.src = comentario.foto_url;
+        img.alt = 'Foto';
+        avatar.appendChild(img);
+    } else {
+        avatar.textContent = comentario.inicial || '?';
+    }
+
+    const conteudo = document.createElement('div');
+    conteudo.className = 'comentario-conteudo';
+
+    const texto = document.createElement('p');
+    const usuario = document.createElement('strong');
+    usuario.textContent = `@${comentario.username}`;
+
+    texto.appendChild(usuario);
+    texto.append(` ${comentario.texto}`);
+
+    const data = document.createElement('span');
+    data.className = 'comentario-data';
+    data.textContent = comentario.data;
+
+    conteudo.appendChild(texto);
+    conteudo.appendChild(data);
+
+    item.appendChild(avatar);
+    item.appendChild(conteudo);
+
+    return item;
+}
+
+function removerMensagemSemComentarios(container) {
+    const mensagem = container.querySelector('.sem-comentarios');
+
+    if (mensagem) {
+        mensagem.remove();
+    }
+}
 
 function abrirModalComentarios(botao) {
     const id = botao.dataset.id;
     const comentarios = document.getElementById(`comentarios-${id}`);
 
+    comentarioAbertoId = id;
     listaComentariosModal.innerHTML = comentarios.innerHTML;
     formComentarioModal.action = botao.dataset.url;
+    formComentarioModal.dataset.id = id;
+    formComentarioModal.reset();
 
     modalComentarios.classList.remove('oculto');
     document.body.classList.add('modal-aberto');
+    listaComentariosModal.scrollTop = listaComentariosModal.scrollHeight;
 }
 
 function fecharModalComentarios() {
     modalComentarios.classList.add('oculto');
     document.body.classList.remove('modal-aberto');
+    comentarioAbertoId = null;
 }
 
 botoesComentario.forEach(botao => {
@@ -215,6 +268,58 @@ botoesComentario.forEach(botao => {
 
 fecharComentarios.addEventListener('click', fecharModalComentarios);
 fundoComentarios.addEventListener('click', fecharModalComentarios);
+
+formComentarioModal.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const input = formComentarioModal.querySelector('input[name="comentario"]');
+    const botaoEnviar = formComentarioModal.querySelector('button[type="submit"]');
+    const texto = input.value.trim();
+
+    if (!texto || !comentarioAbertoId) {
+        return;
+    }
+
+    botaoEnviar.disabled = true;
+
+    try {
+        const formData = new FormData(formComentarioModal);
+
+        const response = await fetch(formComentarioModal.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const comentario = await response.json();
+        const novoComentarioModal = criarComentarioElemento(comentario);
+        const comentariosOriginais = document.getElementById(`comentarios-${comentarioAbertoId}`);
+        const novoComentarioOriginal = criarComentarioElemento(comentario);
+        const botaoComentario = document.querySelector(`.btn-comentar[data-id="${comentarioAbertoId}"]`);
+
+        removerMensagemSemComentarios(listaComentariosModal);
+        removerMensagemSemComentarios(comentariosOriginais);
+
+        listaComentariosModal.appendChild(novoComentarioModal);
+        comentariosOriginais.appendChild(novoComentarioOriginal);
+
+        if (botaoComentario) {
+            botaoComentario.querySelector('span').innerText = comentario.total_comentarios;
+        }
+
+        input.value = '';
+        listaComentariosModal.scrollTop = listaComentariosModal.scrollHeight;
+    } finally {
+        botaoEnviar.disabled = false;
+        input.focus();
+    }
+});
 </script>
 
 {% endblock %}

@@ -1,23 +1,16 @@
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
-import os
-import shutil
-from django.conf import settings
 from django.urls import reverse
 from urllib.parse import urlencode
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
-from datetime import datetime
-from .models import Buraco
 from django.contrib.auth.decorators import login_required
 from .models import Buraco, Like, Comentario, Reporte
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-
-# class CadastroView(TemplateView):
-#     template_name = "buracos/cadastro.html"
+from django.utils import timezone
 
 
 def cadastroView(request):
@@ -37,8 +30,6 @@ def cadastroView(request):
 
     return render(request, 'buracos/cadastro.html', variaveis)
 
-# class CadastroSelecionarLocalView(TemplateView):
-#     template_name = "buracos/cadastro-selecionar-local.html"
 
 def cadastroSelecionarLocalView(request):
     titulo = ''
@@ -58,15 +49,13 @@ def cadastroSelecionarLocalView(request):
 
     return render(request, "buracos/cadastro-selecionar-local.html", variaveis)
 
-# class VerBuracosView(TemplateView):
-#     template_name = "buracos/ver-buracos.html"
 
-def verBuracosView(request):
+def explorarView(request):
     buracos = Buraco.objects.all()
     variaveis = {
         'rows': buracos,
     }
-    return render(request, 'buracos/ver-buracos.html', variaveis)
+    return render(request, 'buracos/explorar.html', variaveis)
 
 def passarLocalParaCadastroView(request):
     if request.method == "POST":
@@ -96,53 +85,36 @@ def cadastroStore(request):
         coordenadas = request.POST.get("coordenadas")
         endereco = request.POST.get("endereco")
         tamanho = request.POST.get("tamanho")
-        imagem = request.FILES["imagem"]
+        imagem = request.FILES.get("imagem")
 
-        caminho_pasta = os.path.join(settings.BASE_DIR, 'paginas/static/paginas/image-users')  # Pasta de destino
-        nome_arquivo = imagem.name
+        if not imagem:
+            messages.error(request, "A imagem do buraco é obrigatória.")
+            return redirect("cadastrarView")
 
-        os.makedirs(caminho_pasta, exist_ok=True)
-
-        caminho_arquivo = os.path.join(caminho_pasta, nome_arquivo)
-
-        if os.path.exists(caminho_arquivo):
-            base_nome, extensao = os.path.splitext(nome_arquivo)
-            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            nome_arquivo = f"{base_nome}_{timestamp}{extensao}"
-            caminho_arquivo = os.path.join(caminho_pasta, nome_arquivo)
+        if not coordenadas or not endereco:
+            messages.error(request, "Selecione a localização do buraco no mapa.")
+            return redirect("cadastrarView")
 
         try:
-            buraco = Buraco.objects.create (
-                titulo = titulo,
-                descricao = descricao,
-                local = coordenadas,
-                endereco = endereco,
-                tamanho = tamanho,
-                url_imagem = nome_arquivo,
+            Buraco.objects.create(
+                titulo=titulo,
+                descricao=descricao,
+                local=coordenadas,
+                endereco=endereco,
+                tamanho=tamanho,
+                imagem=imagem,
                 usuario=request.user,
             )
 
-            buraco.save()
-
-            with open(caminho_arquivo, 'wb+') as destino:
-                shutil.copyfileobj(imagem.file, destino)
-
-            msg = "Buraco cadastrado com sucesso! " \
-                f"Veja mais em <a href='{reverse('verBuracosView')}'>seus buracos</a>"
+            msg = "Buraco cadastrado com sucesso!"
             messages.success(request, msg)
+
         except IntegrityError as e:
             msg = f"Erro ao criar buraco: {e}"
             messages.error(request, msg)
 
-        # print(titulo)
-        # print(descricao)
-        # print(endereco)
-        # print(coordenadas)
-        # print(tamanho)
-        # print(imagem)
-        # print(nome_arquivo)
+    return redirect('cadastrarView')
 
-    return redirect('cadastrarView')   
 
 def detalheBuracoView(request, id):
     buraco = Buraco.objects.get(id=id)
@@ -193,14 +165,30 @@ def comentarBuracoView(request, buraco_id):
 
         buraco = get_object_or_404(Buraco, id=buraco_id)
 
-        texto = request.POST.get("comentario")
+        texto = request.POST.get("comentario", "").strip()
 
-        if texto.strip():
+        if texto:
 
-            Comentario.objects.create(
+            comentario = Comentario.objects.create(
                 usuario=request.user,
                 buraco=buraco,
                 texto=texto
             )
+
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                foto_url = request.user.foto.url if getattr(request.user, "foto", None) else ""
+
+                return JsonResponse({
+                    "id": comentario.id,
+                    "texto": comentario.texto,
+                    "username": request.user.username,
+                    "foto_url": foto_url,
+                    "inicial": request.user.username[:1].upper(),
+                    "data": timezone.localtime(comentario.created_at).strftime("%d/%m/%Y %H:%M"),
+                    "total_comentarios": buraco.comentarios.count(),
+                })
+
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"erro": "Comentário vazio."}, status=400)
 
     return redirect(request.META.get('HTTP_REFERER'))

@@ -28,27 +28,33 @@ Perfil
             <a href="{% url 'editarPerfilView' %}" class="btn-editar-perfil">
                 Editar perfil
             </a>
-
         </div>
-
     </div>
 
     <div class="perfil-stats">
-
         <div class="stat-card">
             <h2>{{ buracos.count }}</h2>
             <p>Buracos cadastrados</p>
         </div>
-
     </div>
 
     <h2 class="titulo-postagens">
         Minhas postagens
     </h2>
 
-<div class="explorar-grid perfil-grid">
+    <div class="explorar-grid perfil-grid">
     {% for buraco in buracos %}
-        <a href="{% url 'detalheBuracoView' buraco.id %}" class="explorar-item" data-index="{{ forloop.counter0 }}">
+        <a 
+            href="{% url 'detalheBuracoView' buraco.id %}" 
+            class="explorar-item" 
+            data-index="{{ forloop.counter0 }}"
+            data-id="{{ buraco.id }}"
+            data-descricao="{{ buraco.descricao }}"
+            data-likes="{{ buraco.likes.count }}"
+            data-comentarios="{{ buraco.comentarios.count }}"
+            data-username="{{ usuario.username }}"
+            data-nome="{{ usuario.name }}"
+            data-endereco="{{ buraco.endereco }}">
 
             {% if buraco.imagem %}
                 <img src="{{ buraco.imagem.url }}" alt="{{ buraco.titulo }}">
@@ -67,10 +73,24 @@ Perfil
                     {{ buraco.comentarios.count }}
                 </span>
             </div>
-    {% empty %}
-        <p class="empty-feed">Você ainda não cadastrou nenhum buraco.</p>
-    {% endfor %}
-</div>
+        </a>
+
+        <div class="comentarios-escondidos" id="comentarios-{{ buraco.id }}">
+            {% for comentario in buraco.comentarios.all %}
+                <div class="comentario-item">
+                    <strong>@{{ comentario.usuario.username }}</strong>
+                    <span>{{ comentario.texto }}</span>
+                    <small>{{ comentario.created_at|date:"d/m/Y H:i" }}</small>
+                </div>
+            {% empty %}
+                <p class="sem-comentarios">Nenhum comentário ainda.</p>
+            {% endfor %}
+        </div>
+
+        {% empty %}
+            <p class="empty-feed">Você ainda não cadastrou nenhum buraco.</p>
+        {% endfor %}
+    </div>
 
 </div>
 
@@ -86,10 +106,49 @@ Perfil
         ❮
     </button>
 
-    <div class="modal-conteudo">
+    <div class="modal-conteudo modal-postagem-detalhe">
 
-        <img id="modalImagem" src="" alt="Imagem">
+        <div class="modal-area-imagem">
+            <img id="modalImagem" src="" alt="Imagem">
+        </div>
 
+        <div class="modal-area-info">
+
+            <div class="modal-post-header">
+                <div class="avatar">
+                    {% if usuario.foto %}
+                        <img src="{{ usuario.foto.url }}" alt="Foto de perfil">
+                    {% else %}
+                        {{ usuario.username|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+
+                <div>
+                    <h3 id="modalUsername"></h3>
+                    <p id="modalEndereco"></p>
+                </div>
+            </div>
+
+            <div class="modal-descricao">
+                <strong id="modalNome"></strong>
+                <span id="modalDescricao"></span>
+            </div>
+
+            <div id="modalComentariosArea" class="modal-comentarios-area"></div>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-like-modal">
+                    <i class='bx bx-heart'></i>
+                    <span id="modalLikes"></span>
+                </button>
+
+                <button type="button" class="btn-comentar-modal">
+                    <i class='bx bx-message-dots'></i>
+                    <span id="modalComentarios"></span>
+                </button>
+            </div>
+
+        </div>
     </div>
 
     <button id="proximoPost" class="seta-modal direita">
@@ -118,6 +177,17 @@ if (posts.length > 0) {
 
     const img = posts[index].querySelector('img');
     modalImg.src = img.src;
+
+    const idPost = posts[index].dataset.id;
+    const comentarios = document.getElementById(`comentarios-${idPost}`);
+
+    document.getElementById('modalUsername').innerText = posts[index].dataset.username;
+    document.getElementById('modalNome').innerText = posts[index].dataset.nome || posts[index].dataset.username;
+    document.getElementById('modalEndereco').innerText = posts[index].dataset.endereco;
+    document.getElementById('modalDescricao').innerText = posts[index].dataset.descricao;
+    document.getElementById('modalLikes').innerText = posts[index].dataset.likes;
+    document.getElementById('modalComentarios').innerText = posts[index].dataset.comentarios;
+    document.getElementById('modalComentariosArea').innerHTML = comentarios.innerHTML;
 
     if (indexAtual === 0) {
         btnAnterior.style.display = 'none';

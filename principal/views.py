@@ -24,14 +24,7 @@ def inicioView(request):
     return render(request, 'principal/inicio.html', variaveis)
 
 
-def rankingView(request):
-    buracos = Buraco.objects.order_by('-tamanho')
 
-    variaveis = {
-        'buracos': buracos,
-    }
-
-    return render(request, 'principal/ranking.html', variaveis)
 
 
 class VerNoMapaView(TemplateView):

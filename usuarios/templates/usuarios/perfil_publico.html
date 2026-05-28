@@ -42,7 +42,15 @@ Perfil de {{ usuario_perfil.username }}
 
         <div class="explorar-grid perfil-grid">
     {% for buraco in buracos %}
-        <a href="{% url 'detalheBuracoView' buraco.id %}" class="explorar-item" data-index="{{ forloop.counter0 }}">
+            <a 
+                href="{% url 'detalheBuracoView' buraco.id %}" 
+                class="explorar-item" 
+                data-index="{{ forloop.counter0 }}"
+                data-titulo="{{ buraco.titulo }}"
+                data-descricao="{{ buraco.descricao }}"
+                data-likes="{{ buraco.likes.count }}"
+                data-comentarios="{{ buraco.comentarios.count }}"
+            >
             <img src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="{{ buraco.titulo }}">
 
             <div class="explorar-overlay">
@@ -70,9 +78,23 @@ Perfil de {{ usuario_perfil.username }}
         ❮
     </button>
 
-    <div class="modal-conteudo">
+    <div class="modal-conteudo modal-postagem-detalhe">
+
+    <div class="modal-area-imagem">
         <img id="modalImagem" src="" alt="Imagem">
     </div>
+
+    <div class="modal-area-info">
+        <h2 id="modalTitulo"></h2>
+        <p id="modalDescricao"></p>
+
+        <div class="modal-stats">
+            <span id="modalLikes"></span>
+            <span id="modalComentarios"></span>
+        </div>
+    </div>
+
+</div>
 
     <button id="proximoPost" class="seta-modal direita">
         ❯
@@ -96,6 +118,9 @@ if (posts.length > 0) {
     let indexAtual = 0;
 
     function abrirModal(index) {
+    document.getElementById('modalDescricao').innerText = posts[index].dataset.descricao;
+    document.getElementById('modalLikes').innerText = `❤️ ${posts[index].dataset.likes}`;
+    document.getElementById('modalComentarios').innerText = `💬 ${posts[index].dataset.comentarios}`;
     indexAtual = index;
 
     const img = posts[index].querySelector('img');
