@@ -52,9 +52,13 @@ Perfil
             data-descricao="{{ buraco.descricao }}"
             data-likes="{{ buraco.likes.count }}"
             data-comentarios="{{ buraco.comentarios.count }}"
+            data-curtido="{% if buraco.curtido %}true{% else %}false{% endif %}"
             data-username="{{ usuario.username }}"
             data-nome="{{ usuario.name }}"
-            data-endereco="{{ buraco.endereco }}">
+            data-endereco="{{ buraco.endereco }}"
+            data-like-url="{% url 'curtirBuraco' buraco.id %}"
+            data-comentar-url="{% url 'comentarBuraco' buraco.id %}"
+            data-reportar-url="{% url 'reportarBuraco' buraco.id %}">
 
             {% if buraco.imagem %}
                 <img src="{{ buraco.imagem.url }}" alt="{{ buraco.titulo }}">
@@ -78,9 +82,20 @@ Perfil
         <div class="comentarios-escondidos" id="comentarios-{{ buraco.id }}">
             {% for comentario in buraco.comentarios.all %}
                 <div class="comentario-item">
-                    <strong>@{{ comentario.usuario.username }}</strong>
-                    <span>{{ comentario.texto }}</span>
-                    <small>{{ comentario.created_at|date:"d/m/Y H:i" }}</small>
+                    <div class="avatar comentario-avatar">
+                        {% if comentario.usuario.foto %}
+                            <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
+                        {% else %}
+                            {{ comentario.usuario.username|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="comentario-conteudo">
+                        <p>
+                            <strong>@{{ comentario.usuario.username }}</strong>
+                            {{ comentario.texto }}
+                        </p>
+                        <span class="comentario-data">{{ comentario.created_at|date:"d/m/Y H:i" }}</span>
+                    </div>
                 </div>
             {% empty %}
                 <p class="sem-comentarios">Nenhum comentário ainda.</p>
@@ -108,26 +123,26 @@ Perfil
 
     <div class="modal-conteudo modal-postagem-detalhe">
 
+        <div class="modal-post-header">
+            <div class="avatar">
+                {% if usuario.foto %}
+                    <img src="{{ usuario.foto.url }}" alt="Foto de perfil">
+                {% else %}
+                    {{ usuario.username|slice:":1"|upper }}
+                {% endif %}
+            </div>
+
+            <div>
+                <h3 id="modalUsername"></h3>
+                <p id="modalEndereco"></p>
+            </div>
+        </div>
+
         <div class="modal-area-imagem">
             <img id="modalImagem" src="" alt="Imagem">
         </div>
 
         <div class="modal-area-info">
-
-            <div class="modal-post-header">
-                <div class="avatar">
-                    {% if usuario.foto %}
-                        <img src="{{ usuario.foto.url }}" alt="Foto de perfil">
-                    {% else %}
-                        {{ usuario.username|slice:":1"|upper }}
-                    {% endif %}
-                </div>
-
-                <div>
-                    <h3 id="modalUsername"></h3>
-                    <p id="modalEndereco"></p>
-                </div>
-            </div>
 
             <div class="modal-descricao">
                 <strong id="modalNome"></strong>
@@ -137,16 +152,31 @@ Perfil
             <div id="modalComentariosArea" class="modal-comentarios-area"></div>
 
             <div class="modal-acoes">
-                <button type="button" class="btn-like-modal">
+                <button type="button" id="btnLikeModal" class="btn-like-modal">
                     <i class='bx bx-heart'></i>
                     <span id="modalLikes"></span>
                 </button>
 
-                <button type="button" class="btn-comentar-modal">
+                <button type="button" id="btnFocarComentarioModal" class="btn-comentar-modal">
                     <i class='bx bx-message-dots'></i>
                     <span id="modalComentarios"></span>
                 </button>
+
+                <button type="button" id="btnReportarModal" class="btn-reportar-modal">
+                    <i class='bx bx-error-circle'></i>
+                    <span>Reportar</span>
+                </button>
             </div>
+
+            <form id="formComentarioPostModal" class="form-comentario-post-modal" method="post">
+                {% csrf_token %}
+                <input
+                    type="text"
+                    name="comentario"
+                    placeholder="Adicionar comentário..."
+                    required>
+                <button type="submit">Publicar</button>
+            </form>
 
         </div>
     </div>
@@ -163,45 +193,108 @@ const posts = document.querySelectorAll('.explorar-item');
 if (posts.length > 0) {
     const modal = document.getElementById('modalPost');
     const modalImg = document.getElementById('modalImagem');
-
     const fechar = document.getElementById('fecharModal');
     const overlay = document.querySelector('.modal-overlay');
-
     const btnAnterior = document.getElementById('anteriorPost');
     const btnProximo = document.getElementById('proximoPost');
+    const btnLikeModal = document.getElementById('btnLikeModal');
+    const btnFocarComentarioModal = document.getElementById('btnFocarComentarioModal');
+    const btnReportarModal = document.getElementById('btnReportarModal');
+    const formComentarioPostModal = document.getElementById('formComentarioPostModal');
+    const modalComentariosArea = document.getElementById('modalComentariosArea');
 
     let indexAtual = 0;
+    let postAtualId = null;
+
+    function criarComentarioElemento(comentario) {
+        const item = document.createElement('div');
+        item.className = 'comentario-item';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar comentario-avatar';
+
+        if (comentario.foto_url) {
+            const img = document.createElement('img');
+            img.src = comentario.foto_url;
+            img.alt = 'Foto';
+            avatar.appendChild(img);
+        } else {
+            avatar.textContent = comentario.inicial || '?';
+        }
+
+        const conteudo = document.createElement('div');
+        conteudo.className = 'comentario-conteudo';
+
+        const texto = document.createElement('p');
+        const usuario = document.createElement('strong');
+        usuario.textContent = `@${comentario.username}`;
+
+        texto.appendChild(usuario);
+        texto.append(` ${comentario.texto}`);
+
+        const data = document.createElement('span');
+        data.className = 'comentario-data';
+        data.textContent = comentario.data;
+
+        conteudo.appendChild(texto);
+        conteudo.appendChild(data);
+
+        item.appendChild(avatar);
+        item.appendChild(conteudo);
+
+        return item;
+    }
+
+    function removerMensagemSemComentarios(container) {
+        const mensagem = container.querySelector('.sem-comentarios');
+
+        if (mensagem) {
+            mensagem.remove();
+        }
+    }
+
+    function fecharPostModal() {
+        modal.classList.add('oculto');
+        document.body.classList.remove('modal-aberto');
+    }
 
     function abrirModal(index) {
-    indexAtual = index;
+        indexAtual = index;
 
-    const img = posts[index].querySelector('img');
-    modalImg.src = img.src;
+        const post = posts[index];
+        const img = post.querySelector('img');
+        const comentarios = document.getElementById(`comentarios-${post.dataset.id}`);
 
-    const idPost = posts[index].dataset.id;
-    const comentarios = document.getElementById(`comentarios-${idPost}`);
+        postAtualId = post.dataset.id;
+        modalImg.src = img.src;
 
-    document.getElementById('modalUsername').innerText = posts[index].dataset.username;
-    document.getElementById('modalNome').innerText = posts[index].dataset.nome || posts[index].dataset.username;
-    document.getElementById('modalEndereco').innerText = posts[index].dataset.endereco;
-    document.getElementById('modalDescricao').innerText = posts[index].dataset.descricao;
-    document.getElementById('modalLikes').innerText = posts[index].dataset.likes;
-    document.getElementById('modalComentarios').innerText = posts[index].dataset.comentarios;
-    document.getElementById('modalComentariosArea').innerHTML = comentarios.innerHTML;
+        document.getElementById('modalUsername').innerText = post.dataset.username;
+        document.getElementById('modalNome').innerText = post.dataset.nome || post.dataset.username;
+        document.getElementById('modalEndereco').innerText = post.dataset.endereco;
+        document.getElementById('modalDescricao').innerText = post.dataset.descricao;
+        document.getElementById('modalLikes').innerText = post.dataset.likes;
+        document.getElementById('modalComentarios').innerText = post.dataset.comentarios;
+        modalComentariosArea.innerHTML = comentarios.innerHTML;
+        modalComentariosArea.scrollTop = 0;
 
-    if (indexAtual === 0) {
-        btnAnterior.style.display = 'none';
-    } else {
-        btnAnterior.style.display = 'flex';
-    }
+        formComentarioPostModal.action = post.dataset.comentarUrl;
+        formComentarioPostModal.reset();
+        btnLikeModal.dataset.url = post.dataset.likeUrl;
+        btnReportarModal.dataset.url = post.dataset.reportarUrl;
+        btnReportarModal.classList.remove('reportado');
+        btnReportarModal.querySelector('span').innerText = 'Reportar';
 
-    if (indexAtual === posts.length - 1) {
-        btnProximo.style.display = 'none';
-    } else {
-        btnProximo.style.display = 'flex';
-    }
+        if (post.dataset.curtido === 'true') {
+            btnLikeModal.classList.add('curtido');
+        } else {
+            btnLikeModal.classList.remove('curtido');
+        }
 
-    modal.classList.remove('oculto');
+        btnAnterior.style.display = indexAtual === 0 ? 'none' : 'flex';
+        btnProximo.style.display = indexAtual === posts.length - 1 ? 'none' : 'flex';
+
+        modal.classList.remove('oculto');
+        document.body.classList.add('modal-aberto');
     }   
 
     posts.forEach((post, index) => {
@@ -211,13 +304,8 @@ if (posts.length > 0) {
         });
     });
 
-    fechar.addEventListener('click', () => {
-        modal.classList.add('oculto');
-    });
-
-    overlay.addEventListener('click', () => {
-        modal.classList.add('oculto');
-    });
+    fechar.addEventListener('click', fecharPostModal);
+    overlay.addEventListener('click', fecharPostModal);
 
     btnProximo.addEventListener('click', () => {
     if (indexAtual < posts.length - 1) {
@@ -226,9 +314,105 @@ if (posts.length > 0) {
     });
 
     btnAnterior.addEventListener('click', () => {
-    if (indexAtual > 0) {
-        abrirModal(indexAtual - 1);
-    }
+        if (indexAtual > 0) {
+            abrirModal(indexAtual - 1);
+        }
+    });
+
+    btnLikeModal.addEventListener('click', async () => {
+        const response = await fetch(btnLikeModal.dataset.url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const data = await response.json();
+        const post = posts[indexAtual];
+
+        post.dataset.likes = data.likes;
+        post.dataset.curtido = data.curtido ? 'true' : 'false';
+        document.getElementById('modalLikes').innerText = data.likes;
+
+        if (data.curtido) {
+            btnLikeModal.classList.add('curtido');
+        } else {
+            btnLikeModal.classList.remove('curtido');
+        }
+
+        const overlayLike = post.querySelector('.explorar-overlay span:first-child');
+        if (overlayLike) {
+            overlayLike.innerHTML = `<i class='bx bx-heart'></i> ${data.likes}`;
+        }
+    });
+
+    btnFocarComentarioModal.addEventListener('click', () => {
+        formComentarioPostModal.querySelector('input[name="comentario"]').focus();
+    });
+
+    btnReportarModal.addEventListener('click', async () => {
+        await fetch(btnReportarModal.dataset.url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        btnReportarModal.classList.add('reportado');
+        btnReportarModal.querySelector('span').innerText = 'Reportado';
+    });
+
+    formComentarioPostModal.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const input = formComentarioPostModal.querySelector('input[name="comentario"]');
+        const botaoEnviar = formComentarioPostModal.querySelector('button[type="submit"]');
+
+        if (!input.value.trim() || !postAtualId) {
+            return;
+        }
+
+        botaoEnviar.disabled = true;
+
+        try {
+            const response = await fetch(formComentarioPostModal.action, {
+                method: 'POST',
+                body: new FormData(formComentarioPostModal),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const comentario = await response.json();
+            const comentariosOriginais = document.getElementById(`comentarios-${postAtualId}`);
+            const post = posts[indexAtual];
+
+            removerMensagemSemComentarios(modalComentariosArea);
+            removerMensagemSemComentarios(comentariosOriginais);
+
+            modalComentariosArea.appendChild(criarComentarioElemento(comentario));
+            comentariosOriginais.appendChild(criarComentarioElemento(comentario));
+
+            post.dataset.comentarios = comentario.total_comentarios;
+            document.getElementById('modalComentarios').innerText = comentario.total_comentarios;
+
+            const overlayComentarios = post.querySelector('.explorar-overlay span:last-child');
+            if (overlayComentarios) {
+                overlayComentarios.innerHTML = `<i class='bx bx-message-dots'></i> ${comentario.total_comentarios}`;
+            }
+
+            input.value = '';
+            modalComentariosArea.scrollTop = modalComentariosArea.scrollHeight;
+        } finally {
+            botaoEnviar.disabled = false;
+            input.focus();
+        }
     });
 }
 </script>

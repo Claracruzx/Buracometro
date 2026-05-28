@@ -8,7 +8,7 @@ from django.db import IntegrityError
 from django.urls import reverse
 from .models import CustomUser
 from django.contrib.auth.decorators import login_required
-from buracos.models import Buraco
+from buracos.models import Buraco, Like
 
 class LoginView(TemplateView):
     template_name = "usuarios/login.html"
@@ -88,6 +88,12 @@ def perfilView(request):
 
     buracos = Buraco.objects.filter(usuario=usuario).order_by('-created_at')
 
+    for buraco in buracos:
+        buraco.curtido = Like.objects.filter(
+            usuario=request.user,
+            buraco=buraco
+        ).exists()
+
     return render(request, 'usuarios/perfil.html', {
         'usuario': usuario,
         'buracos': buracos,
@@ -101,6 +107,12 @@ def perfilPublicoView(request, username):
     usuario_perfil = get_object_or_404(CustomUser, username=username)
 
     buracos = Buraco.objects.filter(usuario=usuario_perfil).order_by('-created_at')
+
+    for buraco in buracos:
+        buraco.curtido = request.user.is_authenticated and Like.objects.filter(
+            usuario=request.user,
+            buraco=buraco
+        ).exists()
 
     return render(request, 'usuarios/perfil_publico.html', {
         'usuario_perfil': usuario_perfil,
