@@ -35,6 +35,26 @@ main {
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
 }
 
+.alert.alert-error {
+    color: #7f1d1d;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+.alert.alert-success {
+    color: #14532d;
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
 .title {
     display: block;
     font-size: 2.2rem;
@@ -118,6 +138,10 @@ label {
     fill: #4b5563; /* Cor cinza pro ícone aparecer bem no input branco */
 }
 
+.btn-icon.senha-visivel svg {
+    fill: #8f0b13;
+}
+
 /* Melhorando o Input de Data */
 input[type="date"] {
     appearance: none;
@@ -140,7 +164,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 16px;
     border: none;
     border-radius: 12px;
-    background: #cf621e;
+    background: #8f0b13;
     color: white;
     font-size: 1.1rem;
     font-weight: 700;

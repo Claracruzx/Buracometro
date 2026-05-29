@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
-from .models import Buraco, Like, Comentario, Reporte
+from .models import Buraco, Like, Comentario, LikeComentario, Reporte
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -160,6 +160,7 @@ def excluirBuracoView(request, buraco_id):
         return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
 
     if request.method == "POST":
+        Notificacao.objects.filter(buraco=buraco).delete()
         buraco.delete()
 
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -181,7 +182,16 @@ def curtirBuracoView(request, buraco_id):
 
     curtido = True
 
+    if buraco.usuario and buraco.usuario != request.user:
+        notificacao_like = Notificacao.objects.filter(
+            destinatario=buraco.usuario,
+            ator=request.user,
+            buraco=buraco,
+            tipo="like"
+        )
+
     if created and buraco.usuario and buraco.usuario != request.user:
+        notificacao_like.delete()
         Notificacao.objects.create(
             destinatario=buraco.usuario,
             ator=request.user,
@@ -193,6 +203,9 @@ def curtirBuracoView(request, buraco_id):
     if not created:
         like.delete()
         curtido = False
+
+        if buraco.usuario and buraco.usuario != request.user:
+            notificacao_like.delete()
 
     return JsonResponse({
         'likes': buraco.likes.count(),
@@ -249,13 +262,34 @@ def comentarBuracoView(request, buraco_id):
 
         if texto:
 
+            resposta_de_id = request.POST.get("resposta_de")
+            comentario_pai = None
+
+            if resposta_de_id:
+                comentario_pai = get_object_or_404(
+                    Comentario,
+                    id=resposta_de_id,
+                    buraco=buraco,
+                    resposta_de__isnull=True
+                )
+
             comentario = Comentario.objects.create(
                 usuario=request.user,
                 buraco=buraco,
-                texto=texto
+                texto=texto,
+                resposta_de=comentario_pai
             )
 
-            if buraco.usuario and buraco.usuario != request.user:
+            if comentario_pai and comentario_pai.usuario != request.user:
+                Notificacao.objects.create(
+                    destinatario=comentario_pai.usuario,
+                    ator=request.user,
+                    buraco=buraco,
+                    comentario=comentario_pai,
+                    tipo="resposta_comentario",
+                    mensagem="respondeu seu comentario."
+                )
+            elif buraco.usuario and buraco.usuario != request.user:
                 Notificacao.objects.create(
                     destinatario=buraco.usuario,
                     ator=request.user,
@@ -274,6 +308,10 @@ def comentarBuracoView(request, buraco_id):
                     "foto_url": foto_url,
                     "inicial": request.user.username[:1].upper(),
                     "data": timezone.localtime(comentario.created_at).strftime("%d/%m/%Y %H:%M"),
+                    "resposta_de": comentario_pai.id if comentario_pai else None,
+                    "pode_excluir": True,
+                    "curtido": False,
+                    "likes": 0,
                     "total_comentarios": buraco.comentarios.count(),
                 })
 
@@ -281,3 +319,77 @@ def comentarBuracoView(request, buraco_id):
             return JsonResponse({"erro": "Comentário vazio."}, status=400)
 
     return redirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def curtirComentarioView(request, comentario_id):
+    comentario = get_object_or_404(Comentario, id=comentario_id)
+
+    like, created = LikeComentario.objects.get_or_create(
+        usuario=request.user,
+        comentario=comentario
+    )
+
+    curtido = True
+
+    if comentario.usuario != request.user:
+        notificacao_like = Notificacao.objects.filter(
+            destinatario=comentario.usuario,
+            ator=request.user,
+            buraco=comentario.buraco,
+            comentario=comentario,
+            tipo="like_comentario"
+        )
+
+    if created and comentario.usuario != request.user:
+        notificacao_like.delete()
+        Notificacao.objects.create(
+            destinatario=comentario.usuario,
+            ator=request.user,
+            buraco=comentario.buraco,
+            comentario=comentario,
+            tipo="like_comentario",
+            mensagem="curtiu seu comentario."
+        )
+
+    if not created:
+        like.delete()
+        curtido = False
+
+        if comentario.usuario != request.user:
+            notificacao_like.delete()
+
+    return JsonResponse({
+        "curtido": curtido,
+        "likes": comentario.likes.count(),
+    })
+
+
+@login_required
+def excluirComentarioView(request, comentario_id):
+    comentario = get_object_or_404(Comentario, id=comentario_id)
+    buraco = comentario.buraco
+
+    pode_excluir = comentario.usuario == request.user or buraco.usuario == request.user
+
+    if not pode_excluir:
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"erro": "VocÃª nÃ£o pode excluir esse comentÃ¡rio."}, status=403)
+
+        messages.error(request, "VocÃª nÃ£o pode excluir esse comentÃ¡rio.")
+        return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
+
+    if request.method == "POST":
+        Notificacao.objects.filter(comentario=comentario).delete()
+        comentario.delete()
+        total_comentarios = buraco.comentarios.count()
+
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({
+                "excluido": True,
+                "total_comentarios": total_comentarios,
+            })
+
+        messages.success(request, "ComentÃ¡rio excluÃ­do.")
+
+    return redirect(request.META.get('HTTP_REFERER', 'inicioView'))

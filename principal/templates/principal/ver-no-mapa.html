@@ -58,7 +58,7 @@ Ver no mapa
         height: 46px;
         border: none;
         border-radius: 50%;
-        background: #ff9900;
+        background: #8f0b13;
         color: white;
         font-size: 20px;
         cursor: pointer;
@@ -141,12 +141,12 @@ Ver no mapa
     }
 
     .zona-item:hover {
-        border-color: #ff9900;
+        border-color: #8f0b13;
         background: #fff8ed;
     }
 
     .zona-item.ativa {
-        border-color: #cf621e;
+        border-color: #850b13b4;
         background: #fff3df;
     }
 
@@ -169,7 +169,7 @@ Ver no mapa
         height: 34px;
         border: 3px solid white;
         border-radius: 50%;
-        background: #ff9900;
+        background: #8f0b13;
         color: white;
         box-shadow: 0 6px 14px rgba(0,0,0,0.28);
     }
@@ -197,7 +197,7 @@ Ver no mapa
     }
 
     .popup-buraco a {
-        color: #cf621e;
+        color: #8f0b13;
         font-weight: 700;
         text-decoration: none;
     }
@@ -310,9 +310,9 @@ zonasMapa.forEach(zona => {
 
     const circulo = L.circle([zona.latitude, zona.longitude], {
         radius: raio,
-        color: '#cf621e',
+        color: '#8f0b13',
         weight: 2,
-        fillColor: '#ff9900',
+        fillColor: '#8f0b13',
         fillOpacity: 0.16 + (intensidade * 0.22)
     }).addTo(mapa).bindPopup(`
         <strong>${zona.nome}</strong><br>

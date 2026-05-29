@@ -5,8 +5,10 @@ from django.conf import settings
 class Notificacao(models.Model):
     TIPO_CHOICES = [
         ("like", "Curtida"),
-        ("comentario", "Comentário"),
-        ("remocao", "Remoção"),
+        ("like_comentario", "Curtida em comentario"),
+        ("comentario", "Comentario"),
+        ("resposta_comentario", "Resposta em comentario"),
+        ("remocao", "Remocao"),
     ]
 
     destinatario = models.ForeignKey(
@@ -24,6 +26,13 @@ class Notificacao(models.Model):
     buraco = models.ForeignKey(
         "buracos.Buraco",
         on_delete=models.SET_NULL,
+        related_name="notificacoes",
+        null=True,
+        blank=True
+    )
+    comentario = models.ForeignKey(
+        "buracos.Comentario",
+        on_delete=models.CASCADE,
         related_name="notificacoes",
         null=True,
         blank=True

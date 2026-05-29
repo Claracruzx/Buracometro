@@ -77,25 +77,76 @@ Iní­cio
 
                 <div class="comentarios-escondidos" id="comentarios-{{ buraco.id }}">
                     {% for comentario in buraco.comentarios.all %}
-                        <div class="comentario-item">
-                            <div class="avatar comentario-avatar">
-                                {% if comentario.usuario.foto %}
-                                    <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
-                                {% else %}
-                                    {{ comentario.usuario.username|slice:":1"|upper }}
-                                {% endif %}
-                            </div>
-                            <div>
-                                <p>
-                                    <strong>@{{ comentario.usuario.username }}</strong>
-                                    {{ comentario.texto }}
-                                </p>
+                        {% if not comentario.resposta_de %}
+                            <div
+                                class="comentario-item"
+                                data-comentario-id="{{ comentario.id }}"
+                                data-username="{{ comentario.usuario.username }}"
+                                data-like-url="{% url 'curtirComentario' comentario.id %}"
+                                data-delete-url="{% url 'excluirComentario' comentario.id %}">
+                                <div class="avatar comentario-avatar">
+                                    {% if comentario.usuario.foto %}
+                                        <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
+                                    {% else %}
+                                        {{ comentario.usuario.username|slice:":1"|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="comentario-conteudo">
+                                    <p>
+                                        <strong>@{{ comentario.usuario.username }}</strong>
+                                        {{ comentario.texto }}
+                                    </p>
 
-                                <span class="comentario-data">
-                                    {{ comentario.created_at|date:"d/m/Y H:i" }}
-                                </span>
+                                    <span class="comentario-data">
+                                        {{ comentario.created_at|date:"d/m/Y H:i" }}
+                                    </span>
+                                    <div class="comentario-acoes">
+                                        <button type="button" class="btn-curtir-comentario">
+                                            <i class='bx bx-heart'></i>
+                                            <span>{{ comentario.likes.count }}</span>
+                                        </button>
+                                        <button type="button" class="btn-responder-comentario">Responder</button>
+                                        {% if request.user.id == comentario.usuario.id or request.user.id == buraco.usuario.id %}
+                                            <button type="button" class="btn-excluir-comentario">Apagar</button>
+                                        {% endif %}
+                                    </div>
+                                    <div class="comentario-respostas">
+                                        {% for resposta in comentario.respostas.all %}
+                                            <div
+                                                class="comentario-item comentario-resposta"
+                                                data-comentario-id="{{ resposta.id }}"
+                                                data-username="{{ resposta.usuario.username }}"
+                                                data-like-url="{% url 'curtirComentario' resposta.id %}"
+                                                data-delete-url="{% url 'excluirComentario' resposta.id %}">
+                                                <div class="avatar comentario-avatar">
+                                                    {% if resposta.usuario.foto %}
+                                                        <img src="{{ resposta.usuario.foto.url }}" alt="Foto">
+                                                    {% else %}
+                                                        {{ resposta.usuario.username|slice:":1"|upper }}
+                                                    {% endif %}
+                                                </div>
+                                                <div class="comentario-conteudo">
+                                                    <p>
+                                                        <strong>@{{ resposta.usuario.username }}</strong>
+                                                        {{ resposta.texto }}
+                                                    </p>
+                                                    <span class="comentario-data">{{ resposta.created_at|date:"d/m/Y H:i" }}</span>
+                                                    <div class="comentario-acoes">
+                                                        <button type="button" class="btn-curtir-comentario">
+                                                            <i class='bx bx-heart'></i>
+                                                            <span>{{ resposta.likes.count }}</span>
+                                                        </button>
+                                                        {% if request.user.id == resposta.usuario.id or request.user.id == buraco.usuario.id %}
+                                                            <button type="button" class="btn-excluir-comentario">Apagar</button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     {% empty %}
                         <p class="sem-comentarios">Nenhum comentário ainda.</p>
                     {% endfor %}
@@ -106,7 +157,7 @@ Iní­cio
                         class="btn-like {% if buraco.curtido %}curtido{% endif %}"
                         data-url="{% url 'curtirBuraco' buraco.id %}"
                     >
-                        <i class='bx bx-heart'></i>
+                        <i class='bx {% if buraco.curtido %}bxs-heart{% else %}bx-heart{% endif %}'></i>
 
                         <span class="like-count">
                             {{ buraco.likes.count }}
@@ -182,10 +233,12 @@ Iní­cio
 
         <form id="formComentarioModal" method="post">
             {% csrf_token %}
+            <input type="hidden" name="resposta_de" value="">
             <input 
                 type="text" 
                 name="comentario" 
                 placeholder="Adicionar comentÃ¡rio..."
+                autocomplete="off"
                 required>
             <button type="submit">Publicar</button>
         </form>
@@ -211,10 +264,19 @@ likes.forEach(botao => {
 
         botao.querySelector('.like-count').innerText = data.likes;
 
+        const icone = botao.querySelector('i');
+
         if (data.curtido) {
             botao.classList.add('curtido');
+
+            icone.classList.remove('bx-heart');
+            icone.classList.add('bxs-heart');
+
         } else {
             botao.classList.remove('curtido');
+
+            icone.classList.remove('bxs-heart');
+            icone.classList.add('bx-heart');
         }
 
         botao.classList.add('animando');
@@ -238,6 +300,10 @@ let comentarioAbertoId = null;
 function criarComentarioElemento(comentario) {
     const item = document.createElement('div');
     item.className = 'comentario-item';
+    item.dataset.comentarioId = comentario.id;
+    item.dataset.username = comentario.username;
+    item.dataset.likeUrl = "{% url 'curtirComentario' 0 %}".replace('/0/', `/${comentario.id}/`);
+    item.dataset.deleteUrl = "{% url 'excluirComentario' 0 %}".replace('/0/', `/${comentario.id}/`);
 
     const avatar = document.createElement('div');
     avatar.className = 'avatar comentario-avatar';
@@ -265,8 +331,26 @@ function criarComentarioElemento(comentario) {
     data.className = 'comentario-data';
     data.textContent = comentario.data;
 
+    const acoes = document.createElement('div');
+    acoes.className = 'comentario-acoes';
+    acoes.innerHTML = `
+        <button type="button" class="btn-curtir-comentario">
+            <i class='bx bx-heart'></i>
+            <span>${comentario.likes || 0}</span>
+        </button>
+        ${comentario.resposta_de ? '' : '<button type="button" class="btn-responder-comentario">Responder</button>'}
+        ${comentario.pode_excluir ? '<button type="button" class="btn-excluir-comentario">Apagar</button>' : ''}
+    `;
+
     conteudo.appendChild(texto);
     conteudo.appendChild(data);
+    conteudo.appendChild(acoes);
+
+    if (!comentario.resposta_de) {
+        const respostas = document.createElement('div');
+        respostas.className = 'comentario-respostas';
+        conteudo.appendChild(respostas);
+    }
 
     item.appendChild(avatar);
     item.appendChild(conteudo);
@@ -291,6 +375,8 @@ function abrirModalComentarios(botao) {
     formComentarioModal.action = botao.dataset.url;
     formComentarioModal.dataset.id = id;
     formComentarioModal.reset();
+    formComentarioModal.querySelector('input[name="resposta_de"]').value = '';
+    formComentarioModal.querySelector('input[name="comentario"]').placeholder = 'Adicionar comentário...';
 
     modalComentarios.classList.remove('oculto');
     document.body.classList.add('modal-aberto');
@@ -349,18 +435,102 @@ formComentarioModal.addEventListener('submit', async (event) => {
         removerMensagemSemComentarios(listaComentariosModal);
         removerMensagemSemComentarios(comentariosOriginais);
 
-        listaComentariosModal.appendChild(novoComentarioModal);
-        comentariosOriginais.appendChild(novoComentarioOriginal);
+        if (comentario.resposta_de) {
+            const paiModal = listaComentariosModal.querySelector(`[data-comentario-id="${comentario.resposta_de}"]`);
+            const paiOriginal = comentariosOriginais.querySelector(`[data-comentario-id="${comentario.resposta_de}"]`);
+            const respostasModal = paiModal ? paiModal.querySelector('.comentario-respostas') : null;
+            const respostasOriginal = paiOriginal ? paiOriginal.querySelector('.comentario-respostas') : null;
+
+            if (respostasModal) {
+                novoComentarioModal.classList.add('comentario-resposta');
+                respostasModal.appendChild(novoComentarioModal);
+            }
+
+            if (respostasOriginal) {
+                novoComentarioOriginal.classList.add('comentario-resposta');
+                respostasOriginal.appendChild(novoComentarioOriginal);
+            }
+        } else {
+            listaComentariosModal.appendChild(novoComentarioModal);
+            comentariosOriginais.appendChild(novoComentarioOriginal);
+        }
 
         if (botaoComentario) {
             botaoComentario.querySelector('span').innerText = comentario.total_comentarios;
         }
 
         input.value = '';
+        formComentarioModal.querySelector('input[name="resposta_de"]').value = '';
+        input.placeholder = 'Adicionar comentário...';
         listaComentariosModal.scrollTop = listaComentariosModal.scrollHeight;
     } finally {
         botaoEnviar.disabled = false;
         input.focus();
+    }
+});
+
+listaComentariosModal.addEventListener('click', async (event) => {
+    const btnCurtir = event.target.closest('.btn-curtir-comentario');
+    const btnResponder = event.target.closest('.btn-responder-comentario');
+    const btnExcluir = event.target.closest('.btn-excluir-comentario');
+    const comentarioItem = event.target.closest('.comentario-item');
+
+    if (!comentarioItem) {
+        return;
+    }
+
+    if (btnCurtir) {
+        const response = await fetch(comentarioItem.dataset.likeUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        btnCurtir.classList.toggle('curtido', data.curtido);
+        btnCurtir.querySelector('i').classList.toggle('bxs-heart', data.curtido);
+        btnCurtir.querySelector('i').classList.toggle('bx-heart', !data.curtido);
+        btnCurtir.querySelector('span').innerText = data.likes;
+    }
+
+    if (btnResponder) {
+        formComentarioModal.querySelector('input[name="resposta_de"]').value = comentarioItem.dataset.comentarioId;
+        const input = formComentarioModal.querySelector('input[name="comentario"]');
+        input.placeholder = `Responder @${comentarioItem.dataset.username}...`;
+        input.focus();
+    }
+
+    if (btnExcluir) {
+        const response = await fetch(comentarioItem.dataset.deleteUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        const original = document.querySelector(`#comentarios-${comentarioAbertoId} [data-comentario-id="${comentarioItem.dataset.comentarioId}"]`);
+        comentarioItem.remove();
+
+        if (original) {
+            original.remove();
+        }
+
+        const botaoComentario = document.querySelector(`.btn-comentar[data-id="${comentarioAbertoId}"]`);
+        if (botaoComentario) {
+            botaoComentario.querySelector('span').innerText = data.total_comentarios;
+        }
     }
 });
 </script>

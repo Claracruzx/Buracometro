@@ -10,7 +10,7 @@
     --espacamanto-conteudo: 50px;
     --body-color:#ffffff;
     --sidebar-color: #ffffff;
-    --primary-color: #ff9900;
+    --primary-color: #8f0b13;
     --primary-color-light: #f6f5ff;
     --togle-color:#DDDD;
     --text-color: #707070;
@@ -115,7 +115,7 @@ header #logo {
 
     background-color: var(--primary-color);
 
-    color: white;
+    color: rgb(252, 249, 249);
 
     cursor: pointer;
 
@@ -129,7 +129,7 @@ header #logo {
 }
 
 .search-container button:hover {
-    background-color: #cf621e;
+    background-color: #8d1717;
 }
 
 .resultado-card {
@@ -228,7 +228,7 @@ main #barra-lateral #lista-botoes button {
 }
 
 main #barra-lateral #lista-botoes .sair{
-    color:rgba(252, 88, 88, 0.918);
+    color:rgba(129, 19, 19, 0.918);
 }
 
 main #barra-lateral #lista-botoes button:hover {
@@ -379,7 +379,7 @@ ul.no-decoration {
 
     flex-shrink: 0;
 
-    background-color: #ff9900;
+    background-color: #8f0b13;
     color: white;
     font-weight: bold;
     border-radius: 50%;
@@ -536,15 +536,23 @@ ul.no-decoration {
 }
 
 .notificacao-icone.like {
-    background: #ff3040;
+    background: #8f0b13;
+}
+
+.notificacao-icone.like_comentario {
+    background: #8f0b13;
 }
 
 .notificacao-icone.comentario {
-    background: #0095f6;
+    background: #023252;
+}
+
+.notificacao-icone.resposta_comentario {
+    background: #023252;
 }
 
 .notificacao-icone.remocao {
-    background: #cf621e;
+    background: #8f0b13;
 }
 
 .notificacao-conteudo {
@@ -580,7 +588,7 @@ ul.no-decoration {
 .notificacao-post-link {
     display: inline-block;
     margin-top: 4px;
-    color: #cf621e !important;
+    color: #8f0b13 !important;
     font-size: 13px;
 }
 
@@ -622,7 +630,7 @@ ul.no-decoration {
 }
 
 .notificacoes-vazias i {
-    color: #ff9900;
+    color: #8f0b13;
     font-size: 48px;
 }
 
@@ -649,7 +657,7 @@ ul.no-decoration {
     width: 90px;
     height: 90px;
     border-radius: 50%;
-    background-color: orange;
+    background-color: #8f0b13;
     color: white;
     display: flex;
     align-items: center;
@@ -693,7 +701,7 @@ ul.no-decoration {
 }
 
 .post-header a:hover {
-    color: #cf621e;
+    color: #8f0b13;
     text-decoration: underline;
 }
 
@@ -816,7 +824,7 @@ main #conteudo {
     width: 116px;
     height: 116px;
     border-radius: 50%;
-    background: #ff9900;
+    background: #8f0b13;
     color: white;
     display: flex;
     align-items: center;
@@ -851,7 +859,7 @@ main #conteudo {
     gap: 8px;
     border-radius: 999px;
     background: #fff3df;
-    color: #cf621e;
+    color: #8f0b13;
     padding: 9px 14px;
     cursor: pointer;
     font-size: 14px;
@@ -882,7 +890,7 @@ main #conteudo {
 }
 
 .form-editar-perfil .btn-salvar-perfil:hover {
-    background-color: #cf621e;
+    background-color: #8f0b13;
 }
 
 .avatar img {
@@ -908,7 +916,7 @@ main #conteudo {
 }
 
 .checkbox-remover input {
-    accent-color: #cf621e;
+    accent-color: #8f0b13;
 }
 
 @media (max-width: 560px) {
@@ -1061,7 +1069,7 @@ main #conteudo {
 }
 
 .btn-like.curtido i {
-    color: #ff3040;
+    color: #8f0b13;
 }
 
 .btn-like.animando i {
@@ -1297,6 +1305,56 @@ main #conteudo {
     font-weight: 500;
 }
 
+.comentario-acoes {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.comentario-acoes button {
+    border: none;
+    background: transparent;
+    color: #8e8e8e;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+}
+
+.comentario-acoes button:hover {
+    color: #262626;
+}
+
+.btn-curtir-comentario {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-curtir-comentario i {
+    font-size: 16px;
+}
+
+.btn-curtir-comentario.curtido,
+.btn-curtir-comentario.curtido i {
+    color: #8f0b13;
+}
+
+.btn-excluir-comentario {
+    color: #ff3040 !important;
+}
+
+.comentario-respostas {
+    margin-top: 10px;
+    padding-left: 12px;
+    border-left: 2px solid #f1f1f1;
+}
+
+.comentario-resposta {
+    margin-bottom: 10px;
+}
+
 #formComentarioModal {
     display: flex;
     align-items: center;
@@ -1325,7 +1383,7 @@ main #conteudo {
     border: none;
     border-radius: 0;
     background: transparent;
-    color: #0095f6;
+    color: #00376b;
     padding: 8px 0;
     font-size: 14px;
     font-weight: 700;
@@ -1333,7 +1391,7 @@ main #conteudo {
 }
 
 #formComentarioModal button:hover {
-    color: #00376b;
+    color: #022d55;
 }
 
 #formComentarioModal button:disabled {
@@ -1548,7 +1606,7 @@ main #conteudo {
 }
 
 .btn-like-modal.curtido i {
-    color: #ff3040;
+    color: #8f0b13;
 }
 
 .btn-reportar-modal {
@@ -1556,11 +1614,11 @@ main #conteudo {
 }
 
 .btn-reportar-modal.reportado {
-    color: #cf621e;
+    color: #8f0b13;
 }
 
 .btn-reportar-feed.reportado {
-    color: #cf621e;
+    color: #8f0b13;
 }
 
 .form-comentario-post-modal {
@@ -1589,14 +1647,14 @@ main #conteudo {
 .form-comentario-post-modal button {
     border: none;
     background: transparent;
-    color: #0095f6;
+    color: #00376b;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
 }
 
 .form-comentario-post-modal button:hover {
-    color: #00376b;
+    color: #032a4e;
 }
 
 .form-comentario-post-modal button:disabled {
@@ -1665,7 +1723,7 @@ main #conteudo {
 }
 
 .opcoes-reporte input {
-    accent-color: #ff9900;
+    accent-color: #8f0b13;
 }
 
 .acoes-reporte {
@@ -1688,7 +1746,7 @@ main #conteudo {
 }
 
 .confirmar-reporte {
-    color: #cf621e;
+    color: #8f0b13;
 }
 
 .confirmar-reporte:disabled {

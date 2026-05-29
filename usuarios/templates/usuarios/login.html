@@ -31,11 +31,11 @@
                     <div class="content">
                         <div class="mb-4">
                             <label>Usuário:</label>
-                            <input name="usuario" type="text">
+                            <input name="usuario" type="text" value="{{ usuario_digitado|default:'' }}" required>
                         </div>
                         <div class="mb-4">
                             <label>Senha:</label>
-                            <input name="senha" type="password">
+                            <input name="senha" type="password" required>
                         </div>
                         <div class="d-flex justify-content-center mb-4">
                             <button class="btn btn-secondary" type="submit">Entrar</button>

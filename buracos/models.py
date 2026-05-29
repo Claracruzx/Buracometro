@@ -55,7 +55,30 @@ class Comentario(models.Model):
         related_name="comentarios"
     )
     texto = models.TextField()
+    resposta_de = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        related_name="respostas",
+        null=True,
+        blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class LikeComentario(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    comentario = models.ForeignKey(
+        Comentario,
+        on_delete=models.CASCADE,
+        related_name="likes"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('usuario', 'comentario')
 
 
 class Reporte(models.Model):

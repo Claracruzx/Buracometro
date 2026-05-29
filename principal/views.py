@@ -137,7 +137,7 @@ def notificacoesView(request):
     notificacoes = list(
         Notificacao.objects
         .filter(destinatario=request.user)
-        .select_related("ator", "buraco")
+        .select_related("ator", "buraco", "comentario")
         .order_by("-created_at")
     )
 

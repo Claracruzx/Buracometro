@@ -100,7 +100,7 @@ div#areaMapaOculto {
 .valor-tamanho {
     border-radius: 999px;
     background: #fff3df;
-    color: #cf621e;
+    color: #8f0b13;
     padding: 6px 12px;
     font-size: 14px;
 }
@@ -131,6 +131,7 @@ div#areaMapaOculto {
 
 #iptTamanho {
     width: 100%;
+    color: #8f0b13;
 }
 
 #fundoEscuro {
@@ -231,7 +232,7 @@ div#areaMapaOculto {
 }
 
 .btn-form:hover {
-    background-color: #cf621e;
+    background-color: #72070f;
     transform: translateY(-1px);
 }
 

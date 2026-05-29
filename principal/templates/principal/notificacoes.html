@@ -46,9 +46,9 @@ Notificações
 
                 <div class="notificacao-direita">
                     <div class="notificacao-icone {{ notificacao.tipo }}">
-                        {% if notificacao.tipo == "like" %}
+                        {% if notificacao.tipo == "like" or notificacao.tipo == "like_comentario" %}
                             <i class='bx bx-heart'></i>
-                        {% elif notificacao.tipo == "comentario" %}
+                        {% elif notificacao.tipo == "comentario" or notificacao.tipo == "resposta_comentario" %}
                             <i class='bx bx-message-dots'></i>
                         {% else %}
                             <i class='bx bx-error-circle'></i>

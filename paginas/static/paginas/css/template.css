@@ -244,12 +244,12 @@ main > .content {
     font-size: 18px !important;
     font-weight: 700 !important;
 
-    background-color: #ff9900 !important;
+    background-color: #8f0b13 !important;
 
     transition: 0.2s;
 }
 
 #btnConfirmar:hover {
-    background-color: #cf621e !important;
+    background-color: #64060c !important;
     transform: translateY(-2px);
 }

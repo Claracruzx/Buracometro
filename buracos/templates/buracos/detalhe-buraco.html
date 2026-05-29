@@ -62,7 +62,7 @@
                     id="btnLikeDetalhe"
                     class="btn-like {% if buraco.curtido %}curtido{% endif %}"
                     data-url="{% url 'curtirBuraco' buraco.id %}">
-                    <i class='bx bx-heart'></i>
+                    <i class='bx {% if buraco.curtido %}bxs-heart{% else %}bx-heart{% endif %}'></i>
                     <span class="like-count">{{ buraco.likes.count }}</span>
                 </button>
 
@@ -83,22 +83,74 @@
 
             <div id="listaComentariosDetalhe" class="comentarios-detalhe">
                 {% for comentario in buraco.comentarios.all %}
-                    <div class="comentario-item">
-                        <div class="avatar comentario-avatar">
-                            {% if comentario.usuario.foto %}
-                                <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
-                            {% else %}
-                                {{ comentario.usuario.username|slice:":1"|upper }}
-                            {% endif %}
+                    {% if not comentario.resposta_de %}
+                        <div
+                            class="comentario-item"
+                            data-comentario-id="{{ comentario.id }}"
+                            data-username="{{ comentario.usuario.username }}"
+                            data-like-url="{% url 'curtirComentario' comentario.id %}"
+                            data-delete-url="{% url 'excluirComentario' comentario.id %}">
+                            <div class="avatar comentario-avatar">
+                                {% if comentario.usuario.foto %}
+                                    <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
+                                {% else %}
+                                    {{ comentario.usuario.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="comentario-conteudo">
+                                <p>
+                                    <strong>@{{ comentario.usuario.username }}</strong>
+                                    {{ comentario.texto }}
+                                </p>
+                                <span class="comentario-data">{{ comentario.created_at|date:"d/m/Y H:i" }}</span>
+                                <div class="comentario-acoes">
+                                    <button type="button" class="btn-curtir-comentario">
+                                        <i class='bx bx-heart'></i>
+                                        <span>{{ comentario.likes.count }}</span>
+                                    </button>
+                                    <button type="button" class="btn-responder-comentario">Responder</button>
+                                    {% if request.user.id == comentario.usuario.id or request.user.id == buraco.usuario.id %}
+                                        <button type="button" class="btn-excluir-comentario">Apagar</button>
+                                    {% endif %}
+                                </div>
+
+                                <div class="comentario-respostas">
+                                    {% for resposta in comentario.respostas.all %}
+                                        <div
+                                            class="comentario-item comentario-resposta"
+                                            data-comentario-id="{{ resposta.id }}"
+                                            data-username="{{ resposta.usuario.username }}"
+                                            data-like-url="{% url 'curtirComentario' resposta.id %}"
+                                            data-delete-url="{% url 'excluirComentario' resposta.id %}">
+                                            <div class="avatar comentario-avatar">
+                                                {% if resposta.usuario.foto %}
+                                                    <img src="{{ resposta.usuario.foto.url }}" alt="Foto">
+                                                {% else %}
+                                                    {{ resposta.usuario.username|slice:":1"|upper }}
+                                                {% endif %}
+                                            </div>
+                                            <div class="comentario-conteudo">
+                                                <p>
+                                                    <strong>@{{ resposta.usuario.username }}</strong>
+                                                    {{ resposta.texto }}
+                                                </p>
+                                                <span class="comentario-data">{{ resposta.created_at|date:"d/m/Y H:i" }}</span>
+                                                <div class="comentario-acoes">
+                                                    <button type="button" class="btn-curtir-comentario">
+                                                        <i class='bx bx-heart'></i>
+                                                        <span>{{ resposta.likes.count }}</span>
+                                                    </button>
+                                                    {% if request.user.id == resposta.usuario.id or request.user.id == buraco.usuario.id %}
+                                                        <button type="button" class="btn-excluir-comentario">Apagar</button>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
-                        <div class="comentario-conteudo">
-                            <p>
-                                <strong>@{{ comentario.usuario.username }}</strong>
-                                {{ comentario.texto }}
-                            </p>
-                            <span class="comentario-data">{{ comentario.created_at|date:"d/m/Y H:i" }}</span>
-                        </div>
-                    </div>
+                    {% endif %}
                 {% empty %}
                     <p class="sem-comentarios">Nenhum comentário ainda.</p>
                 {% endfor %}
@@ -106,7 +158,8 @@
 
             <form id="formComentarioDetalhe" class="form-comentario-post-modal" action="{% url 'comentarBuraco' buraco.id %}" method="post">
                 {% csrf_token %}
-                <input type="text" name="comentario" placeholder="Adicionar comentário..." required>
+                <input type="hidden" name="resposta_de" value="">
+                <input type="text" name="comentario" placeholder="Adicionar comentário..." autocomplete="off" required>
                 <button type="submit">Publicar</button>
             </form>
         </div>
@@ -147,6 +200,10 @@
 function criarComentarioDetalhe(comentario) {
     const item = document.createElement('div');
     item.className = 'comentario-item';
+    item.dataset.comentarioId = comentario.id;
+    item.dataset.username = comentario.username;
+    item.dataset.likeUrl = "{% url 'curtirComentario' 0 %}".replace('/0/', `/${comentario.id}/`);
+    item.dataset.deleteUrl = "{% url 'excluirComentario' 0 %}".replace('/0/', `/${comentario.id}/`);
 
     const avatar = document.createElement('div');
     avatar.className = 'avatar comentario-avatar';
@@ -173,8 +230,27 @@ function criarComentarioDetalhe(comentario) {
     data.className = 'comentario-data';
     data.textContent = comentario.data;
 
+    const acoes = document.createElement('div');
+    acoes.className = 'comentario-acoes';
+    acoes.innerHTML = `
+        <button type="button" class="btn-curtir-comentario">
+            <i class='bx bx-heart'></i>
+            <span>${comentario.likes || 0}</span>
+        </button>
+        ${comentario.resposta_de ? '' : '<button type="button" class="btn-responder-comentario">Responder</button>'}
+        ${comentario.pode_excluir ? '<button type="button" class="btn-excluir-comentario">Apagar</button>' : ''}
+    `;
+
     conteudo.appendChild(texto);
     conteudo.appendChild(data);
+    conteudo.appendChild(acoes);
+
+    if (!comentario.resposta_de) {
+        const respostas = document.createElement('div');
+        respostas.className = 'comentario-respostas';
+        conteudo.appendChild(respostas);
+    }
+
     item.appendChild(avatar);
     item.appendChild(conteudo);
 
@@ -188,6 +264,8 @@ const btnFocarComentarioDetalhe = document.getElementById('btnFocarComentarioDet
 const btnReportarDetalhe = document.getElementById('btnReportarDetalhe');
 const modalReportar = document.getElementById('modalReportar');
 const formReportar = document.getElementById('formReportar');
+const inputRespostaDetalhe = formComentarioDetalhe.querySelector('input[name="resposta_de"]');
+const inputTextoDetalhe = formComentarioDetalhe.querySelector('input[name="comentario"]');
 const postMenu = document.querySelector('.post-menu');
 const formExcluirPost = document.querySelector('.form-excluir-post');
 
@@ -241,6 +319,9 @@ btnLikeDetalhe.addEventListener('click', async () => {
 
     btnLikeDetalhe.querySelector('.like-count').innerText = data.likes;
     btnLikeDetalhe.classList.toggle('curtido', data.curtido);
+    const icone = btnLikeDetalhe.querySelector('i');
+    icone.classList.toggle('bx-heart', !data.curtido);
+    icone.classList.toggle('bxs-heart', data.curtido);
 });
 
 btnFocarComentarioDetalhe.addEventListener('click', () => {
@@ -279,12 +360,81 @@ formComentarioDetalhe.addEventListener('submit', async (event) => {
             vazio.remove();
         }
 
-        listaComentariosDetalhe.appendChild(criarComentarioDetalhe(comentario));
+        if (comentario.resposta_de) {
+            const comentarioPai = listaComentariosDetalhe.querySelector(`[data-comentario-id="${comentario.resposta_de}"]`);
+            const respostas = comentarioPai ? comentarioPai.querySelector('.comentario-respostas') : null;
+
+            if (respostas) {
+                const respostaElemento = criarComentarioDetalhe(comentario);
+                respostaElemento.classList.add('comentario-resposta');
+                respostas.appendChild(respostaElemento);
+            }
+        } else {
+            listaComentariosDetalhe.appendChild(criarComentarioDetalhe(comentario));
+        }
+
         document.getElementById('contadorComentariosDetalhe').innerText = comentario.total_comentarios;
         input.value = '';
+        inputRespostaDetalhe.value = '';
+        input.placeholder = 'Adicionar comentário...';
     } finally {
         botao.disabled = false;
         input.focus();
+    }
+});
+
+listaComentariosDetalhe.addEventListener('click', async (event) => {
+    const btnCurtir = event.target.closest('.btn-curtir-comentario');
+    const btnResponder = event.target.closest('.btn-responder-comentario');
+    const btnExcluir = event.target.closest('.btn-excluir-comentario');
+    const comentarioItem = event.target.closest('.comentario-item');
+
+    if (!comentarioItem) {
+        return;
+    }
+
+    if (btnCurtir) {
+        const response = await fetch(comentarioItem.dataset.likeUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        btnCurtir.classList.toggle('curtido', data.curtido);
+        btnCurtir.querySelector('i').classList.toggle('bxs-heart', data.curtido);
+        btnCurtir.querySelector('i').classList.toggle('bx-heart', !data.curtido);
+        btnCurtir.querySelector('span').innerText = data.likes;
+    }
+
+    if (btnResponder) {
+        inputRespostaDetalhe.value = comentarioItem.dataset.comentarioId;
+        inputTextoDetalhe.placeholder = `Responder @${comentarioItem.dataset.username}...`;
+        inputTextoDetalhe.focus();
+    }
+
+    if (btnExcluir) {
+        const response = await fetch(comentarioItem.dataset.deleteUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        comentarioItem.remove();
+        document.getElementById('contadorComentariosDetalhe').innerText = data.total_comentarios;
     }
 });
 
