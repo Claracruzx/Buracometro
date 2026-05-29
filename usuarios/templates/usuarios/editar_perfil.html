@@ -1,4 +1,5 @@
 {% extends 'principal/principal.html' %}
+{% load static %}
 
 {% block title %}
 Editar perfil
@@ -12,19 +13,65 @@ Editar perfil
     <form class="form-editar-perfil" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
+        <div class="editar-foto-area">
+            <label class="editar-foto-preview" for="inputFotoPerfil">
+                <div id="previewFotoPerfil" class="preview-foto-perfil">
+                    {% if request.user.foto %}
+                        <img src="{{ request.user.foto.url }}" alt="Foto atual">
+                    {% else %}
+                        <span>{{ request.user.username|slice:":1"|upper }}</span>
+                    {% endif %}
+                </div>
+            </label>
+
+            <div class="editar-foto-acoes">
+                <strong>Foto de perfil</strong>
+                <label class="btn-escolher-foto" for="inputFotoPerfil">
+                    <i class='bx bx-image-add'></i>
+                    Escolher imagem
+                </label>
+                <input id="inputFotoPerfil" type="file" name="foto" accept="image/*">
+
+                {% if request.user.foto %}
+                    <label class="checkbox-remover">
+                        <input type="checkbox" name="remover_foto">
+                        Remover foto atual
+                    </label>
+                {% endif %}
+            </div>
+        </div>
+
         <label>Nome</label>
         <input type="text" name="nome" value="{{ request.user.name }}">
 
-        <label>Foto de perfil</label>
-        <input type="file" name="foto" accept="image/*">
-
-        {% if request.user.foto %}
-        <label class="checkbox-remover">
-            <input type="checkbox" name="remover_foto">Remover foto atual</label>
-        {% endif %}
-
-        <button type="submit">Salvar</button>
+        <button type="submit" class="btn-salvar-perfil">
+            <i class='bx bx-check'></i>
+            Salvar alterações
+        </button>
     </form>
 </div>
 
+{% endblock %}
+
+{% block js %}
+<script>
+const inputFotoPerfil = document.getElementById('inputFotoPerfil');
+const previewFotoPerfil = document.getElementById('previewFotoPerfil');
+
+inputFotoPerfil.addEventListener('change', function () {
+    const arquivo = this.files[0];
+
+    if (!arquivo) {
+        return;
+    }
+
+    const leitor = new FileReader();
+
+    leitor.onload = function (event) {
+        previewFotoPerfil.innerHTML = `<img src="${event.target.result}" alt="Prévia da foto">`;
+    };
+
+    leitor.readAsDataURL(arquivo);
+});
+</script>
 {% endblock %}

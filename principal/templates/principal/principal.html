@@ -64,9 +64,17 @@
                 </li>
 
                 <li>
-                    <button><i class='bx bx-bell'></i>
+                    <form action="{% url 'notificacoesView' %}">
+                        <button>
+                            <span class="icone-notificacao">
+                                <i class='bx bx-bell'></i>
+                                {% if notificacoes_nao_lidas %}
+                                    <span class="badge-notificacao">{{ notificacoes_nao_lidas }}</span>
+                                {% endif %}
+                            </span>
                         <span>Notificações</span>
-                    </button>
+                        </button>
+                    </form>
                 </li>
 
                 <li>

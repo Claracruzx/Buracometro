@@ -90,6 +90,49 @@ div#areaMapaOculto {
     height: 500px;
 }
 
+.campo-tamanho-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.valor-tamanho {
+    border-radius: 999px;
+    background: #fff3df;
+    color: #cf621e;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.escala-tamanho {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 8px;
+    color: #777;
+    font-size: 12px;
+
+    padding: 0 6px;
+}
+
+.escala-tamanho span {
+    width: 60px;
+    text-align: center;
+}
+
+.escala-tamanho span:first-child {
+    text-align: left;
+}
+
+.escala-tamanho span:last-child {
+    text-align: right;
+}
+
+#iptTamanho {
+    width: 100%;
+}
+
 #fundoEscuro {
     background-color: rgba(0, 0, 0, 0.589);
     position: absolute;

@@ -10,6 +10,14 @@ document.addEventListener('DOMContentLoaded', function () {
     let btnAvancarLocal = document.getElementById('btnAvancarLocal');
 
     let btnEnviar = document.getElementById('btnEnviar');
+    let labelTamanhoBuraco = document.getElementById('labelTamanhoBuraco');
+    const nomesTamanho = {
+        1: 'Pequeno',
+        2: 'Médio',
+        3: 'Grande',
+        4: 'Gigante',
+    };
+    const imagemPendenteKey = 'buracometro.imagemCadastroPendente';
     // let areaMapaOculto = document.getElementById('areaMapaOculto');
     // let mapa = document.getElementById('mapa');
     // var map = L.map('mapa').setView([-2.5184, -44.2054], 16);
@@ -27,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('iptHiddenDescricao').value = descricao;
         document.getElementById('iptHiddenTamanho').value  = tamanho;
 
+        salvarImagemTemporaria();
         form.submit();
     });
 
@@ -49,7 +58,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     iptEscolherArquivo
     .addEventListener('change', function () {
-        mostrarImagem(this, areaFoto);
+        if (areaFoto) {
+            mostrarImagem(this, areaFoto);
+        }
     });
 
     btnEnviar
@@ -57,9 +68,78 @@ document.addEventListener('DOMContentLoaded', function () {
         let form = document.getElementById('formularioCadastroBuracos');
 
         if (validarCampos()) {
+            sessionStorage.removeItem(imagemPendenteKey);
             form.submit();
         }
     });
+
+    function atualizarLabelTamanho() {
+        const valor = document.getElementById('iptTamanho').value;
+
+        if (labelTamanhoBuraco) {
+            labelTamanhoBuraco.innerText = nomesTamanho[valor] || 'Pequeno';
+        }
+    }
+
+    document.getElementById('iptTamanho').addEventListener('input', atualizarLabelTamanho);
+    atualizarLabelTamanho();
+
+    function salvarImagemTemporaria() {
+        const arquivo = iptEscolherArquivo.files[0];
+
+        if (!arquivo) {
+            return;
+        }
+
+        const leitor = new FileReader();
+
+        leitor.onload = function (event) {
+            sessionStorage.setItem(imagemPendenteKey, JSON.stringify({
+                nome: arquivo.name,
+                tipo: arquivo.type,
+                dados: event.target.result,
+            }));
+        };
+
+        leitor.readAsDataURL(arquivo);
+    }
+
+    function dataUrlParaArquivo(dataUrl, nome, tipo) {
+        const partes = dataUrl.split(',');
+        const binario = atob(partes[1]);
+        const bytes = new Uint8Array(binario.length);
+
+        for (let i = 0; i < binario.length; i++) {
+            bytes[i] = binario.charCodeAt(i);
+        }
+
+        return new File([bytes], nome, { type: tipo });
+    }
+
+    function restaurarImagemTemporaria() {
+        const imagemSalva = sessionStorage.getItem(imagemPendenteKey);
+
+        if (!imagemSalva || iptEscolherArquivo.files.length > 0) {
+            return;
+        }
+
+        try {
+            const imagem = JSON.parse(imagemSalva);
+            const arquivo = dataUrlParaArquivo(imagem.dados, imagem.nome, imagem.tipo);
+            const arquivos = new DataTransfer();
+
+            arquivos.items.add(arquivo);
+            iptEscolherArquivo.files = arquivos.files;
+
+            if (previewImagem) {
+                previewImagem.innerHTML = `
+                    <img src="${imagem.dados}" alt="Prévia da imagem">
+                `;
+            }
+        } catch (error) {
+            sessionStorage.removeItem(imagemPendenteKey);
+        }
+    }
 
     // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -147,7 +227,10 @@ if (inputImagem && previewImagem) {
             };
 
             leitor.readAsDataURL(arquivo);
+            salvarImagemTemporaria();
         }
     });
+
+    restaurarImagemTemporaria();
 }
 });

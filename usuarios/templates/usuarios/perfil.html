@@ -38,9 +38,7 @@ Perfil
         </div>
     </div>
 
-    <h2 class="titulo-postagens">
-        Minhas postagens
-    </h2>
+    <hr>
 
     <div class="explorar-grid perfil-grid">
     {% for buraco in buracos %}
@@ -50,6 +48,7 @@ Perfil
             data-index="{{ forloop.counter0 }}"
             data-id="{{ buraco.id }}"
             data-descricao="{{ buraco.descricao }}"
+            data-tamanho="{{ buraco.tamanho_nome }}"
             data-likes="{{ buraco.likes.count }}"
             data-comentarios="{{ buraco.comentarios.count }}"
             data-curtido="{% if buraco.curtido %}true{% else %}false{% endif %}"
@@ -147,6 +146,7 @@ Perfil
             <div class="modal-descricao">
                 <strong id="modalNome"></strong>
                 <span id="modalDescricao"></span>
+                <small id="modalTamanho" class="modal-tamanho"></small>
             </div>
 
             <div id="modalComentariosArea" class="modal-comentarios-area"></div>
@@ -306,6 +306,7 @@ if (posts.length > 0) {
         document.getElementById('modalNome').innerText = post.dataset.nome || post.dataset.username;
         document.getElementById('modalEndereco').innerText = post.dataset.endereco;
         document.getElementById('modalDescricao').innerText = post.dataset.descricao;
+        document.getElementById('modalTamanho').innerText = `Tamanho: ${post.dataset.tamanho}`;
         document.getElementById('modalLikes').innerText = post.dataset.likes;
         document.getElementById('modalComentarios').innerText = post.dataset.comentarios;
         modalComentariosArea.innerHTML = comentarios.innerHTML;

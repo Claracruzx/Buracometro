@@ -1,0 +1,79 @@
+{% extends 'principal/principal.html' %}
+{% load static %}
+
+{% block title %}
+Notificações
+{% endblock %}
+
+{% block content %}
+
+<div class="notificacoes-container">
+    <div class="notificacoes-topo">
+        <h1>Notificações</h1>
+        <p>Veja quem interagiu com suas postagens.</p>
+    </div>
+
+    <div class="notificacoes-lista">
+        {% for notificacao in notificacoes %}
+            <article class="notificacao-item {% if not notificacao.lida %}nao-lida{% endif %}">
+                <a class="notificacao-avatar" href="{% if notificacao.ator %}{% url 'perfilPublicoView' notificacao.ator.username %}{% else %}#{% endif %}">
+                    {% if notificacao.ator and notificacao.ator.foto %}
+                        <img src="{{ notificacao.ator.foto.url }}" alt="Foto de perfil">
+                    {% elif notificacao.ator %}
+                        <span>{{ notificacao.ator.username|slice:":1"|upper }}</span>
+                    {% else %}
+                        <i class='bx bx-error-circle'></i>
+                    {% endif %}
+                </a>
+
+                <div class="notificacao-conteudo">
+                    <p>
+                        {% if notificacao.ator %}
+                            <a href="{% url 'perfilPublicoView' notificacao.ator.username %}">
+                                @{{ notificacao.ator.username }}
+                            </a>
+                        {% endif %}
+                        {{ notificacao.mensagem }}
+                        <span class="notificacao-tempo">{{ notificacao.created_at|timesince }} atrás</span>
+                    </p>
+
+                    {% if notificacao.buraco %}
+                        <a class="notificacao-post-link" href="{% url 'detalheBuracoView' notificacao.buraco.id %}">
+                            Ver postagem
+                        </a>
+                    {% endif %}
+                </div>
+
+                <div class="notificacao-direita">
+                    <div class="notificacao-icone {{ notificacao.tipo }}">
+                        {% if notificacao.tipo == "like" %}
+                            <i class='bx bx-heart'></i>
+                        {% elif notificacao.tipo == "comentario" %}
+                            <i class='bx bx-message-dots'></i>
+                        {% else %}
+                            <i class='bx bx-error-circle'></i>
+                        {% endif %}
+                    </div>
+
+                    {% if notificacao.buraco %}
+                        <a class="notificacao-miniatura" href="{% url 'detalheBuracoView' notificacao.buraco.id %}">
+                            {% if notificacao.buraco.imagem %}
+                                <img src="{{ notificacao.buraco.imagem.url }}" alt="Postagem">
+                            {% elif notificacao.buraco.url_imagem %}
+                                <img src="{% static 'image-users/' %}{{ notificacao.buraco.url_imagem }}" alt="Postagem">
+                            {% endif %}
+                        </a>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <div class="notificacoes-vazias">
+                <i class='bx bx-bell-off'></i>
+                <h2>Nenhuma notificação ainda</h2>
+                <p>Quando alguém curtir ou comentar suas postagens, elas aparecem aqui.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

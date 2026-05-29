@@ -4,8 +4,7 @@
 {% block content %}
 
 <div class="feed-container">
-    <div class="post-card">
-
+    <div class="post-card detalhe-post-card">
         <div class="post-header">
             <div class="avatar">
                 {% if buraco.usuario.foto %}
@@ -19,7 +18,11 @@
 
             <div>
                 {% if buraco.usuario %}
-                    <h2>{{ buraco.usuario.name|default:buraco.usuario.username }}</h2>
+                    <h2>
+                        <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
+                            {{ buraco.usuario.name|default:buraco.usuario.username }}
+                        </a>
+                    </h2>
                     <p>@{{ buraco.usuario.username }} • {{ buraco.endereco }}</p>
                 {% else %}
                     <h2>Usuário desconhecido</h2>
@@ -28,7 +31,9 @@
             </div>
         </div>
 
-        {% if buraco.url_imagem %}
+        {% if buraco.imagem %}
+            <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco">
+        {% elif buraco.url_imagem %}
             <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco">
         {% endif %}
 
@@ -36,12 +41,239 @@
             <p>{{ buraco.descricao }}</p>
 
             <div class="post-info">
-                <span>Tamanho: {{ buraco.tamanho }}</span>
+                <span>Tamanho: {{ buraco.tamanho_nome }}</span>
                 <span>{{ buraco.created_at|date:"d/m/Y H:i" }}</span>
             </div>
-        </div>
 
+            <div class="post-actions">
+                <button
+                    id="btnLikeDetalhe"
+                    class="btn-like {% if buraco.curtido %}curtido{% endif %}"
+                    data-url="{% url 'curtirBuraco' buraco.id %}">
+                    <i class='bx bx-heart'></i>
+                    <span class="like-count">{{ buraco.likes.count }}</span>
+                </button>
+
+                <button type="button" id="btnFocarComentarioDetalhe" class="btn-comentar">
+                    <i class="bx bx-message-dots"></i>
+                    <span id="contadorComentariosDetalhe">{{ buraco.comentarios.count }}</span>
+                </button>
+
+                <button
+                    type="button"
+                    id="btnReportarDetalhe"
+                    class="btn-reportar-feed"
+                    data-url="{% url 'reportarBuraco' buraco.id %}">
+                    <i class='bx bx-error-circle'></i>
+                    <span>Reportar</span>
+                </button>
+            </div>
+
+            <div id="listaComentariosDetalhe" class="comentarios-detalhe">
+                {% for comentario in buraco.comentarios.all %}
+                    <div class="comentario-item">
+                        <div class="avatar comentario-avatar">
+                            {% if comentario.usuario.foto %}
+                                <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
+                            {% else %}
+                                {{ comentario.usuario.username|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="comentario-conteudo">
+                            <p>
+                                <strong>@{{ comentario.usuario.username }}</strong>
+                                {{ comentario.texto }}
+                            </p>
+                            <span class="comentario-data">{{ comentario.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="sem-comentarios">Nenhum comentário ainda.</p>
+                {% endfor %}
+            </div>
+
+            <form id="formComentarioDetalhe" class="form-comentario-post-modal" action="{% url 'comentarBuraco' buraco.id %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="comentario" placeholder="Adicionar comentário..." required>
+                <button type="submit">Publicar</button>
+            </form>
+        </div>
     </div>
 </div>
+
+<div id="modalReportar" class="modal-reportar oculto">
+    <div class="modal-reportar-fundo"></div>
+
+    <form id="formReportar" class="modal-reportar-card">
+        {% csrf_token %}
+        <h2>Por que está reportando essa postagem?</h2>
+        <p>Escolha o motivo que melhor explica o problema.</p>
+
+        <div class="opcoes-reporte">
+            <label>
+                <input type="radio" name="motivo" value="Isso não é um buraco" required>
+                Isso não é um buraco
+            </label>
+            <label>
+                <input type="radio" name="motivo" value="Esse buraco não é em São Luís">
+                Esse buraco não é em São Luís
+            </label>
+            <label>
+                <input type="radio" name="motivo" value="Esse buraco não é real">
+                Esse buraco não é real
+            </label>
+        </div>
+
+        <div class="acoes-reporte">
+            <button type="button" class="cancelar-reporte">Cancelar</button>
+            <button type="submit" class="confirmar-reporte">Reportar</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function criarComentarioDetalhe(comentario) {
+    const item = document.createElement('div');
+    item.className = 'comentario-item';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar comentario-avatar';
+
+    if (comentario.foto_url) {
+        const img = document.createElement('img');
+        img.src = comentario.foto_url;
+        img.alt = 'Foto';
+        avatar.appendChild(img);
+    } else {
+        avatar.textContent = comentario.inicial || '?';
+    }
+
+    const conteudo = document.createElement('div');
+    conteudo.className = 'comentario-conteudo';
+
+    const texto = document.createElement('p');
+    const usuario = document.createElement('strong');
+    usuario.textContent = `@${comentario.username}`;
+    texto.appendChild(usuario);
+    texto.append(` ${comentario.texto}`);
+
+    const data = document.createElement('span');
+    data.className = 'comentario-data';
+    data.textContent = comentario.data;
+
+    conteudo.appendChild(texto);
+    conteudo.appendChild(data);
+    item.appendChild(avatar);
+    item.appendChild(conteudo);
+
+    return item;
+}
+
+const btnLikeDetalhe = document.getElementById('btnLikeDetalhe');
+const formComentarioDetalhe = document.getElementById('formComentarioDetalhe');
+const listaComentariosDetalhe = document.getElementById('listaComentariosDetalhe');
+const btnFocarComentarioDetalhe = document.getElementById('btnFocarComentarioDetalhe');
+const btnReportarDetalhe = document.getElementById('btnReportarDetalhe');
+const modalReportar = document.getElementById('modalReportar');
+const formReportar = document.getElementById('formReportar');
+
+btnLikeDetalhe.addEventListener('click', async () => {
+    const response = await fetch(btnLikeDetalhe.dataset.url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    });
+    const data = await response.json();
+
+    btnLikeDetalhe.querySelector('.like-count').innerText = data.likes;
+    btnLikeDetalhe.classList.toggle('curtido', data.curtido);
+});
+
+btnFocarComentarioDetalhe.addEventListener('click', () => {
+    formComentarioDetalhe.querySelector('input[name="comentario"]').focus();
+});
+
+formComentarioDetalhe.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const input = formComentarioDetalhe.querySelector('input[name="comentario"]');
+    const botao = formComentarioDetalhe.querySelector('button[type="submit"]');
+
+    if (!input.value.trim()) {
+        return;
+    }
+
+    botao.disabled = true;
+
+    try {
+        const response = await fetch(formComentarioDetalhe.action, {
+            method: 'POST',
+            body: new FormData(formComentarioDetalhe),
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const comentario = await response.json();
+        const vazio = listaComentariosDetalhe.querySelector('.sem-comentarios');
+
+        if (vazio) {
+            vazio.remove();
+        }
+
+        listaComentariosDetalhe.appendChild(criarComentarioDetalhe(comentario));
+        document.getElementById('contadorComentariosDetalhe').innerText = comentario.total_comentarios;
+        input.value = '';
+    } finally {
+        botao.disabled = false;
+        input.focus();
+    }
+});
+
+btnReportarDetalhe.addEventListener('click', () => {
+    formReportar.action = btnReportarDetalhe.dataset.url;
+    formReportar.reset();
+    modalReportar.classList.remove('oculto');
+});
+
+document.querySelector('.modal-reportar-fundo').addEventListener('click', () => {
+    modalReportar.classList.add('oculto');
+});
+
+document.querySelector('.cancelar-reporte').addEventListener('click', () => {
+    modalReportar.classList.add('oculto');
+});
+
+formReportar.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const response = await fetch(formReportar.action, {
+        method: 'POST',
+        body: new FormData(formReportar),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    });
+
+    if (!response.ok) {
+        return;
+    }
+
+    const data = await response.json();
+    btnReportarDetalhe.classList.add('reportado');
+    btnReportarDetalhe.querySelector('span').innerText = 'Reportado';
+    modalReportar.classList.add('oculto');
+
+    if (data.removido) {
+        document.querySelector('.detalhe-post-card').remove();
+    }
+});
+</script>
 
 {% endblock %}

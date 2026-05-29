@@ -31,7 +31,7 @@ Iní­cio
                                 <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
                             {% endif %}
 
-                                <h2>{{ buraco.usuario.username }}</h2>
+                                <h2>{{ buraco.usuario.name|default:buraco.usuario.username }}</h2>
 
                             </a>
                         </h2>
@@ -40,7 +40,7 @@ Iní­cio
                             <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
                                 @{{ buraco.usuario.username }}
                             </a>
-                            â€¢ {{ buraco.endereco }}
+                              • {{ buraco.endereco }}
                         </p>
                     {% else %}
                         <h2>Usuário desconhecido</h2>
@@ -59,7 +59,7 @@ Iní­cio
                 <p>{{ buraco.descricao }}</p>
 
                 <div class="post-info">
-                    <span>Tamanho: {{ buraco.tamanho }}</span>
+                    <span>Tamanho: {{ buraco.tamanho_nome }}</span>
                     <span>{{ buraco.created_at|date:"d/m/Y H:i" }}</span>
                 </div>
 

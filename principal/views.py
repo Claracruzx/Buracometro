@@ -3,8 +3,10 @@ from django.views.generic import TemplateView
 from django.urls import reverse
 from django.contrib.auth import logout
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 from buracos.models import Buraco, Like
+from .models import Notificacao
 from usuarios.models import CustomUser
 
 
@@ -127,4 +129,20 @@ def pesquisaView(request):
         'termo': termo,
         'usuarios': usuarios,
         'buracos': buracos,
+    })
+
+
+@login_required
+def notificacoesView(request):
+    notificacoes = list(
+        Notificacao.objects
+        .filter(destinatario=request.user)
+        .select_related("ator", "buraco")
+        .order_by("-created_at")
+    )
+
+    Notificacao.objects.filter(destinatario=request.user, lida=False).update(lida=True)
+
+    return render(request, "principal/notificacoes.html", {
+        "notificacoes": notificacoes,
     })

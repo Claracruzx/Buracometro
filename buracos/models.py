@@ -17,6 +17,17 @@ class Buraco(models.Model):
     def __str__(self):
         return self.titulo
 
+    @property
+    def tamanho_nome(self):
+        tamanhos = {
+            1: "Pequeno",
+            2: "Médio",
+            3: "Grande",
+            4: "Gigante",
+        }
+
+        return tamanhos.get(self.tamanho, "Pequeno")
+
 class Like(models.Model):
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,

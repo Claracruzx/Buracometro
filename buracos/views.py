@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Count, F, IntegerField, ExpressionWrapper
+from principal.models import Notificacao
 
 
 def cadastroView(request):
@@ -137,7 +138,11 @@ def cadastroStore(request):
 
 
 def detalheBuracoView(request, id):
-    buraco = Buraco.objects.get(id=id)
+    buraco = get_object_or_404(Buraco, id=id)
+    buraco.curtido = request.user.is_authenticated and Like.objects.filter(
+        usuario=request.user,
+        buraco=buraco
+    ).exists()
 
     return render(request, 'buracos/detalhe-buraco.html', {
         'buraco': buraco
@@ -153,6 +158,15 @@ def curtirBuracoView(request, buraco_id):
     )
 
     curtido = True
+
+    if created and buraco.usuario and buraco.usuario != request.user:
+        Notificacao.objects.create(
+            destinatario=buraco.usuario,
+            ator=request.user,
+            buraco=buraco,
+            tipo="like",
+            mensagem="curtiu sua postagem."
+        )
 
     if not created:
         like.delete()
@@ -183,6 +197,14 @@ def reportarBuracoView(request, buraco_id):
     removido = total_reportes >= 5
 
     if removido:
+        if buraco.usuario:
+            Notificacao.objects.create(
+                destinatario=buraco.usuario,
+                buraco=buraco,
+                tipo="remocao",
+                mensagem="Sua postagem foi removida por receber muitas denúncias."
+            )
+
         buraco.delete()
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
@@ -210,6 +232,15 @@ def comentarBuracoView(request, buraco_id):
                 buraco=buraco,
                 texto=texto
             )
+
+            if buraco.usuario and buraco.usuario != request.user:
+                Notificacao.objects.create(
+                    destinatario=buraco.usuario,
+                    ator=request.user,
+                    buraco=buraco,
+                    tipo="comentario",
+                    mensagem="comentou na sua postagem."
+                )
 
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
                 foto_url = request.user.foto.url if getattr(request.user, "foto", None) else ""

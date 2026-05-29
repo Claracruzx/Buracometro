@@ -61,7 +61,10 @@ Cadastro de buracos
                     value="{{endereco}}">
             </div>
             <div class="mb-3">
-                <label class="form-label">Tamanho do buraco</label>
+                <div class="campo-tamanho-topo">
+                    <label class="form-label">Tamanho do buraco</label>
+                    <strong id="labelTamanhoBuraco" class="valor-tamanho">Pequeno</strong>
+                </div>
                 <input
                     id="iptTamanho" 
                     type="range" 
@@ -72,6 +75,12 @@ Cadastro de buracos
                     max="4" 
                     step="1" 
                     id="customRange3">
+                <div class="escala-tamanho">
+                    <span>Pequeno</span>
+                    <span>Médio</span>
+                    <span>Grande</span>
+                    <span>Gigante</span>
+                </div>
             </div>
         </div>
         <div class="area-imagem">
