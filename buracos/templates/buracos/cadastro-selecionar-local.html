@@ -8,6 +8,45 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static '/css/template.css' %}">
+    <style>
+        .mapa-area {
+            position: relative;
+        }
+
+        .busca-mapa-cadastro {
+            position: absolute;
+            top: 16px;
+            left: 62px;
+            right: 16px;
+            z-index: 500;
+            display: flex;
+            gap: 8px;
+            max-width: 520px;
+        }
+
+        .busca-mapa-cadastro input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #ddd;
+            border-radius: 999px;
+            background: white;
+            padding: 12px 16px;
+            outline: none;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+        }
+
+        .busca-mapa-cadastro button {
+            width: 46px;
+            height: 46px;
+            border: none;
+            border-radius: 50%;
+            background: #ff9900;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+        }
+    </style>
 </head>
 <body>
     <div class="mapa-container">
@@ -24,7 +63,15 @@
                 </p>
             </div>
         </div>
-        <div id="mapa"></div>
+        <div class="mapa-area">
+            <form id="formBuscaCadastro" class="busca-mapa-cadastro">
+                <input id="inputBuscaCadastro" type="search" placeholder="Buscar rua, bairro ou ponto em São Luís...">
+                <button type="submit" aria-label="Buscar no mapa">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </form>
+            <div id="mapa"></div>
+        </div>
         <div id="linha-endereco-selecionado">
             <h4 class="wmx">Endereço selecionado: </h4>
             <div id="area-endereco">
@@ -60,11 +107,7 @@
 
     var marker = null; // Armazena o marcador atual
 
-    // Evento de clique no mapa
-    map.on('click', function(e) {
-        var lat = e.latlng.lat; // Latitude
-        var lng = e.latlng.lng; // Longitude
-
+    function marcarLocal(lat, lng, abrirPopup = true) {
         getEndereco(lat, lng);
 
         if (marker) {
@@ -72,17 +115,22 @@
         }
 
         marker = L.marker([lat, lng]);
-        // marker = L.marker(e.latlng);
 
-        console.log(marker);
-
-        // Adiciona um marcador no local clicado
-        // L.marker([lat, lng]).addTo(map)
         marker.addTo(map)
-            .bindPopup('Coordenadas: ' + lat.toFixed(4) + ', ' + lng.toFixed(4))
-            .openPopup();
-        
+            .bindPopup('Coordenadas: ' + lat.toFixed(4) + ', ' + lng.toFixed(4));
+
+        if (abrirPopup) {
+            marker.openPopup();
+        }
+
         iptCoordenadasMapa.value = `${lat}, ${lng}`;
+    }
+
+    // Evento de clique no mapa
+    map.on('click', function(e) {
+        var lat = e.latlng.lat; // Latitude
+        var lng = e.latlng.lng; // Longitude
+        marcarLocal(lat, lng);
     });
 
     var coordenadas = [-2.5184, -44.2054];
@@ -133,5 +181,33 @@
             })
             .catch(error => console.error("Erro ao buscar endereço:", error));
     }
+    document.getElementById('formBuscaCadastro').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const input = document.getElementById('inputBuscaCadastro');
+        const termo = input.value.trim();
+
+        if (!termo) {
+            return;
+        }
+
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&bounded=1&viewbox=-44.57,-2.40,-43.87,-2.80&q=${encodeURIComponent(`${termo}, São Luís, Maranhão, Brasil`)}`;
+        const response = await fetch(url);
+        const resultados = await response.json();
+
+        if (!resultados.length) {
+            input.setCustomValidity('Local não encontrado em São Luís.');
+            input.reportValidity();
+            input.setCustomValidity('');
+            return;
+        }
+
+        const resultado = resultados[0];
+        const lat = Number(resultado.lat);
+        const lng = Number(resultado.lon);
+
+        map.flyTo([lat, lng], 17, { duration: 0.7 });
+        marcarLocal(lat, lng);
+    });
 </script>
 </html>

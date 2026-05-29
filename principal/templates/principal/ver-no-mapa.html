@@ -1,95 +1,412 @@
 {% extends 'principal/principal.html' %}
-{% load static %}
 
 {% block title %}
 Ver no mapa
 {% endblock %}
 
 {% block content %}
+
 <style>
-    #map {
-        height: 400px;
+    .mapa-painel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 18px;
+        width: min(1180px, 100%);
+        margin: 0 auto;
+    }
+
+    .mapa-card {
+        position: relative;
+        min-height: calc(100vh - 190px);
+        overflow: hidden;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    }
+
+    #mapaBuracos {
         width: 100%;
+        height: 100%;
+        min-height: calc(100vh - 190px);
+    }
+
+    .busca-mapa {
+        position: absolute;
+        top: 16px;
+        left: 62px;
+        right: 16px;
+        z-index: 500;
+        display: flex;
+        gap: 8px;
+        max-width: 520px;
+    }
+
+    .busca-mapa input {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid #ddd;
+        border-radius: 999px;
+        background: white;
+        padding: 12px 16px;
+        outline: none;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    }
+
+    .busca-mapa button {
+        width: 46px;
+        height: 46px;
+        border: none;
+        border-radius: 50%;
+        background: #ff9900;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+    }
+
+    .mapa-lateral {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .mapa-resumo,
+    .zonas-card {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background: white;
+        padding: 16px;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+    }
+
+    .mapa-resumo h1 {
+        margin: 0 0 8px;
+        color: #111;
+        font-size: 22px;
+    }
+
+    .mapa-resumo p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
+    .mapa-contadores {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .mapa-contador {
+        border-radius: 8px;
+        background: #f6f6f6;
+        padding: 12px;
+    }
+
+    .mapa-contador strong {
+        display: block;
+        color: #111;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .mapa-contador span {
+        color: #777;
+        font-size: 12px;
+    }
+
+    .zonas-card h2 {
+        margin: 0 0 12px;
+        color: #111;
+        font-size: 17px;
+    }
+
+    .zonas-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: calc(100vh - 390px);
+        overflow-y: auto;
+    }
+
+    .zona-item {
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        padding: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .zona-item:hover {
+        border-color: #ff9900;
+        background: #fff8ed;
+    }
+
+    .zona-item.ativa {
+        border-color: #cf621e;
+        background: #fff3df;
+    }
+
+    .zona-item strong {
+        display: block;
+        color: #222;
+        font-size: 14px;
+    }
+
+    .zona-item span {
+        color: #777;
+        font-size: 12px;
+    }
+
+    .pin-buraco {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 3px solid white;
+        border-radius: 50%;
+        background: #ff9900;
+        color: white;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.28);
+    }
+
+    .pin-buraco i {
+        font-size: 20px;
+    }
+
+    .popup-buraco {
+        min-width: 210px;
+    }
+
+    .popup-buraco strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #111;
+        font-size: 14px;
+    }
+
+    .popup-buraco p {
+        margin: 0 0 8px;
+        color: #555;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .popup-buraco a {
+        color: #cf621e;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    @media (max-width: 980px) {
+        .mapa-painel {
+            grid-template-columns: 1fr;
+        }
+
+        .mapa-card,
+        #mapaBuracos {
+            min-height: 520px;
+        }
+
+        .zonas-lista {
+            max-height: none;
+        }
     }
 </style>
-<h1>Clique no mapa para pegar as coordenadas</h1>
-<div id="map"></div>
-<p>Coordenadas: <span id="coords">Nenhuma coordenada selecionada</span></p>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<div class="mapa-painel">
+    <div class="mapa-card">
+        <form id="formBuscaMapa" class="busca-mapa">
+            <input id="inputBuscaMapa" type="search" placeholder="Buscar rua, bairro ou ponto em São Luís...">
+            <button type="submit" aria-label="Buscar no mapa">
+                <i class='bx bx-search'></i>
+            </button>
+        </form>
+
+        <div id="mapaBuracos"></div>
+    </div>
+
+    <aside class="mapa-lateral">
+        <section class="mapa-resumo">
+            <h1>Mapa de buracos</h1>
+            <p>As áreas maiores indicam zonas com mais registros. Os pins mostram os buracos cadastrados individualmente.</p>
+
+            <div class="mapa-contadores">
+                <div class="mapa-contador">
+                    <strong>{{ pontos_mapa|length }}</strong>
+                    <span>buracos</span>
+                </div>
+                <div class="mapa-contador">
+                    <strong>{{ zonas_mapa|length }}</strong>
+                    <span>zonas</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="zonas-card">
+            <h2>Zonas com mais registros</h2>
+
+            <div class="zonas-lista">
+                {% for zona in zonas_mapa %}
+                    <button
+                        type="button"
+                        class="zona-item"
+                        data-zona="{{ zona.nome }}"
+                        data-latitude="{{ zona.latitude }}"
+                        data-longitude="{{ zona.longitude }}">
+                        <strong>{{ zona.nome }}</strong>
+                        <span>{{ zona.quantidade }} registro{% if zona.quantidade != 1 %}s{% endif %}</span>
+                    </button>
+                {% empty %}
+                    <p class="empty-feed">Ainda não há buracos com localização cadastrada.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </aside>
+</div>
+
+{{ pontos_mapa|json_script:"pontosMapa" }}
+{{ zonas_mapa|json_script:"zonasMapa" }}
+
+{% endblock %}
+
+{% block js %}
 <script>
-    var map = L.map('map').setView([-2.5184, -44.2054], 16);
-    
-    // Adicionar a camada de tiles do OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+const pontosMapa = JSON.parse(document.getElementById('pontosMapa').textContent);
+const zonasMapa = JSON.parse(document.getElementById('zonasMapa').textContent);
 
-    // Evento de clique no mapa
-    map.on('click', function(e) {
-        var lat = e.latlng.lat; // Latitude
-        var lng = e.latlng.lng; // Longitude
+const mapa = L.map('mapaBuracos').setView([-2.5297, -44.3028], 12);
 
-        // if (marker) {
-        //     map.removeLayer(marker);
-        // }
+function escaparHtml(texto) {
+    return String(texto || '').replace(/[&<>"']/g, caractere => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    }[caractere]));
+}
 
-        // // Adiciona um novo marcador na posição clicada
-        // marker = L.marker(e.latlng).addTo(map);
+function numeroCoordenada(valor) {
+    return Number(String(valor).replace(',', '.'));
+}
 
-        // Atualiza o texto com as coordenadas
-        document.getElementById('coords').innerText = 'Latitude: ' + lat + ', Longitude: ' + lng;
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(mapa);
 
-        // Adiciona um marcador no local clicado
-        L.marker([lat, lng]).addTo(map)
-            .bindPopup('Coordenadas: ' + lat.toFixed(4) + ', ' + lng.toFixed(4))
-            .openPopup();
+const grupoPins = L.featureGroup().addTo(mapa);
+const maiorZona = zonasMapa.reduce((maior, zona) => Math.max(maior, zona.quantidade), 1);
+const circulosPorZona = {};
+let marcadorBusca = null;
+
+zonasMapa.forEach(zona => {
+    const intensidade = zona.quantidade / maiorZona;
+    const raio = 260 + (intensidade * 1250);
+
+    const circulo = L.circle([zona.latitude, zona.longitude], {
+        radius: raio,
+        color: '#cf621e',
+        weight: 2,
+        fillColor: '#ff9900',
+        fillOpacity: 0.16 + (intensidade * 0.22)
+    }).addTo(mapa).bindPopup(`
+        <strong>${zona.nome}</strong><br>
+        ${zona.quantidade} registro${zona.quantidade === 1 ? '' : 's'}
+    `);
+
+    circulosPorZona[zona.nome] = circulo;
+});
+
+const pinIcone = L.divIcon({
+    className: '',
+    html: "<div class='pin-buraco'><i class='bx bx-map-pin'></i></div>",
+    iconSize: [34, 34],
+    iconAnchor: [17, 34],
+    popupAnchor: [0, -34]
+});
+
+pontosMapa.forEach(ponto => {
+    const titulo = escaparHtml(ponto.titulo || 'Buraco cadastrado');
+    const endereco = escaparHtml(ponto.endereco);
+
+    const marker = L.marker([ponto.latitude, ponto.longitude], { icon: pinIcone })
+        .bindPopup(`
+            <div class="popup-buraco">
+                <strong>${titulo}</strong>
+                <p>${endereco}</p>
+                <p>${ponto.likes} curtida${ponto.likes === 1 ? '' : 's'} · ${ponto.comentarios} comentário${ponto.comentarios === 1 ? '' : 's'}</p>
+                <a href="${ponto.url}">Ver postagem</a>
+            </div>
+        `);
+
+    marker.addTo(grupoPins);
+});
+
+if (pontosMapa.length > 0) {
+    mapa.fitBounds(grupoPins.getBounds().pad(0.18));
+}
+
+document.querySelectorAll('.zona-item').forEach(botao => {
+    botao.addEventListener('click', () => {
+        const latitude = numeroCoordenada(botao.dataset.latitude);
+        const longitude = numeroCoordenada(botao.dataset.longitude);
+        const circulo = circulosPorZona[botao.dataset.zona];
+
+        if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
+            return;
+        }
+
+        document.querySelectorAll('.zona-item').forEach(item => item.classList.remove('ativa'));
+        botao.classList.add('ativa');
+        mapa.flyTo([latitude, longitude], 14, { duration: 0.7 });
+
+        if (circulo) {
+            setTimeout(() => circulo.openPopup(), 720);
+        }
     });
+});
 
-    // Definir a coordenada onde a imagem será adicionada
-    var coordenadas = [-2.5184, -44.2054]; // Exemplo de coordenadas (Latitude, Longitude)
+document.getElementById('formBuscaMapa').addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-    // Definir a imagem a ser usada como ícone
-    // var imagemIcone = L.icon({
-    //     // iconUrl: 'https://example.com/sua-imagem.png',  // URL da imagem
-    //     iconUrl: "{% static 'imgs/boneco.png' %}",
-    //     iconSize: [50, 50],  // Tamanho da imagem (ajuste conforme necessário)
-    //     iconAnchor: [25, 50], // Posição do ponto de ancoragem (ajuste conforme necessário)
-    //     popupAnchor: [0, -50] // Posição do popup (ajuste conforme necessário)
-    // });
+    const input = document.getElementById('inputBuscaMapa');
+    const termo = input.value.trim();
 
-    // Adicionar o marcador com a imagem como ícone na coordenada
-    L.marker(coordenadas, { icon: imagemIcone }).addTo(map)
-        .bindPopup("Este é o local com a imagem!")
+    if (!termo) {
+        return;
+    }
+
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&bounded=1&viewbox=-44.57,-2.40,-43.87,-2.80&q=${encodeURIComponent(`${termo}, São Luís, Maranhão, Brasil`)}`;
+    const response = await fetch(url);
+    const resultados = await response.json();
+
+    if (!resultados.length) {
+        input.setCustomValidity('Local não encontrado em São Luís.');
+        input.reportValidity();
+        input.setCustomValidity('');
+        return;
+    }
+
+    const resultado = resultados[0];
+    const latitude = Number(resultado.lat);
+    const longitude = Number(resultado.lon);
+
+    if (marcadorBusca) {
+        mapa.removeLayer(marcadorBusca);
+    }
+
+    marcadorBusca = L.marker([latitude, longitude])
+        .addTo(mapa)
+        .bindPopup(escaparHtml(resultado.display_name))
         .openPopup();
 
-    // var bounds = [
-    //     [-2.4025, -43.8717], // Coordenada sudoeste
-    //     [-2.8044, -44.5679]  // Coordenada nordeste
-    // ];
-
-    // // Definir os limites do mapa (exemplo: uma região ao redor de São Paulo)
-    // var bounds = L.latLngBounds(
-    //     L.latLng(-23.8, -46.9), // Sudoeste
-    //     L.latLng(-23.3, -46.3)  // Nordeste
-    // );
-
-    // var bounds = L.latLngBounds(
-    //     L.latLng(-2.4025, -43.8717),
-    //     L.latLng(-2.8044, -44.5679)
-    // );
-
-    // Aplicar os limites ao mapa
-    // map.setMaxBounds(bounds);
-
-    // Opcional: Evitar que o usuário saia da área ao dar zoom out
-    // map.options.minZoom = 10;
-
-    // map.setMaxBounds(bounds);
-
-    // // Configuração de zoom para garantir que o zoom não ultrapasse o nível desejado
-    map.on('drag', function() {
-        map.panInsideBounds(bounds);
-    });
+    mapa.flyTo([latitude, longitude], 16, { duration: 0.7 });
+});
 </script>
+
 {% endblock %}

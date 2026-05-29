@@ -30,6 +30,79 @@ def inicioView(request):
 class VerNoMapaView(TemplateView):
     template_name = "principal/ver-no-mapa.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pontos = []
+        zonas = {}
+
+        for buraco in Buraco.objects.exclude(local__isnull=True).exclude(local=""):
+            coordenadas = [parte.strip() for parte in buraco.local.split(",")]
+
+            if len(coordenadas) < 2:
+                continue
+
+            try:
+                latitude = float(coordenadas[0])
+                longitude = float(coordenadas[1])
+            except ValueError:
+                continue
+
+            zona = self.extrair_zona(buraco.endereco)
+
+            pontos.append({
+                "id": buraco.id,
+                "titulo": buraco.titulo,
+                "descricao": buraco.descricao,
+                "endereco": buraco.endereco,
+                "latitude": latitude,
+                "longitude": longitude,
+                "zona": zona,
+                "likes": buraco.likes.count(),
+                "comentarios": buraco.comentarios.count(),
+                "url": reverse("detalheBuracoView", args=[buraco.id]),
+            })
+
+            if zona not in zonas:
+                zonas[zona] = {
+                    "nome": zona,
+                    "quantidade": 0,
+                    "soma_latitude": 0,
+                    "soma_longitude": 0,
+                }
+
+            zonas[zona]["quantidade"] += 1
+            zonas[zona]["soma_latitude"] += latitude
+            zonas[zona]["soma_longitude"] += longitude
+
+        context["pontos_mapa"] = pontos
+        context["zonas_mapa"] = [
+            {
+                "nome": zona["nome"],
+                "quantidade": zona["quantidade"],
+                "latitude": zona["soma_latitude"] / zona["quantidade"],
+                "longitude": zona["soma_longitude"] / zona["quantidade"],
+            }
+            for zona in sorted(zonas.values(), key=lambda item: item["quantidade"], reverse=True)
+        ]
+
+        return context
+
+    @staticmethod
+    def extrair_zona(endereco):
+        partes = [
+            parte.split(" - ")[0].strip()
+            for parte in endereco.split(",")
+            if parte.strip()
+        ]
+
+        ignorar = {"brasil", "maranhão", "são luís", "região nordeste"}
+
+        for parte in reversed(partes):
+            if parte.lower() not in ignorar:
+                return parte
+
+        return "Local não identificado"
+
 
 def deslogar(request):
     logout(request)
