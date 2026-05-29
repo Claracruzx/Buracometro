@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
+from django.db.models import Count, F, IntegerField, ExpressionWrapper
 
 
 def cadastroView(request):
@@ -50,8 +51,16 @@ def cadastroSelecionarLocalView(request):
     return render(request, "buracos/cadastro-selecionar-local.html", variaveis)
 
 
-def explorarView(request):
-    buracos = Buraco.objects.all().order_by('-created_at')
+def popularView(request):
+    buracos = Buraco.objects.annotate(
+        total_likes=Count('likes', distinct=True),
+        total_comentarios=Count('comentarios', distinct=True),
+    ).annotate(
+        engajamento=ExpressionWrapper(
+            F('total_likes') + F('total_comentarios'),
+            output_field=IntegerField()
+        )
+    ).order_by('-engajamento', '-total_likes', '-total_comentarios', '-created_at')
 
     for buraco in buracos:
         buraco.curtido = request.user.is_authenticated and Like.objects.filter(
@@ -63,6 +72,10 @@ def explorarView(request):
         'rows': buracos,
     }
     return render(request, 'buracos/explorar.html', variaveis)
+
+
+def explorarView(request):
+    return popularView(request)
 
 def passarLocalParaCadastroView(request):
     if request.method == "POST":
@@ -154,14 +167,30 @@ def curtirBuracoView(request, buraco_id):
 def reportarBuracoView(request, buraco_id):
 
     buraco = get_object_or_404(Buraco, id=buraco_id)
+    motivo = request.POST.get("motivo", "").strip()
 
     reporte, created = Reporte.objects.get_or_create(
         usuario=request.user,
-        buraco=buraco
+        buraco=buraco,
+        defaults={"motivo": motivo}
     )
 
-    if buraco.reportes.count() >= 5:
+    if not created and motivo:
+        reporte.motivo = motivo
+        reporte.save(update_fields=["motivo"])
+
+    total_reportes = buraco.reportes.count()
+    removido = total_reportes >= 5
+
+    if removido:
         buraco.delete()
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JsonResponse({
+            "reportado": True,
+            "total_reportes": total_reportes,
+            "removido": removido,
+        })
 
     return redirect(request.META.get('HTTP_REFERER'))
 

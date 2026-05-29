@@ -187,6 +187,36 @@ Perfil
 
 </div>
 
+<div id="modalReportar" class="modal-reportar oculto">
+    <div class="modal-reportar-fundo"></div>
+
+    <form id="formReportar" class="modal-reportar-card">
+        {% csrf_token %}
+        <h2>Por que está reportando essa postagem?</h2>
+        <p>Escolha o motivo que melhor explica o problema.</p>
+
+        <div class="opcoes-reporte">
+            <label>
+                <input type="radio" name="motivo" value="Isso não é um buraco" required>
+                Isso não é um buraco
+            </label>
+            <label>
+                <input type="radio" name="motivo" value="Esse buraco não é em São Luís">
+                Esse buraco não é em São Luís
+            </label>
+            <label>
+                <input type="radio" name="motivo" value="Esse buraco não é real">
+                Esse buraco não é real
+            </label>
+        </div>
+
+        <div class="acoes-reporte">
+            <button type="button" class="cancelar-reporte">Cancelar</button>
+            <button type="submit" class="confirmar-reporte">Reportar</button>
+        </div>
+    </form>
+</div>
+
 <script>
 const posts = document.querySelectorAll('.explorar-item');
 
@@ -202,6 +232,10 @@ if (posts.length > 0) {
     const btnReportarModal = document.getElementById('btnReportarModal');
     const formComentarioPostModal = document.getElementById('formComentarioPostModal');
     const modalComentariosArea = document.getElementById('modalComentariosArea');
+    const modalReportar = document.getElementById('modalReportar');
+    const formReportar = document.getElementById('formReportar');
+    const fundoReportar = document.querySelector('.modal-reportar-fundo');
+    const cancelarReporte = document.querySelector('.cancelar-reporte');
 
     let indexAtual = 0;
     let postAtualId = null;
@@ -351,17 +385,54 @@ if (posts.length > 0) {
         formComentarioPostModal.querySelector('input[name="comentario"]').focus();
     });
 
-    btnReportarModal.addEventListener('click', async () => {
-        await fetch(btnReportarModal.dataset.url, {
+    function abrirModalReportar() {
+        formReportar.action = btnReportarModal.dataset.url;
+        formReportar.reset();
+        modalReportar.classList.remove('oculto');
+    }
+
+    function fecharModalReportar() {
+        modalReportar.classList.add('oculto');
+    }
+
+    btnReportarModal.addEventListener('click', abrirModalReportar);
+    fundoReportar.addEventListener('click', fecharModalReportar);
+    cancelarReporte.addEventListener('click', fecharModalReportar);
+
+    formReportar.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const botaoEnviar = formReportar.querySelector('.confirmar-reporte');
+        botaoEnviar.disabled = true;
+
+        try {
+            const response = await fetch(formReportar.action, {
             method: 'POST',
+            body: new FormData(formReportar),
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
 
-        btnReportarModal.classList.add('reportado');
-        btnReportarModal.querySelector('span').innerText = 'Reportado';
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+            btnReportarModal.classList.add('reportado');
+            btnReportarModal.querySelector('span').innerText = 'Reportado';
+
+            if (data.removido) {
+                const post = posts[indexAtual];
+                fecharPostModal();
+                post.remove();
+            }
+
+            fecharModalReportar();
+        } finally {
+            botaoEnviar.disabled = false;
+        }
     });
 
     formComentarioPostModal.addEventListener('submit', async (event) => {
