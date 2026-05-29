@@ -310,6 +310,65 @@ ul.no-decoration {
     align-items: center;
     gap: 14px;
     padding: 18px;
+    position: relative;
+}
+
+.post-menu {
+    position: relative;
+    margin-left: auto;
+}
+
+.btn-post-menu {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #262626;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btn-post-menu i {
+    font-size: 26px;
+}
+
+.btn-post-menu:hover {
+    background: #f2f2f2;
+}
+
+.post-menu-opcoes {
+    position: absolute;
+    top: 42px;
+    right: 0;
+    min-width: 148px;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.14);
+    overflow: hidden;
+    z-index: 30;
+}
+
+.post-menu-opcoes button {
+    width: 100%;
+    border: none;
+    background: white;
+    color: #ff3040;
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.post-menu-opcoes button:hover {
+    background: #fff1f2;
+}
+
+.post-menu-modal {
+    margin-left: 0;
 }
 
 .avatar {
@@ -1669,6 +1728,24 @@ main #conteudo {
     .modal-acoes button span {
         font-size: 14px;
     }
+}
+
+.modal-acoes .post-menu-opcoes button,
+.post-actions .post-menu-opcoes button {
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    background: white;
+    color: #ff3040;
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.modal-acoes .post-menu-opcoes button:hover,
+.post-actions .post-menu-opcoes button:hover {
+    background: #fff1f2;
 }
 
 

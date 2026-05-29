@@ -47,6 +47,18 @@ Iní­cio
                         <p>{{ buraco.endereco }}</p>
                     {% endif %}
                 </div>
+
+                {% if buraco.usuario and request.user.id == buraco.usuario.id %}
+                    <div class="post-menu">
+                        <button type="button" class="btn-post-menu" aria-label="Opções da postagem">
+                            <i class='bx bx-dots-horizontal-rounded'></i>
+                        </button>
+                        <form class="post-menu-opcoes form-excluir-post oculto" action="{% url 'excluirBuraco' buraco.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit">Excluir post</button>
+                        </form>
+                    </div>
+                {% endif %}
             </div>
 
             {% if buraco.imagem %}
@@ -419,6 +431,53 @@ formReportar.addEventListener('submit', async (event) => {
     } finally {
         botaoEnviar.disabled = false;
     }
+});
+</script>
+
+<script>
+document.querySelectorAll('.post-menu').forEach(menu => {
+    const botao = menu.querySelector('.btn-post-menu');
+    const opcoes = menu.querySelector('.post-menu-opcoes');
+
+    botao.addEventListener('click', (event) => {
+        event.stopPropagation();
+        document.querySelectorAll('.post-menu-opcoes').forEach(item => {
+            if (item !== opcoes) {
+                item.classList.add('oculto');
+            }
+        });
+        opcoes.classList.toggle('oculto');
+    });
+});
+
+document.addEventListener('click', () => {
+    document.querySelectorAll('.post-menu-opcoes').forEach(opcoes => {
+        opcoes.classList.add('oculto');
+    });
+});
+
+document.querySelectorAll('.form-excluir-post').forEach(form => {
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const card = form.closest('.post-card');
+        if (card) {
+            card.remove();
+        }
+    });
 });
 </script>
 

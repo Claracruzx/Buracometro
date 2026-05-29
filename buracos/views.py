@@ -149,6 +149,28 @@ def detalheBuracoView(request, id):
     }) 
 
 @login_required
+def excluirBuracoView(request, buraco_id):
+    buraco = get_object_or_404(Buraco, id=buraco_id)
+
+    if buraco.usuario != request.user:
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"erro": "VocÃª nÃ£o pode excluir essa postagem."}, status=403)
+
+        messages.error(request, "VocÃª nÃ£o pode excluir essa postagem.")
+        return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
+
+    if request.method == "POST":
+        buraco.delete()
+
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"excluido": True})
+
+        messages.success(request, "Postagem excluÃ­da com sucesso.")
+        return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
+
+    return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
+
+@login_required
 def curtirBuracoView(request, buraco_id):
     buraco = get_object_or_404(Buraco, id=buraco_id)
 

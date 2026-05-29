@@ -59,7 +59,9 @@ Perfil de {{ usuario_perfil.username }}
                     data-endereco="{{ buraco.endereco }}"
                     data-like-url="{% url 'curtirBuraco' buraco.id %}"
                     data-comentar-url="{% url 'comentarBuraco' buraco.id %}"
-                    data-reportar-url="{% url 'reportarBuraco' buraco.id %}">
+                    data-reportar-url="{% url 'reportarBuraco' buraco.id %}"
+                    data-excluir-url="{% url 'excluirBuraco' buraco.id %}"
+                    data-pode-excluir="{% if request.user.id == buraco.usuario.id %}true{% else %}false{% endif %}">
 
                     {% if buraco.imagem %}
                         <img src="{{ buraco.imagem.url }}" alt="{{ buraco.titulo }}">
@@ -160,6 +162,16 @@ Perfil de {{ usuario_perfil.username }}
                     <i class='bx bx-error-circle'></i>
                     <span>Reportar</span>
                 </button>
+
+                <div id="menuExcluirModal" class="post-menu post-menu-modal oculto">
+                    <button type="button" class="btn-post-menu" aria-label="Opcoes da postagem">
+                        <i class='bx bx-dots-horizontal-rounded'></i>
+                    </button>
+                    <form id="formExcluirModal" class="post-menu-opcoes form-excluir-post oculto" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Excluir post</button>
+                    </form>
+                </div>
             </div>
 
             <form id="formComentarioPostModal" class="form-comentario-post-modal" method="post">
@@ -226,6 +238,8 @@ if (posts.length > 0) {
     const formReportar = document.getElementById('formReportar');
     const fundoReportar = document.querySelector('.modal-reportar-fundo');
     const cancelarReporte = document.querySelector('.cancelar-reporte');
+    const menuExcluirModal = document.getElementById('menuExcluirModal');
+    const formExcluirModal = document.getElementById('formExcluirModal');
 
     let indexAtual = 0;
     let postAtualId = null;
@@ -308,6 +322,9 @@ if (posts.length > 0) {
         btnReportarModal.dataset.url = post.dataset.reportarUrl;
         btnReportarModal.classList.remove('reportado');
         btnReportarModal.querySelector('span').innerText = 'Reportar';
+        formExcluirModal.action = post.dataset.excluirUrl;
+        formExcluirModal.classList.add('oculto');
+        menuExcluirModal.classList.toggle('oculto', post.dataset.podeExcluir !== 'true');
 
         if (post.dataset.curtido === 'true') {
             btnLikeModal.classList.add('curtido');
@@ -389,6 +406,38 @@ if (posts.length > 0) {
     btnReportarModal.addEventListener('click', abrirModalReportar);
     fundoReportar.addEventListener('click', fecharModalReportar);
     cancelarReporte.addEventListener('click', fecharModalReportar);
+
+    menuExcluirModal.querySelector('.btn-post-menu').addEventListener('click', (event) => {
+        event.stopPropagation();
+        formExcluirModal.classList.toggle('oculto');
+    });
+
+    formExcluirModal.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const response = await fetch(formExcluirModal.action, {
+            method: 'POST',
+            body: new FormData(formExcluirModal),
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const post = posts[indexAtual];
+        const comentarios = document.getElementById(`comentarios-${postAtualId}`);
+
+        fecharPostModal();
+        post.remove();
+
+        if (comentarios) {
+            comentarios.remove();
+        }
+    });
 
     formReportar.addEventListener('submit', async (event) => {
         event.preventDefault();

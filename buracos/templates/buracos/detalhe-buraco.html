@@ -29,6 +29,18 @@
                     <p>{{ buraco.endereco }}</p>
                 {% endif %}
             </div>
+
+            {% if buraco.usuario and request.user.id == buraco.usuario.id %}
+                <div class="post-menu">
+                    <button type="button" class="btn-post-menu" aria-label="Opcoes da postagem">
+                        <i class='bx bx-dots-horizontal-rounded'></i>
+                    </button>
+                    <form class="post-menu-opcoes form-excluir-post oculto" action="{% url 'excluirBuraco' buraco.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Excluir post</button>
+                    </form>
+                </div>
+            {% endif %}
         </div>
 
         {% if buraco.imagem %}
@@ -176,6 +188,46 @@ const btnFocarComentarioDetalhe = document.getElementById('btnFocarComentarioDet
 const btnReportarDetalhe = document.getElementById('btnReportarDetalhe');
 const modalReportar = document.getElementById('modalReportar');
 const formReportar = document.getElementById('formReportar');
+const postMenu = document.querySelector('.post-menu');
+const formExcluirPost = document.querySelector('.form-excluir-post');
+
+if (postMenu) {
+    const botaoMenu = postMenu.querySelector('.btn-post-menu');
+    const opcoesMenu = postMenu.querySelector('.post-menu-opcoes');
+
+    botaoMenu.addEventListener('click', (event) => {
+        event.stopPropagation();
+        opcoesMenu.classList.toggle('oculto');
+    });
+
+    document.addEventListener('click', () => {
+        opcoesMenu.classList.add('oculto');
+    });
+}
+
+if (formExcluirPost) {
+    formExcluirPost.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const response = await fetch(formExcluirPost.action, {
+            method: 'POST',
+            body: new FormData(formExcluirPost),
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const card = document.querySelector('.detalhe-post-card');
+        if (card) {
+            card.remove();
+        }
+    });
+}
 
 btnLikeDetalhe.addEventListener('click', async () => {
     const response = await fetch(btnLikeDetalhe.dataset.url, {

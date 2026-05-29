@@ -10,6 +10,7 @@ urlpatterns = [
     path('popular', popularView, name='popularView'),
     path('explorar', explorarView, name='explorarView'),
     path('detalhe/<int:id>/', detalheBuracoView, name='detalheBuracoView'),
+    path('excluir/<int:buraco_id>/', excluirBuracoView, name='excluirBuraco'),
     path('curtir/<int:buraco_id>/', curtirBuracoView, name='curtirBuraco'),
     path('reportar/<int:buraco_id>/', reportarBuracoView, name='reportarBuraco'),
     path('comentar/<int:buraco_id>/', comentarBuracoView, name='comentarBuraco'),

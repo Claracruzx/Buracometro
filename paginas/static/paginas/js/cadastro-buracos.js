@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let areaFoto = document.getElementById('area-foto');
     let areaBotoesFoto = document.getElementById('area-botoes-foto');
     let iptEscolherArquivo = document.getElementById('iptEscolherArquivo');
+    let btnRemoverImagem = document.getElementById('btnRemoverImagem');
     let btnMaximizarImagem = document.getElementById('btnMaximizarImagem');
 
     let btnSelecionarLocal = document.getElementById('btnSelecionarLocal');
@@ -136,6 +137,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     <img src="${imagem.dados}" alt="Prévia da imagem">
                 `;
             }
+
+            if (btnRemoverImagem) {
+                btnRemoverImagem.classList.remove('oculto');
+            }
         } catch (error) {
             sessionStorage.removeItem(imagemPendenteKey);
         }
@@ -213,6 +218,25 @@ document.addEventListener('DOMContentLoaded', function () {
 const inputImagem = document.getElementById("iptEscolherArquivo");
 const previewImagem = document.getElementById("previewImagem");
 
+function limparPreviewImagem() {
+    if (inputImagem) {
+        inputImagem.value = '';
+    }
+
+    if (previewImagem) {
+        previewImagem.innerHTML = `
+            <i class="fa-solid fa-image"></i>
+            <span>Escolher imagem</span>
+        `;
+    }
+
+    if (btnRemoverImagem) {
+        btnRemoverImagem.classList.add('oculto');
+    }
+
+    sessionStorage.removeItem(imagemPendenteKey);
+}
+
 if (inputImagem && previewImagem) {
     inputImagem.addEventListener("change", function () {
         const arquivo = this.files[0];
@@ -228,8 +252,18 @@ if (inputImagem && previewImagem) {
 
             leitor.readAsDataURL(arquivo);
             salvarImagemTemporaria();
+
+            if (btnRemoverImagem) {
+                btnRemoverImagem.classList.remove('oculto');
+            }
+        } else {
+            limparPreviewImagem();
         }
     });
+
+    if (btnRemoverImagem) {
+        btnRemoverImagem.addEventListener('click', limparPreviewImagem);
+    }
 
     restaurarImagemTemporaria();
 }
