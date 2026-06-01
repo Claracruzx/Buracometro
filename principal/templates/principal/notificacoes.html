@@ -31,6 +31,11 @@ Notificações
                         {% if notificacao.ator %}
                             <a href="{% url 'perfilPublicoView' notificacao.ator.username %}">
                                 @{{ notificacao.ator.username }}
+                                {% if notificacao.ator.is_staff or notificacao.ator.is_superuser %}
+                                    <span class="selo-admin"><i class='bx bxs-badge-check'></i> admin</span>
+                                {% elif notificacao.ator.verificado %}
+                                    <span class="selo-verificado" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                                {% endif %}
                             </a>
                         {% endif %}
                         {{ notificacao.mensagem }}

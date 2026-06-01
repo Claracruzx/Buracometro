@@ -92,7 +92,24 @@
 }
 
 @media (max-width: 600px) {
+    .explorar-container {
+        padding: 4px 0 96px;
+    }
+
     .explorar-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 2px;
+    }
+
+    .explorar-overlay {
+        gap: 10px;
+    }
+
+    .explorar-overlay span {
+        font-size: 13px;
+    }
+
+    .explorar-overlay i {
+        font-size: 19px;
     }
 }

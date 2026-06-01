@@ -2,6 +2,16 @@ from django.db import models
 from django.conf import settings
 
 class Buraco(models.Model):
+    STATUS_NAO_ARRUMADO = "nao_arrumado"
+    STATUS_EM_OBRA = "em_obra"
+    STATUS_ARRUMADO = "arrumado"
+
+    STATUS_CHOICES = [
+        (STATUS_NAO_ARRUMADO, "Ainda nao foi arrumado"),
+        (STATUS_EM_OBRA, "Em obra"),
+        (STATUS_ARRUMADO, "Ja arrumado"),
+    ]
+
     titulo = models.CharField(max_length=255) 
     descricao = models.TextField()  
     local = models.CharField(max_length=255)  
@@ -9,6 +19,11 @@ class Buraco(models.Model):
     url_imagem = models.URLField(blank=True, null=True)
     imagem = models.ImageField(upload_to='buracos/', null=True, blank=True)
     tamanho = models.SmallIntegerField(default=1)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_NAO_ARRUMADO
+    )
     data_atual = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)  # Data e hora de criação (preenchido automaticamente)
     updated_at = models.DateTimeField(auto_now=True)  # Data e hora de última atualização (atualizado automaticamente)
@@ -27,6 +42,14 @@ class Buraco(models.Model):
         }
 
         return tamanhos.get(self.tamanho, "Pequeno")
+
+    @property
+    def status_nome(self):
+        return dict(self.STATUS_CHOICES).get(self.status, "Ainda nao foi arrumado")
+
+    @property
+    def status_classe(self):
+        return self.status.replace("_", "-")
 
 class Like(models.Model):
     usuario = models.ForeignKey(

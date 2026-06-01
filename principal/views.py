@@ -59,6 +59,8 @@ class VerNoMapaView(TemplateView):
                 "latitude": latitude,
                 "longitude": longitude,
                 "zona": zona,
+                "status": buraco.status_nome,
+                "status_classe": buraco.status_classe,
                 "likes": buraco.likes.count(),
                 "comentarios": buraco.comentarios.count(),
                 "url": reverse("detalheBuracoView", args=[buraco.id]),

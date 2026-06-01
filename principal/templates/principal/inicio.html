@@ -31,7 +31,14 @@ Iní­cio
                                 <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
                             {% endif %}
 
-                                <h2>{{ buraco.usuario.name|default:buraco.usuario.username }}</h2>
+                                <h2>
+                                    {{ buraco.usuario.name|default:buraco.usuario.username }}
+                                    {% if buraco.usuario.is_staff or buraco.usuario.is_superuser %}
+                                        <span class="selo-admin"><i class='bx bxs-badge-check'></i> admin</span>
+                                    {% elif buraco.usuario.verificado %}
+                                        <span class="selo-verificado" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                                    {% endif %}
+                                </h2>
 
                             </a>
                         </h2>
@@ -42,9 +49,31 @@ Iní­cio
                             </a>
                               • {{ buraco.endereco }}
                         </p>
+                        <span class="status-buraco status-{{ buraco.status_classe }}">{{ buraco.status_nome }}</span>
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                            <form class="form-status-buraco" data-url="{% url 'atualizarStatusBuraco' buraco.id %}">
+                                {% csrf_token %}
+                                <select name="status" aria-label="Alterar status da postagem">
+                                    <option value="nao_arrumado" {% if buraco.status == "nao_arrumado" %}selected{% endif %}>Ainda nao foi arrumado</option>
+                                    <option value="em_obra" {% if buraco.status == "em_obra" %}selected{% endif %}>Em obra</option>
+                                    <option value="arrumado" {% if buraco.status == "arrumado" %}selected{% endif %}>Ja arrumado</option>
+                                </select>
+                            </form>
+                        {% endif %}
                     {% else %}
                         <h2>Usuário desconhecido</h2>
                         <p>{{ buraco.endereco }}</p>
+                        <span class="status-buraco status-{{ buraco.status_classe }}">{{ buraco.status_nome }}</span>
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                            <form class="form-status-buraco" data-url="{% url 'atualizarStatusBuraco' buraco.id %}">
+                                {% csrf_token %}
+                                <select name="status" aria-label="Alterar status da postagem">
+                                    <option value="nao_arrumado" {% if buraco.status == "nao_arrumado" %}selected{% endif %}>Ainda nao foi arrumado</option>
+                                    <option value="em_obra" {% if buraco.status == "em_obra" %}selected{% endif %}>Em obra</option>
+                                    <option value="arrumado" {% if buraco.status == "arrumado" %}selected{% endif %}>Ja arrumado</option>
+                                </select>
+                            </form>
+                        {% endif %}
                     {% endif %}
                 </div>
 
@@ -94,6 +123,11 @@ Iní­cio
                                 <div class="comentario-conteudo">
                                     <p>
                                         <strong>@{{ comentario.usuario.username }}</strong>
+                                        {% if comentario.usuario.is_staff or comentario.usuario.is_superuser %}
+                                            <span class="selo-admin selo-admin-comentario"><i class='bx bxs-badge-check'></i> admin</span>
+                                        {% elif comentario.usuario.verificado %}
+                                            <span class="selo-verificado selo-verificado-comentario" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                                        {% endif %}
                                         {{ comentario.texto }}
                                     </p>
 
@@ -128,6 +162,11 @@ Iní­cio
                                                 <div class="comentario-conteudo">
                                                     <p>
                                                         <strong>@{{ resposta.usuario.username }}</strong>
+                                                        {% if resposta.usuario.is_staff or resposta.usuario.is_superuser %}
+                                                            <span class="selo-admin selo-admin-comentario"><i class='bx bxs-badge-check'></i> admin</span>
+                                                        {% elif resposta.usuario.verificado %}
+                                                            <span class="selo-verificado selo-verificado-comentario" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                                                        {% endif %}
                                                         {{ resposta.texto }}
                                                     </p>
                                                     <span class="comentario-data">{{ resposta.created_at|date:"d/m/Y H:i" }}</span>
@@ -325,6 +364,18 @@ function criarComentarioElemento(comentario) {
     usuario.textContent = `@${comentario.username}`;
 
     texto.appendChild(usuario);
+    if (comentario.admin) {
+        const seloAdmin = document.createElement('span');
+        seloAdmin.className = 'selo-admin selo-admin-comentario';
+        seloAdmin.innerHTML = "<i class='bx bxs-badge-check'></i> admin";
+        texto.appendChild(seloAdmin);
+    } else if (comentario.verificado) {
+        const seloVerificado = document.createElement('span');
+        seloVerificado.className = 'selo-verificado selo-verificado-comentario';
+        seloVerificado.title = 'Colaborador verificado';
+        seloVerificado.innerHTML = "<i class='bx bxs-check-circle'></i>";
+        texto.appendChild(seloVerificado);
+    }
     texto.append(` ${comentario.texto}`);
 
     const data = document.createElement('span');
@@ -646,6 +697,41 @@ document.querySelectorAll('.form-excluir-post').forEach(form => {
         const card = form.closest('.post-card');
         if (card) {
             card.remove();
+        }
+    });
+});
+</script>
+
+<script>
+document.querySelectorAll('.form-status-buraco').forEach(form => {
+    const select = form.querySelector('select[name="status"]');
+    const statusVisual = form.parentElement.querySelector('.status-buraco');
+
+    select.addEventListener('change', async () => {
+        select.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('status', select.value);
+
+            const response = await fetch(form.dataset.url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+            statusVisual.textContent = data.status_nome;
+            statusVisual.className = `status-buraco status-${data.status_classe}`;
+        } finally {
+            select.disabled = false;
         }
     });
 });

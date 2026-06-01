@@ -330,3 +330,70 @@ div#areaMapaOculto {
 .btn-remover-imagem:hover {
     background: #ff3040;
 }
+
+@media (max-width: 768px) {
+    #formularioCadastroBuracos {
+        padding: 0 0 96px;
+    }
+
+    .content-title {
+        position: static;
+        padding-left: 0;
+        margin-bottom: 16px;
+        font-size: 24px;
+    }
+
+    #formularioCadastroBuracos > .content {
+        flex-direction: column-reverse;
+        gap: 18px;
+    }
+
+    #formularioCadastroBuracos > .content > .area-itens,
+    #formularioCadastroBuracos > .content > .area-imagem {
+        width: 100%;
+        padding: 0;
+    }
+
+    .upload-card,
+    #formularioCadastroBuracos > .content > .area-imagem .area-foto {
+        width: min(100%, 320px);
+        height: auto;
+        aspect-ratio: 1 / 1;
+        border-radius: 8px;
+    }
+
+    .btn-remover-imagem {
+        right: calc(50% - min(160px, 50vw - 10px));
+    }
+
+    .campo-tamanho-topo {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .escala-tamanho {
+        font-size: 10px;
+        padding: 0;
+    }
+
+    .escala-tamanho span {
+        width: auto;
+    }
+
+    .btn-enviar {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 18px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-local {
+        width: 100%;
+        margin: 6px 0;
+    }
+}

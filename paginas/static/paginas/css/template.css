@@ -253,3 +253,62 @@ main > .content {
     background-color: #64060c !important;
     transform: translateY(-2px);
 }
+
+@media (max-width: 768px) {
+    .container {
+        max-width: none;
+        padding: 0 14px;
+    }
+
+    .mapa-container {
+        padding: 18px 12px 80px;
+    }
+
+    .mapa-topo {
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    #titulo {
+        font-size: 26px;
+    }
+
+    .subtitulo-mapa {
+        font-size: 13px;
+    }
+
+    .btn-voltar {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    #mapa {
+        height: 58vh;
+        min-height: 380px;
+        border-radius: 8px;
+    }
+
+    #linha-endereco-selecionado {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+        padding: 14px;
+        border-radius: 8px;
+    }
+
+    #linha-endereco-selecionado h4 {
+        font-size: 16px;
+        margin: 0;
+    }
+
+    #area-endereco {
+        font-size: 13px;
+    }
+
+    .btn.btn-large {
+        width: 100%;
+        padding: 12px 18px;
+    }
+}

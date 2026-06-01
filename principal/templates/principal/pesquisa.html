@@ -26,6 +26,11 @@ Pesquisa
                 <h3>
                     <a href="{% url 'perfilPublicoView' usuario.username %}">
                         {{ usuario.name|default:usuario.username }}
+                        {% if usuario.is_staff or usuario.is_superuser %}
+                            <span class="selo-admin"><i class='bx bxs-badge-check'></i> admin</span>
+                        {% elif usuario.verificado %}
+                            <span class="selo-verificado" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                        {% endif %}
                     </a>
                 </h3>
 

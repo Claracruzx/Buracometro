@@ -196,6 +196,10 @@ Ver no mapa
         line-height: 1.35;
     }
 
+    .popup-buraco .status-buraco {
+        margin: 2px 0 8px;
+    }
+
     .popup-buraco a {
         color: #8f0b13;
         font-weight: 700;
@@ -214,6 +218,72 @@ Ver no mapa
 
         .zonas-lista {
             max-height: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .mapa-painel {
+            gap: 12px;
+        }
+
+        .mapa-card,
+        #mapaBuracos {
+            min-height: 58vh;
+        }
+
+        .mapa-card {
+            border-radius: 8px;
+        }
+
+        .busca-mapa {
+            top: 12px;
+            left: 50px;
+            right: 10px;
+            max-width: none;
+        }
+
+        .busca-mapa input {
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .busca-mapa button {
+            width: 40px;
+            height: 40px;
+        }
+
+        .mapa-lateral {
+            gap: 10px;
+        }
+
+        .mapa-resumo,
+        .zonas-card {
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .mapa-resumo h1 {
+            font-size: 20px;
+        }
+
+        .mapa-resumo p {
+            font-size: 13px;
+        }
+
+        .zonas-lista {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .zona-item {
+            min-height: 64px;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .zonas-lista {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -339,6 +409,7 @@ pontosMapa.forEach(ponto => {
             <div class="popup-buraco">
                 <strong>${titulo}</strong>
                 <p>${endereco}</p>
+                <span class="status-buraco status-${ponto.status_classe}">${ponto.status}</span>
                 <p>${ponto.likes} curtida${ponto.likes === 1 ? '' : 's'} · ${ponto.comentarios} comentário${ponto.comentarios === 1 ? '' : 's'}</p>
                 <a href="${ponto.url}">Ver postagem</a>
             </div>

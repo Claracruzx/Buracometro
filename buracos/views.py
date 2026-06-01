@@ -171,6 +171,45 @@ def excluirBuracoView(request, buraco_id):
 
     return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
 
+
+@login_required
+def atualizarStatusBuracoView(request, buraco_id):
+    buraco = get_object_or_404(Buraco, id=buraco_id)
+
+    if not (request.user.is_staff or request.user.is_superuser):
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"erro": "Apenas administradores podem alterar o status."}, status=403)
+
+        messages.error(request, "Apenas administradores podem alterar o status.")
+        return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
+
+    if request.method != "POST":
+        return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
+
+    novo_status = request.POST.get("status", "")
+    status_validos = dict(Buraco.STATUS_CHOICES)
+
+    if novo_status not in status_validos:
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"erro": "Status invalido."}, status=400)
+
+        messages.error(request, "Status invalido.")
+        return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
+
+    buraco.status = novo_status
+    buraco.save(update_fields=["status", "updated_at"])
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JsonResponse({
+            "status": buraco.status,
+            "status_nome": buraco.status_nome,
+            "status_classe": buraco.status_classe,
+        })
+
+    messages.success(request, "Status atualizado com sucesso.")
+    return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
+
+
 @login_required
 def curtirBuracoView(request, buraco_id):
     buraco = get_object_or_404(Buraco, id=buraco_id)
@@ -233,6 +272,9 @@ def reportarBuracoView(request, buraco_id):
 
     if removido:
         if buraco.usuario:
+            buraco.usuario.postagens_removidas_por_reporte += 1
+            buraco.usuario.save(update_fields=["postagens_removidas_por_reporte"])
+
             Notificacao.objects.create(
                 destinatario=buraco.usuario,
                 buraco=buraco,
@@ -307,6 +349,8 @@ def comentarBuracoView(request, buraco_id):
                     "username": request.user.username,
                     "foto_url": foto_url,
                     "inicial": request.user.username[:1].upper(),
+                    "admin": request.user.is_staff or request.user.is_superuser,
+                    "verificado": request.user.verificado,
                     "data": timezone.localtime(comentario.created_at).strftime("%d/%m/%Y %H:%M"),
                     "resposta_de": comentario_pai.id if comentario_pai else None,
                     "pode_excluir": True,

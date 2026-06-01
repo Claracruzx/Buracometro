@@ -19,7 +19,14 @@ Perfil de {{ usuario_perfil.username }}
         </div>
 
         <div class="perfil-info">
-            <h1>{{ usuario_perfil.name|default:usuario_perfil.username }}</h1>
+            <h1>
+                {{ usuario_perfil.name|default:usuario_perfil.username }}
+                {% if usuario_perfil.is_staff or usuario_perfil.is_superuser %}
+                    <span class="selo-admin"><i class='bx bxs-badge-check'></i> admin</span>
+                {% elif usuario_perfil.verificado %}
+                    <span class="selo-verificado" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                {% endif %}
+            </h1>
             <p>@{{ usuario_perfil.username }}</p>
             <p class="perfil-data">
                 Perfil criado em {{ usuario_perfil.date_joined|date:"d/m/Y" }}
@@ -51,15 +58,21 @@ Perfil de {{ usuario_perfil.username }}
                     data-titulo="{{ buraco.titulo }}"
                     data-descricao="{{ buraco.descricao }}"
                     data-tamanho="{{ buraco.tamanho_nome }}"
+                    data-status-valor="{{ buraco.status }}"
+                    data-status="{{ buraco.status_nome }}"
+                    data-status-classe="{{ buraco.status_classe }}"
                     data-likes="{{ buraco.likes.count }}"
                     data-comentarios="{{ buraco.comentarios.count }}"
                     data-curtido="{% if buraco.curtido %}true{% else %}false{% endif %}"
                     data-username="{{ usuario_perfil.username }}"
                     data-nome="{{ usuario_perfil.name }}"
+                    data-admin="{% if usuario_perfil.is_staff or usuario_perfil.is_superuser %}true{% else %}false{% endif %}"
+                    data-verificado="{% if usuario_perfil.verificado %}true{% else %}false{% endif %}"
                     data-endereco="{{ buraco.endereco }}"
                     data-like-url="{% url 'curtirBuraco' buraco.id %}"
                     data-comentar-url="{% url 'comentarBuraco' buraco.id %}"
                     data-reportar-url="{% url 'reportarBuraco' buraco.id %}"
+                    data-status-url="{% url 'atualizarStatusBuraco' buraco.id %}"
                     data-excluir-url="{% url 'excluirBuraco' buraco.id %}"
                     data-pode-excluir="{% if request.user.id == buraco.usuario.id %}true{% else %}false{% endif %}">
 
@@ -96,6 +109,11 @@ Perfil de {{ usuario_perfil.username }}
                             <div class="comentario-conteudo">
                                 <p>
                                     <strong>@{{ comentario.usuario.username }}</strong>
+                                    {% if comentario.usuario.is_staff or comentario.usuario.is_superuser %}
+                                        <span class="selo-admin selo-admin-comentario"><i class='bx bxs-badge-check'></i> admin</span>
+                                    {% elif comentario.usuario.verificado %}
+                                        <span class="selo-verificado selo-verificado-comentario" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                                    {% endif %}
                                     {{ comentario.texto }}
                                 </p>
                                 <span class="comentario-data">{{ comentario.created_at|date:"d/m/Y H:i" }}</span>
@@ -122,6 +140,11 @@ Perfil de {{ usuario_perfil.username }}
                                             <div class="comentario-conteudo">
                                                 <p>
                                                     <strong>@{{ resposta.usuario.username }}</strong>
+                                                    {% if resposta.usuario.is_staff or resposta.usuario.is_superuser %}
+                                                        <span class="selo-admin selo-admin-comentario"><i class='bx bxs-badge-check'></i> admin</span>
+                                                    {% elif resposta.usuario.verificado %}
+                                                        <span class="selo-verificado selo-verificado-comentario" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                                                    {% endif %}
                                                     {{ resposta.texto }}
                                                 </p>
                                                 <span class="comentario-data">{{ resposta.created_at|date:"d/m/Y H:i" }}</span>
@@ -170,8 +193,23 @@ Perfil de {{ usuario_perfil.username }}
             </div>
 
             <div>
-                <h3 id="modalUsername"></h3>
+                <h3>
+                    <span id="modalUsername"></span>
+                    <span id="modalAdminSelo" class="selo-admin oculto"><i class='bx bxs-badge-check'></i> admin</span>
+                    <span id="modalVerificadoSelo" class="selo-verificado oculto" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                </h3>
                 <p id="modalEndereco"></p>
+                <small id="modalStatus" class="status-buraco"></small>
+                {% if request.user.is_staff or request.user.is_superuser %}
+                    <form id="modalStatusForm" class="form-status-buraco">
+                        {% csrf_token %}
+                        <select id="modalStatusSelect" name="status" aria-label="Alterar status da postagem">
+                            <option value="nao_arrumado">Ainda nao foi arrumado</option>
+                            <option value="em_obra">Em obra</option>
+                            <option value="arrumado">Ja arrumado</option>
+                        </select>
+                    </form>
+                {% endif %}
             </div>
         </div>
 
@@ -315,6 +353,18 @@ if (posts.length > 0) {
         usuario.textContent = `@${comentario.username}`;
 
         texto.appendChild(usuario);
+        if (comentario.admin) {
+            const seloAdmin = document.createElement('span');
+            seloAdmin.className = 'selo-admin selo-admin-comentario';
+            seloAdmin.innerHTML = "<i class='bx bxs-badge-check'></i> admin";
+            texto.appendChild(seloAdmin);
+        } else if (comentario.verificado) {
+            const seloVerificado = document.createElement('span');
+            seloVerificado.className = 'selo-verificado selo-verificado-comentario';
+            seloVerificado.title = 'Colaborador verificado';
+            seloVerificado.innerHTML = "<i class='bx bxs-check-circle'></i>";
+            texto.appendChild(seloVerificado);
+        }
         texto.append(` ${comentario.texto}`);
 
         const data = document.createElement('span');
@@ -391,10 +441,22 @@ if (posts.length > 0) {
         modalImg.src = img.src;
 
         document.getElementById('modalUsername').innerText = post.dataset.username;
+        document.getElementById('modalAdminSelo').classList.toggle('oculto', post.dataset.admin !== 'true');
+        document.getElementById('modalVerificadoSelo').classList.toggle('oculto', post.dataset.admin === 'true' || post.dataset.verificado !== 'true');
         document.getElementById('modalNome').innerText = post.dataset.nome || post.dataset.username;
         document.getElementById('modalEndereco').innerText = post.dataset.endereco;
         document.getElementById('modalDescricao').innerText = post.dataset.descricao;
         document.getElementById('modalTamanho').innerText = `Tamanho: ${post.dataset.tamanho}`;
+        const modalStatus = document.getElementById('modalStatus');
+        modalStatus.innerText = post.dataset.status;
+        modalStatus.className = `status-buraco status-${post.dataset.statusClasse}`;
+        const modalStatusForm = document.getElementById('modalStatusForm');
+        const modalStatusSelect = document.getElementById('modalStatusSelect');
+
+        if (modalStatusForm && modalStatusSelect) {
+            modalStatusForm.dataset.url = post.dataset.statusUrl;
+            modalStatusSelect.value = post.dataset.statusValor;
+        }
         document.getElementById('modalLikes').innerText = post.dataset.likes;
         document.getElementById('modalComentarios').innerText = post.dataset.comentarios;
         modalComentariosArea.innerHTML = comentarios.innerHTML;
@@ -433,6 +495,44 @@ if (posts.length > 0) {
             abrirModal(index);
         });
     });
+
+    const modalStatusForm = document.getElementById('modalStatusForm');
+    const modalStatusSelect = document.getElementById('modalStatusSelect');
+
+    if (modalStatusForm && modalStatusSelect) {
+        modalStatusSelect.addEventListener('change', async () => {
+            const post = posts[indexAtual];
+            modalStatusSelect.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('status', modalStatusSelect.value);
+
+                const response = await fetch(modalStatusForm.dataset.url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': modalStatusForm.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const data = await response.json();
+                const modalStatus = document.getElementById('modalStatus');
+                modalStatus.innerText = data.status_nome;
+                modalStatus.className = `status-buraco status-${data.status_classe}`;
+                post.dataset.statusValor = data.status;
+                post.dataset.status = data.status_nome;
+                post.dataset.statusClasse = data.status_classe;
+            } finally {
+                modalStatusSelect.disabled = false;
+            }
+        });
+    }
 
     fechar.addEventListener('click', fecharPostModal);
     overlay.addEventListener('click', fecharPostModal);
