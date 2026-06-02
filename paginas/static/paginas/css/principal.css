@@ -2705,3 +2705,55 @@ html[data-theme="dark"] .opcoes-reporte label {
     border-color: var(--border-color);
 }
 
+html[data-theme="dark"] .modal-postagem-detalhe {
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+}
+
+html[data-theme="dark"] .modal-post-header,
+html[data-theme="dark"] .modal-area-info,
+html[data-theme="dark"] .modal-acoes,
+html[data-theme="dark"] .form-comentario-post-modal,
+html[data-theme="dark"] .modal-descricao {
+    background: var(--card-color);
+    border-color: var(--border-color);
+}
+
+html[data-theme="dark"] .modal-area-imagem {
+    background: #050506;
+}
+
+html[data-theme="dark"] .modal-comentarios-area {
+    background: var(--card-color);
+    border-color: var(--border-color);
+}
+
+html[data-theme="dark"] .modal-acoes button,
+html[data-theme="dark"] .modal-acoes .btn-post-menu {
+    background: transparent;
+    color: var(--text-color);
+}
+
+html[data-theme="dark"] .modal-acoes button:hover,
+html[data-theme="dark"] .modal-acoes .btn-post-menu:hover {
+    background: var(--surface-color);
+}
+
+html[data-theme="dark"] .form-comentario-post-modal input {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+html[data-theme="dark"] .form-comentario-post-modal button {
+    color: #7cc7ff;
+}
+
+html[data-theme="dark"] .form-status-buraco select {
+    background: var(--surface-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
