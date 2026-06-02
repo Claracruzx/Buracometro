@@ -2,6 +2,7 @@ body{
     margin: 0;
     padding: 0;
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 .navbar {
@@ -14,7 +15,8 @@ body{
     display:flex;
     justify-content: flex-start;
     align-items: center;
-    padding: 3px 30px;
+    gap: clamp(18px, 5vw, 80px);
+    padding: 3px clamp(16px, 4vw, 30px);
     z-index: 1000;
     border-bottom: 2px rgba(255, 255, 255, 0.274) solid;
     backdrop-filter: blur(8px);
@@ -23,7 +25,12 @@ body{
 .navbar ul {
     list-style: none;
     display: flex;
-    gap: 190px;
+    justify-content: space-between;
+    gap: clamp(18px, 8vw, 120px);
+    flex: 1;
+    max-width: 980px;
+    margin: 0;
+    padding: 0;
     transition: all 0.3s ease;
 }
 
@@ -212,4 +219,124 @@ p{
 .contato-item img {
     width: 35px;
     height: 30px;
+}
+
+/* Ajustes responsivos da pagina inicial */
+.logo {
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
+#inicio h1,
+#inicio p {
+    max-width: 760px;
+}
+
+.contato-info {
+    flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        gap: 24px;
+        padding: 6px 18px;
+    }
+
+    .navbar ul {
+        gap: 24px;
+    }
+
+    .logo {
+        height: 54px;
+    }
+
+    #inicio {
+        padding: 96px 32px 64px;
+        min-height: 72vh;
+        background-position: center;
+    }
+
+    h1 {
+        font-size: 38px;
+        line-height: 1.15;
+    }
+
+    p {
+        font-size: 19px;
+        text-align: left;
+    }
+
+    .trabalho-item {
+        width: min(100%, 320px);
+    }
+}
+
+@media (max-width: 620px) {
+    .navbar {
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 6px 12px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .navbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .navbar ul {
+        flex: 0 0 auto;
+        gap: 18px;
+        white-space: nowrap;
+    }
+
+    .navbar ul li a {
+        font-size: 14px;
+    }
+
+    .logo {
+        height: 42px;
+    }
+
+    #inicio {
+        justify-content: center;
+        padding: 96px 20px 52px;
+        min-height: 76vh;
+        text-align: left;
+    }
+
+    h1 {
+        font-size: 31px;
+        line-height: 1.14;
+    }
+
+    p {
+        font-size: 16px;
+        line-height: 1.55;
+        max-width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 260px;
+        text-align: center;
+    }
+
+    #sobre,
+    #trabalhos,
+    #contatos {
+        padding: 48px 20px;
+    }
+
+    #sobre h1,
+    #trabalhos h1,
+    #contatos h1 {
+        font-size: 28px;
+    }
+
+    .trabalho-item,
+    .contato-item {
+        width: 100%;
+        max-width: 340px;
+    }
 }
