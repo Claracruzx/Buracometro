@@ -12,12 +12,20 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
     </style>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script>
+        (function () {
+            const escolha = localStorage.getItem('tema-buracometro') || 'system';
+            const prefereEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.dataset.themeChoice = escolha;
+            document.documentElement.dataset.theme = escolha === 'system' ? (prefereEscuro ? 'dark' : 'light') : escolha;
+        })();
+    </script>
 
     {% block css %}{% endblock %}
 </head>
 <body>
     <header>
-        <img id="logo" src="{% static 'imgs/Nosso buraco.png' %}" alt="Logo">
+        <img id="logo" src="{% static 'imgs/logoBura.png' %}" alt="Logo">
 
         <form class="search-container" action="{% url 'pesquisaView' %}" method="get">
             <input type="text" name="q" placeholder="Pesquisar usuário ou bairro...">
@@ -26,11 +34,25 @@
             </button>
         </form>
 
-        <form class="logout-mobile" action="{% url 'deslogar' %}">
-            <button type="submit" aria-label="Sair">
-                <i class="bx bx-exit"></i>
-            </button>
-        </form>
+        <div class="header-acoes">
+            <div class="theme-toggle" aria-label="Escolher tema">
+                <button type="button" data-theme-option="light" aria-label="Modo claro" title="Modo claro">
+                    <i class='bx bx-sun'></i>
+                </button>
+                <button type="button" data-theme-option="dark" aria-label="Modo escuro" title="Modo escuro">
+                    <i class='bx bx-moon'></i>
+                </button>
+                <button type="button" data-theme-option="system" aria-label="Tema do sistema" title="Tema do sistema">
+                    <i class='bx bx-desktop'></i>
+                </button>
+            </div>
+
+            <form class="logout-mobile" action="{% url 'deslogar' %}">
+                <button type="submit" aria-label="Sair">
+                    <i class="bx bx-exit"></i>
+                </button>
+            </form>
+        </div>
 
     </header>
     <main>
@@ -108,5 +130,37 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://kit.fontawesome.com/bcdcf795f9.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    const botoesTema = document.querySelectorAll('[data-theme-option]');
+    const preferenciaSistema = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function aplicarTema(escolha) {
+        const temaResolvido = escolha === 'system'
+            ? (preferenciaSistema.matches ? 'dark' : 'light')
+            : escolha;
+
+        document.documentElement.dataset.themeChoice = escolha;
+        document.documentElement.dataset.theme = temaResolvido;
+        localStorage.setItem('tema-buracometro', escolha);
+
+        botoesTema.forEach((botao) => {
+            const ativo = botao.dataset.themeOption === escolha;
+            botao.classList.toggle('ativo', ativo);
+            botao.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+        });
+    }
+
+    botoesTema.forEach((botao) => {
+        botao.addEventListener('click', () => aplicarTema(botao.dataset.themeOption));
+    });
+
+    preferenciaSistema.addEventListener('change', () => {
+        if ((localStorage.getItem('tema-buracometro') || 'system') === 'system') {
+            aplicarTema('system');
+        }
+    });
+
+    aplicarTema(localStorage.getItem('tema-buracometro') || 'system');
+</script>
             {% block js %}{% endblock %}
 </html>

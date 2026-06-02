@@ -8,7 +8,7 @@ body {
     min-height: 100vh;
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     /* Adicionei a imagem aqui como background padrão caso queira gerenciar pelo CSS */
-    background: url('../imgs/paisagem-montanha.jpg') no-repeat center center fixed;
+    background: url('../imgs/fundoLogin.jpg') no-repeat center center fixed;
     background-size: cover;
     display: flex;
     justify-content: center;
@@ -27,8 +27,8 @@ main {
     width: 100%;
     max-width: 500px;
     background: rgba(255, 255, 255, 0.062); 
-    backdrop-filter: blur(2px); 
-    -webkit-backdrop-filter: blur(12px); 
+    backdrop-filter: blur(3px); 
+    -webkit-backdrop-filter: blur(14px); 
     padding: 40px;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.25);
@@ -60,7 +60,7 @@ main {
     font-size: 2.2rem;
     font-weight: 700;
     color: #ffffff; /* Texto branco para contrastar com a estrada escura */
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(110, 110, 110, 0.075);
     text-align: center;
 }
 
@@ -76,7 +76,7 @@ label {
     margin-bottom: 8px;
     color: #ffffff; /* Texto branco para leitura sobre o fundo */
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 18px;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
@@ -164,7 +164,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 16px;
     border: none;
     border-radius: 12px;
-    background: #8f0b13;
+    background: #d40303;
     color: white;
     font-size: 1.1rem;
     font-weight: 700;
@@ -174,9 +174,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .btn-tertiary:hover {
-    background: #43301b;
+    background: #810101;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(45, 106, 79, 0.4);
+    color: white;
 }
 
 /* Link inferior */
@@ -186,7 +187,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .observation a {
-    color: #ffffff;
+    color: #d40303;
     font-weight: 600;
     text-decoration: none;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -196,7 +197,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .observation a:hover {
-    color: #d8f3dc;
+    color: #990303;
     border-bottom-color: #d8f3dc;
 }
 
@@ -212,19 +213,4 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
 }
 
-input[type="date"] {
-    width: 100%;
-    padding: 13px 16px;
-    border: 1px solid #cfd8d3;
-    border-radius: 14px;
-    outline: none;
-    font-size: 1rem;
-    background: #f9fbfa;
-    color: #293d33;
-}
 
-input[type="date"]:focus {
-    border-color: #2d6a4f;
-    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15);
-    background: #ffffff;
-}

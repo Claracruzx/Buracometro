@@ -41,13 +41,15 @@ Pesquisa
         <p class="empty-feed">Nenhum usuário encontrado.</p>
     {% endfor %}
 
-    <h2 class="resultado-titulo">Buracos</h2>
+    <h2 class="resultado-titulo">Postagens encontradas</h2>
 
     {% for buraco in buracos %}
-        <div class="post-card">
+        <article class="post-card resultado-post-card">
             <div class="post-header">
                 <div class="avatar">
-                    {% if buraco.usuario %}
+                    {% if buraco.usuario.foto %}
+                        <img src="{{ buraco.usuario.foto.url }}" alt="Foto de perfil">
+                    {% elif buraco.usuario %}
                         {{ buraco.usuario.username|slice:":1"|upper }}
                     {% else %}
                         ?
@@ -55,19 +57,62 @@ Pesquisa
                 </div>
 
                 <div>
-                    <h2>{{ buraco.titulo }}</h2>
-                    <p>{{ buraco.endereco }}</p>
+                    {% if buraco.usuario %}
+                        <h2>
+                            <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
+                                {{ buraco.usuario.name|default:buraco.usuario.username }}
+                                {% if buraco.usuario.is_staff or buraco.usuario.is_superuser %}
+                                    <span class="selo-admin"><i class='bx bxs-badge-check'></i> admin</span>
+                                {% elif buraco.usuario.verificado %}
+                                    <span class="selo-verificado" title="Colaborador verificado"><i class='bx bxs-check-circle'></i></span>
+                                {% endif %}
+                            </a>
+                        </h2>
+                        <p>
+                            <a href="{% url 'perfilPublicoView' buraco.usuario.username %}">
+                                @{{ buraco.usuario.username }}
+                            </a>
+                            • {{ buraco.endereco }}
+                        </p>
+                    {% else %}
+                        <h2>Usuário desconhecido</h2>
+                        <p>{{ buraco.endereco }}</p>
+                    {% endif %}
+
+                    <span class="status-buraco status-{{ buraco.status_classe }}">{{ buraco.status_nome }}</span>
                 </div>
             </div>
 
-            {% if buraco.url_imagem %}
+            {% if buraco.imagem %}
+                <a class="resultado-post-imagem" href="{% url 'detalheBuracoView' buraco.id %}">
+                    <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco">
+                </a>
+            {% elif buraco.url_imagem %}
+                <a class="resultado-post-imagem" href="{% url 'detalheBuracoView' buraco.id %}">
                 <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco">
+                </a>
             {% endif %}
 
             <div class="post-body">
                 <p>{{ buraco.descricao }}</p>
+
+                <div class="post-info">
+                    <span>Tamanho: {{ buraco.tamanho_nome }}</span>
+                    <span>{{ buraco.created_at|date:"d/m/Y H:i" }}</span>
+                </div>
+
+                <div class="resultado-post-footer">
+                    <div class="resultado-post-metricas">
+                        <span><i class='bx bx-heart'></i> {{ buraco.likes.count }}</span>
+                        <span><i class='bx bx-message-dots'></i> {{ buraco.comentarios.count }}</span>
+                    </div>
+
+                    <a class="btn-ver-postagem" href="{% url 'detalheBuracoView' buraco.id %}">
+                        Ver postagem
+                    </a>
+                </div>
             </div>
-        </div>
+        </article>
     {% empty %}
         <p class="empty-feed">Nenhum buraco encontrado.</p>
     {% endfor %}

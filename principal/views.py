@@ -124,8 +124,9 @@ def pesquisaView(request):
     buracos = Buraco.objects.filter(
         Q(endereco__icontains=termo) |
         Q(local__icontains=termo) |
-        Q(titulo__icontains=termo)
-    ) if termo else []
+        Q(titulo__icontains=termo) |
+        Q(descricao__icontains=termo)
+    ).select_related("usuario").order_by("-created_at") if termo else []
 
     return render(request, 'principal/pesquisa.html', {
         'termo': termo,
