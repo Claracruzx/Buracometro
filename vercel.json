@@ -6,10 +6,5 @@
       "source": "/(.*)",
       "destination": "/api/index.py"
     }
-  ],
-  "functions": {
-    "api/index.py": {
-      "excludeFiles": "{venv/**,.venv/**,**/__pycache__/**,**/*.pyc,db.sqlite3,media/**,staticfiles/**}"
-    }
-  }
+  ]
 }
