@@ -53,10 +53,14 @@ main {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    padding: 24px;
 }
 
 main > .content {
-    padding-top: 180px;
+    min-height: calc(100vh - 48px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #area-login {
@@ -64,7 +68,7 @@ main > .content {
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 24px;
      background: rgba(255, 255, 255, 0.062); 
-    width: max-content;
+    width: min(100%, 420px);
     font-size: 24px;
     padding: 30px;
     backdrop-filter: blur(2px);
@@ -105,11 +109,15 @@ main > .content {
     font-size: 24px;
     width: 80%;
     font-weight: bold;
+    border-radius: 14px;
 }
 
 #area-login .observation {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 8px;
+    text-align: center;
 }
 
 a {
@@ -120,5 +128,40 @@ a {
 
 a:hover {
     transform: scale(1.05); 
+}
+
+@media (max-width: 620px) {
+    main {
+        padding: 18px;
+        background-position: center;
+    }
+
+    main > .content {
+        min-height: calc(100vh - 36px);
+    }
+
+    #area-login {
+        width: 100%;
+        padding: 24px 20px;
+        font-size: 17px;
+        border-radius: 20px;
+    }
+
+    #area-login .header > .title {
+        font-size: 34px;
+    }
+
+    #area-login .content input[type="text"],
+    #area-login .content input[type="password"] {
+        height: 46px;
+        border-radius: 16px;
+        font-size: 16px;
+    }
+
+    #area-login button {
+        width: 100%;
+        font-size: 18px;
+        padding: 12px 16px;
+    }
 }
 
