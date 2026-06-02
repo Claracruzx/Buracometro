@@ -55,6 +55,8 @@ Notificações
                             <i class='bx bx-heart'></i>
                         {% elif notificacao.tipo == "comentario" or notificacao.tipo == "resposta_comentario" %}
                             <i class='bx bx-message-dots'></i>
+                        {% elif notificacao.tipo == "status" %}
+                            <i class='bx bx-check-shield'></i>
                         {% else %}
                             <i class='bx bx-error-circle'></i>
                         {% endif %}

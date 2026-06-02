@@ -15,6 +15,23 @@ from django.db.models import Count, F, IntegerField, ExpressionWrapper
 from principal.models import Notificacao
 
 
+STATUS_FILTROS = [
+    ("", "Todos"),
+    (Buraco.STATUS_NAO_ARRUMADO, "Ainda não arrumados"),
+    (Buraco.STATUS_EM_OBRA, "Em obra"),
+    (Buraco.STATUS_ARRUMADO, "Já arrumados"),
+]
+
+
+def filtrar_buracos_por_status(queryset, status):
+    status_validos = {valor for valor, _ in Buraco.STATUS_CHOICES}
+
+    if status in status_validos:
+        return queryset.filter(status=status)
+
+    return queryset
+
+
 def cadastroView(request):
     titulo = request.GET.get('titulo', '')
     descricao = request.GET.get('descricao', '')
@@ -53,7 +70,8 @@ def cadastroSelecionarLocalView(request):
 
 
 def popularView(request):
-    buracos = Buraco.objects.annotate(
+    status_atual = request.GET.get("status", "")
+    buracos = filtrar_buracos_por_status(Buraco.objects.annotate(
         total_likes=Count('likes', distinct=True),
         total_comentarios=Count('comentarios', distinct=True),
     ).annotate(
@@ -61,7 +79,7 @@ def popularView(request):
             F('total_likes') + F('total_comentarios'),
             output_field=IntegerField()
         )
-    ).order_by('-engajamento', '-total_likes', '-total_comentarios', '-created_at')
+    ), status_atual).order_by('-engajamento', '-total_likes', '-total_comentarios', '-created_at')
 
     for buraco in buracos:
         buraco.curtido = request.user.is_authenticated and Like.objects.filter(
@@ -71,6 +89,8 @@ def popularView(request):
 
     variaveis = {
         'rows': buracos,
+        'status_atual': status_atual,
+        'status_filtros': STATUS_FILTROS,
     }
     return render(request, 'buracos/explorar.html', variaveis)
 
@@ -196,8 +216,18 @@ def atualizarStatusBuracoView(request, buraco_id):
         messages.error(request, "Status invalido.")
         return redirect(request.META.get('HTTP_REFERER', 'inicioView'))
 
+    status_anterior = buraco.status
     buraco.status = novo_status
     buraco.save(update_fields=["status", "updated_at"])
+
+    if status_anterior != novo_status and buraco.usuario and buraco.usuario != request.user:
+        Notificacao.objects.create(
+            destinatario=buraco.usuario,
+            ator=request.user,
+            buraco=buraco,
+            tipo="status",
+            mensagem=f"marcou sua postagem como {buraco.status_nome}."
+        )
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse({

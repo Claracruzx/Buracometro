@@ -312,6 +312,37 @@ header #logo {
     color: #fff;
 }
 
+.filtro-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 18px;
+}
+
+.filtro-status button {
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--card-color);
+    color: var(--muted-text-color);
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.filtro-status button:hover,
+.filtro-status button.ativo {
+    border-color: var(--primary-color);
+    background: var(--primary-color-light);
+    color: var(--primary-color);
+}
+
+.filtro-status-explorar {
+    max-width: 980px;
+    margin: 0 auto 16px;
+}
+
 html[data-theme="dark"] h1,
 html[data-theme="dark"] h2,
 html[data-theme="dark"] h3,
@@ -1009,6 +1040,10 @@ ul.no-decoration {
 
 .notificacao-icone.resposta_comentario {
     background: #023252;
+}
+
+.notificacao-icone.status {
+    background: #137a35;
 }
 
 .notificacao-icone.remocao {

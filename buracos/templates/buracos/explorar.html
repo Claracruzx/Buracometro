@@ -12,6 +12,18 @@ Popular
 {% block content %}
 
 <div class="explorar-container">
+    <form class="filtro-status filtro-status-explorar" method="get" aria-label="Filtrar por status">
+        {% for valor, label in status_filtros %}
+            <button
+                type="submit"
+                name="status"
+                value="{{ valor }}"
+                class="{% if status_atual == valor %}ativo{% endif %}">
+                {{ label }}
+            </button>
+        {% endfor %}
+    </form>
+
     <div class="explorar-grid">
         {% for row in rows %}
             <a

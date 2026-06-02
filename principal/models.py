@@ -8,6 +8,7 @@ class Notificacao(models.Model):
         ("like_comentario", "Curtida em comentario"),
         ("comentario", "Comentario"),
         ("resposta_comentario", "Resposta em comentario"),
+        ("status", "Status"),
         ("remocao", "Remocao"),
     ]
 

@@ -85,6 +85,10 @@ Ver no mapa
         box-shadow: 0 8px 22px var(--shadow-color);
     }
 
+    .mapa-filtro-status {
+        margin-bottom: 0;
+    }
+
     .mapa-resumo h1 {
         margin: 0 0 8px;
         color: var(--heading-color);
@@ -339,6 +343,18 @@ Ver no mapa
     </div>
 
     <aside class="mapa-lateral">
+        <form class="filtro-status mapa-filtro-status" method="get" aria-label="Filtrar por status">
+            {% for valor, label in status_filtros %}
+                <button
+                    type="submit"
+                    name="status"
+                    value="{{ valor }}"
+                    class="{% if status_atual == valor %}ativo{% endif %}">
+                    {{ label }}
+                </button>
+            {% endfor %}
+        </form>
+
         <section class="mapa-resumo">
             <h1>Mapa de buracos</h1>
             <p>As áreas maiores indicam zonas com mais registros. Os pins mostram os buracos cadastrados individualmente.</p>

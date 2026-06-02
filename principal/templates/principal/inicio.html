@@ -8,6 +8,17 @@ Iní­cio
 {% block content %}
 
 <div class="feed-container">
+    <form class="filtro-status" method="get" aria-label="Filtrar por status">
+        {% for valor, label in status_filtros %}
+            <button
+                type="submit"
+                name="status"
+                value="{{ valor }}"
+                class="{% if status_atual == valor %}ativo{% endif %}">
+                {{ label }}
+            </button>
+        {% endfor %}
+    </form>
     
     {% for buraco in buracos %}
         <div class="post-card">

@@ -10,6 +10,19 @@ Pesquisa
 <div class="feed-container">
     <h1 class="feed-title">Resultado para "{{ termo }}"</h1>
 
+    <form class="filtro-status" method="get" aria-label="Filtrar por status">
+        <input type="hidden" name="q" value="{{ termo }}">
+        {% for valor, label in status_filtros %}
+            <button
+                type="submit"
+                name="status"
+                value="{{ valor }}"
+                class="{% if status_atual == valor %}ativo{% endif %}">
+                {{ label }}
+            </button>
+        {% endfor %}
+    </form>
+
     <h2 class="resultado-titulo">Usuários</h2>
 
     {% for usuario in usuarios %}

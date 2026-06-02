@@ -10,8 +10,29 @@ from .models import Notificacao
 from usuarios.models import CustomUser
 
 
+STATUS_FILTROS = [
+    ("", "Todos"),
+    (Buraco.STATUS_NAO_ARRUMADO, "Ainda não arrumados"),
+    (Buraco.STATUS_EM_OBRA, "Em obra"),
+    (Buraco.STATUS_ARRUMADO, "Já arrumados"),
+]
+
+
+def filtrar_buracos_por_status(queryset, status):
+    status_validos = {valor for valor, _ in Buraco.STATUS_CHOICES}
+
+    if status in status_validos:
+        return queryset.filter(status=status)
+
+    return queryset
+
+
 def inicioView(request):
-    buracos = Buraco.objects.all().order_by('-created_at')
+    status_atual = request.GET.get("status", "")
+    buracos = filtrar_buracos_por_status(
+        Buraco.objects.all(),
+        status_atual
+    ).order_by('-created_at')
 
     for buraco in buracos:
         buraco.curtido = Like.objects.filter(
@@ -21,6 +42,8 @@ def inicioView(request):
 
     variaveis = {
         'buracos': buracos,
+        'status_atual': status_atual,
+        'status_filtros': STATUS_FILTROS,
     }
 
     return render(request, 'principal/inicio.html', variaveis)
@@ -36,8 +59,13 @@ class VerNoMapaView(TemplateView):
         context = super().get_context_data(**kwargs)
         pontos = []
         zonas = {}
+        status_atual = self.request.GET.get("status", "")
+        buracos = filtrar_buracos_por_status(
+            Buraco.objects.exclude(local__isnull=True).exclude(local=""),
+            status_atual
+        )
 
-        for buraco in Buraco.objects.exclude(local__isnull=True).exclude(local=""):
+        for buraco in buracos:
             coordenadas = [parte.strip() for parte in buraco.local.split(",")]
 
             if len(coordenadas) < 2:
@@ -79,6 +107,8 @@ class VerNoMapaView(TemplateView):
             zonas[zona]["soma_longitude"] += longitude
 
         context["pontos_mapa"] = pontos
+        context["status_atual"] = status_atual
+        context["status_filtros"] = STATUS_FILTROS
         context["zonas_mapa"] = [
             {
                 "nome": zona["nome"],
@@ -115,23 +145,26 @@ def deslogar(request):
 
 def pesquisaView(request):
     termo = request.GET.get('q', '')
+    status_atual = request.GET.get("status", "")
 
     usuarios = CustomUser.objects.filter(
         Q(username__icontains=termo) |
         Q(name__icontains=termo)
     ) if termo else []
 
-    buracos = Buraco.objects.filter(
+    buracos = filtrar_buracos_por_status(Buraco.objects.filter(
         Q(endereco__icontains=termo) |
         Q(local__icontains=termo) |
         Q(titulo__icontains=termo) |
         Q(descricao__icontains=termo)
-    ).select_related("usuario").order_by("-created_at") if termo else []
+    ), status_atual).select_related("usuario").order_by("-created_at") if termo else []
 
     return render(request, 'principal/pesquisa.html', {
         'termo': termo,
         'usuarios': usuarios,
         'buracos': buracos,
+        'status_atual': status_atual,
+        'status_filtros': STATUS_FILTROS,
     })
 
 
