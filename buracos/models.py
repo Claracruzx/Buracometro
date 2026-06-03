@@ -51,6 +51,13 @@ class Buraco(models.Model):
     def status_classe(self):
         return self.status.replace("_", "-")
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["-created_at"], name="buraco_created_idx"),
+            models.Index(fields=["status", "-created_at"], name="buraco_status_created_idx"),
+            models.Index(fields=["usuario", "-created_at"], name="buraco_usuario_created_idx"),
+        ]
+
 class Like(models.Model):
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -86,6 +93,11 @@ class Comentario(models.Model):
         blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["buraco", "resposta_de", "created_at"], name="coment_buraco_resp_idx"),
+        ]
 
 
 class LikeComentario(models.Model):

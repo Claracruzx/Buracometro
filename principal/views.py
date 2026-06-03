@@ -9,10 +9,10 @@ from buracos.models import Buraco, Like
 from .models import Notificacao
 from usuarios.models import CustomUser
 
-FEED_LIMIT = 30
-MAPA_LIMIT = 120
-PESQUISA_LIMIT = 30
-NOTIFICACOES_LIMIT = 60
+FEED_LIMIT = 12
+MAPA_LIMIT = 80
+PESQUISA_LIMIT = 20
+NOTIFICACOES_LIMIT = 30
 
 
 STATUS_FILTROS = [

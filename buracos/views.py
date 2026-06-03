@@ -15,7 +15,7 @@ from django.db.models import Count, F, IntegerField, ExpressionWrapper
 from principal.models import Notificacao
 from paginas.templatetags.cloudinary_images import cloudinary_avatar
 
-POPULAR_LIMIT = 45
+POPULAR_LIMIT = 24
 
 
 STATUS_FILTROS = [

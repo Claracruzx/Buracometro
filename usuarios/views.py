@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .models import CustomUser
 from buracos.models import Buraco, Like
 
-PERFIL_LIMIT = 45
+PERFIL_LIMIT = 24
 
 
 class LoginView(TemplateView):

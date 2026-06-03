@@ -45,6 +45,10 @@ class Notificacao(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["destinatario", "lida", "-created_at"], name="notif_dest_lida_created_idx"),
+            models.Index(fields=["destinatario", "-created_at"], name="notif_dest_created_idx"),
+        ]
 
     def __str__(self):
         return self.mensagem
