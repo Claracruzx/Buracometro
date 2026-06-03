@@ -1318,7 +1318,7 @@ main #barra-lateral #lista-botoes button {
         border: none;
         border-radius: 10px;
         background-color: transparent;
-        color: #222;
+        color: var(--heading-color);
         text-align: center;
         font-size: 10px;
         font-weight: 600;
@@ -2688,6 +2688,36 @@ main #conteudo {
         width: 16px;
         height: 16px;
     }
+}
+
+@media (max-width: 768px) {
+    main #barra-lateral {
+        background-color: var(--sidebar-color);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+
+    main #barra-lateral #lista-botoes button {
+        color: var(--heading-color);
+    }
+
+    main #barra-lateral #lista-botoes button i,
+    main #barra-lateral #lista-botoes button span {
+        color: inherit;
+    }
+
+    main #barra-lateral #lista-botoes button:hover,
+    main #barra-lateral #lista-botoes button.ativo {
+        background-color: var(--surface-color);
+    }
+}
+
+html[data-theme="dark"] main #barra-lateral {
+    background-color: rgba(21, 23, 27, 0.96);
+}
+
+html[data-theme="dark"] main #barra-lateral #lista-botoes button {
+    color: #f5f5f7;
 }
 
 html[data-theme="dark"] .stat-card,

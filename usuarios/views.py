@@ -95,6 +95,7 @@ def logoutAction(request):
 @login_required
 def perfilView(request):
     usuario = request.user
+    total_buracos = Buraco.objects.filter(usuario=usuario).count()
     buracos = Buraco.objects.filter(usuario=usuario).select_related("usuario").prefetch_related(
         "likes",
         "comentarios__usuario",
@@ -119,11 +120,13 @@ def perfilView(request):
     return render(request, 'usuarios/perfil.html', {
         'usuario': usuario,
         'buracos': buracos,
+        'total_buracos': total_buracos,
     })
 
 
 def perfilPublicoView(request, username):
     usuario_perfil = get_object_or_404(CustomUser, username=username)
+    total_buracos = Buraco.objects.filter(usuario=usuario_perfil).count()
     buracos = Buraco.objects.filter(usuario=usuario_perfil).select_related("usuario").prefetch_related(
         "likes",
         "comentarios__usuario",
@@ -148,6 +151,7 @@ def perfilPublicoView(request, username):
     return render(request, 'usuarios/perfil_publico.html', {
         'usuario_perfil': usuario_perfil,
         'buracos': buracos,
+        'total_buracos': total_buracos,
     })
 
 
