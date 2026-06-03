@@ -1,5 +1,5 @@
 {% extends 'principal/principal.html' %}
-{% load static %}
+{% load static cloudinary_images %}
 
 {% block title %}
 Popular
@@ -44,7 +44,8 @@ Popular
                 data-nome="{{ row.usuario.name }}"
                 data-admin="{% if row.usuario.is_staff or row.usuario.is_superuser %}true{% else %}false{% endif %}"
                 data-verificado="{% if row.usuario.verificado %}true{% else %}false{% endif %}"
-                data-foto-url="{% if row.usuario.foto %}{{ row.usuario.foto.url }}{% endif %}"
+                data-foto-url="{% if row.usuario.foto %}{{ row.usuario.foto.url|cloudinary_avatar }}{% endif %}"
+                data-imagem-url="{% if row.imagem %}{{ row.imagem.url|cloudinary_feed }}{% endif %}"
                 data-perfil-url="{% url 'perfilPublicoView' row.usuario.username %}"
                 data-endereco="{{ row.endereco }}"
                 data-like-url="{% url 'curtirBuraco' row.id %}"
@@ -55,7 +56,7 @@ Popular
                 data-pode-excluir="{% if request.user.id == row.usuario.id %}true{% else %}false{% endif %}">
 
                 {% if row.imagem %}
-                    <img src="{{ row.imagem.url }}" alt="{{ row.titulo }}" loading="lazy" decoding="async">
+                    <img src="{{ row.imagem.url|cloudinary_thumb }}" alt="{{ row.titulo }}" loading="lazy" decoding="async">
                 {% elif row.url_imagem %}
                     <img src="{% static 'image-users/' %}{{ row.url_imagem }}" alt="{{ row.titulo }}" loading="lazy" decoding="async">
                 {% endif %}
@@ -84,7 +85,7 @@ Popular
                             data-delete-url="{% url 'excluirComentario' comentario.id %}">
                             <div class="avatar comentario-avatar">
                                 {% if comentario.usuario.foto %}
-                                    <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
+                                    <img src="{{ comentario.usuario.foto.url|cloudinary_avatar }}" alt="Foto">
                                 {% else %}
                                     {{ comentario.usuario.username|slice:":1"|upper }}
                                 {% endif %}
@@ -120,7 +121,7 @@ Popular
                                             data-delete-url="{% url 'excluirComentario' resposta.id %}">
                                             <div class="avatar comentario-avatar">
                                                 {% if resposta.usuario.foto %}
-                                                    <img src="{{ resposta.usuario.foto.url }}" alt="Foto">
+                                                    <img src="{{ resposta.usuario.foto.url|cloudinary_avatar }}" alt="Foto">
                                                 {% else %}
                                                     {{ resposta.usuario.username|slice:":1"|upper }}
                                                 {% endif %}
@@ -438,7 +439,7 @@ if (posts.length > 0) {
         const comentarios = document.getElementById(`comentarios-${post.dataset.id}`);
 
         postAtualId = post.dataset.id;
-        modalImg.src = img.src;
+        modalImg.src = post.dataset.imagemUrl || img.src;
         preencherAvatar(post);
         modalPerfilAvatar.href = post.dataset.perfilUrl;
         modalPerfilNome.href = post.dataset.perfilUrl;

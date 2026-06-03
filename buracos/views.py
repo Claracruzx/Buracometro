@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Count, F, IntegerField, ExpressionWrapper
 from principal.models import Notificacao
+from paginas.templatetags.cloudinary_images import cloudinary_avatar
 
 POPULAR_LIMIT = 45
 
@@ -391,7 +392,7 @@ def comentarBuracoView(request, buraco_id):
                 )
 
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                foto_url = request.user.foto.url if getattr(request.user, "foto", None) else ""
+                foto_url = cloudinary_avatar(request.user.foto.url) if getattr(request.user, "foto", None) else ""
 
                 return JsonResponse({
                     "id": comentario.id,

@@ -1,5 +1,5 @@
 {% extends 'principal/principal.html' %}
-{% load static %}
+{% load static cloudinary_images %}
 
 {% block title %}
 Pesquisa
@@ -29,7 +29,7 @@ Pesquisa
         <div class="resultado-card">
             <div class="avatar">
                 {% if usuario.foto %}
-                    <img src="{{ usuario.foto.url }}" alt="Foto de perfil">
+                    <img src="{{ usuario.foto.url|cloudinary_avatar }}" alt="Foto de perfil">
                 {% else %}
                     {{ usuario.username|slice:":1"|upper }}
                 {% endif %}
@@ -61,7 +61,7 @@ Pesquisa
             <div class="post-header">
                 <div class="avatar">
                     {% if buraco.usuario.foto %}
-                        <img src="{{ buraco.usuario.foto.url }}" alt="Foto de perfil">
+                        <img src="{{ buraco.usuario.foto.url|cloudinary_avatar }}" alt="Foto de perfil">
                     {% elif buraco.usuario %}
                         {{ buraco.usuario.username|slice:":1"|upper }}
                     {% else %}
@@ -98,7 +98,7 @@ Pesquisa
 
             {% if buraco.imagem %}
                 <a class="resultado-post-imagem" href="{% url 'detalheBuracoView' buraco.id %}">
-                    <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco" loading="lazy" decoding="async">
+                    <img class="post-image" src="{{ buraco.imagem.url|cloudinary_feed }}" alt="Imagem do buraco" loading="lazy" decoding="async">
                 </a>
             {% elif buraco.url_imagem %}
                 <a class="resultado-post-imagem" href="{% url 'detalheBuracoView' buraco.id %}">

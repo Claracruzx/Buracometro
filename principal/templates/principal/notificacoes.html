@@ -1,5 +1,5 @@
 {% extends 'principal/principal.html' %}
-{% load static %}
+{% load static cloudinary_images %}
 
 {% block title %}
 Notificações
@@ -18,7 +18,7 @@ Notificações
             <article class="notificacao-item {% if not notificacao.lida %}nao-lida{% endif %}">
                 <a class="notificacao-avatar" href="{% if notificacao.ator %}{% url 'perfilPublicoView' notificacao.ator.username %}{% else %}#{% endif %}">
                     {% if notificacao.ator and notificacao.ator.foto %}
-                        <img src="{{ notificacao.ator.foto.url }}" alt="Foto de perfil">
+                        <img src="{{ notificacao.ator.foto.url|cloudinary_avatar }}" alt="Foto de perfil">
                     {% elif notificacao.ator %}
                         <span>{{ notificacao.ator.username|slice:":1"|upper }}</span>
                     {% else %}
@@ -65,7 +65,7 @@ Notificações
                     {% if notificacao.buraco %}
                         <a class="notificacao-miniatura" href="{% url 'detalheBuracoView' notificacao.buraco.id %}">
                             {% if notificacao.buraco.imagem %}
-                                <img src="{{ notificacao.buraco.imagem.url }}" alt="Postagem" loading="lazy" decoding="async">
+                                <img src="{{ notificacao.buraco.imagem.url|cloudinary_thumb }}" alt="Postagem" loading="lazy" decoding="async">
                             {% elif notificacao.buraco.url_imagem %}
                                 <img src="{% static 'image-users/' %}{{ notificacao.buraco.url_imagem }}" alt="Postagem" loading="lazy" decoding="async">
                             {% endif %}

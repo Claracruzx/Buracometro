@@ -1,5 +1,5 @@
 {% extends 'principal/principal.html' %}
-{% load static %}
+{% load static cloudinary_images %}
 
 {% block title %}
 Editar perfil
@@ -17,7 +17,7 @@ Editar perfil
             <label class="editar-foto-preview" for="inputFotoPerfil">
                 <div id="previewFotoPerfil" class="preview-foto-perfil">
                     {% if request.user.foto %}
-                        <img src="{{ request.user.foto.url }}" alt="Foto atual">
+                        <img src="{{ request.user.foto.url|cloudinary_avatar }}" alt="Foto atual">
                     {% else %}
                         <span>{{ request.user.username|slice:":1"|upper }}</span>
                     {% endif %}

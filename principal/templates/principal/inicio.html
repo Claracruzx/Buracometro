@@ -1,5 +1,5 @@
 ﻿{% extends 'principal/principal.html' %}
-{% load static %}
+{% load static cloudinary_images %}
 
 {% block title %}
 Iní­cio
@@ -25,7 +25,7 @@ Iní­cio
             <div class="post-header">
                 <div class="avatar">
                     {% if buraco.usuario.foto %}
-                        <img src="{{ buraco.usuario.foto.url }}" alt="Foto de perfil" loading="lazy" decoding="async">
+                        <img src="{{ buraco.usuario.foto.url|cloudinary_avatar }}" alt="Foto de perfil" loading="lazy" decoding="async">
                     {% elif buraco.usuario %}
                         {{ buraco.usuario.username|slice:":1"|upper }}
                     {% else %}
@@ -102,7 +102,7 @@ Iní­cio
             </div>
 
             {% if buraco.imagem %}
-                <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco" loading="lazy" decoding="async">
+                <img class="post-image" src="{{ buraco.imagem.url|cloudinary_feed }}" alt="Imagem do buraco" loading="lazy" decoding="async">
             {% elif buraco.url_imagem %}
                 <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco" loading="lazy" decoding="async">
             {% endif %}
@@ -126,7 +126,7 @@ Iní­cio
                                 data-delete-url="{% url 'excluirComentario' comentario.id %}">
                                 <div class="avatar comentario-avatar">
                                     {% if comentario.usuario.foto %}
-                                        <img src="{{ comentario.usuario.foto.url }}" alt="Foto" loading="lazy" decoding="async">
+                                        <img src="{{ comentario.usuario.foto.url|cloudinary_avatar }}" alt="Foto" loading="lazy" decoding="async">
                                     {% else %}
                                         {{ comentario.usuario.username|slice:":1"|upper }}
                                     {% endif %}
@@ -165,7 +165,7 @@ Iní­cio
                                                 data-delete-url="{% url 'excluirComentario' resposta.id %}">
                                                 <div class="avatar comentario-avatar">
                                                     {% if resposta.usuario.foto %}
-                                                        <img src="{{ resposta.usuario.foto.url }}" alt="Foto" loading="lazy" decoding="async">
+                                                        <img src="{{ resposta.usuario.foto.url|cloudinary_avatar }}" alt="Foto" loading="lazy" decoding="async">
                                                     {% else %}
                                                         {{ resposta.usuario.username|slice:":1"|upper }}
                                                     {% endif %}

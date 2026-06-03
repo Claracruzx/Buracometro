@@ -1,5 +1,5 @@
 {% extends 'principal/principal.html' %}
-{% load static %}
+{% load static cloudinary_images %}
 
 {% block title %}
 Perfil de {{ usuario_perfil.username }}
@@ -12,7 +12,7 @@ Perfil de {{ usuario_perfil.username }}
     <div class="perfil-header">
         <div class="perfil-avatar">
             {% if usuario_perfil.foto %}
-                <img src="{{ usuario_perfil.foto.url }}" alt="Foto de perfil">
+                <img src="{{ usuario_perfil.foto.url|cloudinary_avatar }}" alt="Foto de perfil">
             {% else %}
                 {{ usuario_perfil.username|slice:":1"|upper }}
             {% endif %}
@@ -68,6 +68,7 @@ Perfil de {{ usuario_perfil.username }}
                     data-nome="{{ usuario_perfil.name }}"
                     data-admin="{% if usuario_perfil.is_staff or usuario_perfil.is_superuser %}true{% else %}false{% endif %}"
                     data-verificado="{% if usuario_perfil.verificado %}true{% else %}false{% endif %}"
+                    data-imagem-url="{% if buraco.imagem %}{{ buraco.imagem.url|cloudinary_feed }}{% endif %}"
                     data-endereco="{{ buraco.endereco }}"
                     data-like-url="{% url 'curtirBuraco' buraco.id %}"
                     data-comentar-url="{% url 'comentarBuraco' buraco.id %}"
@@ -77,7 +78,7 @@ Perfil de {{ usuario_perfil.username }}
                     data-pode-excluir="{% if request.user.id == buraco.usuario.id %}true{% else %}false{% endif %}">
 
                     {% if buraco.imagem %}
-                        <img src="{{ buraco.imagem.url }}" alt="{{ buraco.titulo }}" loading="lazy" decoding="async">
+                        <img src="{{ buraco.imagem.url|cloudinary_thumb }}" alt="{{ buraco.titulo }}" loading="lazy" decoding="async">
                     {% elif buraco.url_imagem %}
                         <img src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="{{ buraco.titulo }}" loading="lazy" decoding="async">
                     {% endif %}
@@ -101,7 +102,7 @@ Perfil de {{ usuario_perfil.username }}
                         <div class="comentario-item" data-comentario-id="{{ comentario.id }}" data-username="{{ comentario.usuario.username }}" data-like-url="{% url 'curtirComentario' comentario.id %}" data-delete-url="{% url 'excluirComentario' comentario.id %}">
                             <div class="avatar comentario-avatar">
                                 {% if comentario.usuario.foto %}
-                                    <img src="{{ comentario.usuario.foto.url }}" alt="Foto">
+                                        <img src="{{ comentario.usuario.foto.url|cloudinary_avatar }}" alt="Foto">
                                 {% else %}
                                     {{ comentario.usuario.username|slice:":1"|upper }}
                                 {% endif %}
@@ -132,7 +133,7 @@ Perfil de {{ usuario_perfil.username }}
                                         <div class="comentario-item comentario-resposta" data-comentario-id="{{ resposta.id }}" data-username="{{ resposta.usuario.username }}" data-like-url="{% url 'curtirComentario' resposta.id %}" data-delete-url="{% url 'excluirComentario' resposta.id %}">
                                             <div class="avatar comentario-avatar">
                                                 {% if resposta.usuario.foto %}
-                                                    <img src="{{ resposta.usuario.foto.url }}" alt="Foto">
+                                                        <img src="{{ resposta.usuario.foto.url|cloudinary_avatar }}" alt="Foto">
                                                 {% else %}
                                                     {{ resposta.usuario.username|slice:":1"|upper }}
                                                 {% endif %}
@@ -186,7 +187,7 @@ Perfil de {{ usuario_perfil.username }}
         <div class="modal-post-header">
             <div class="avatar">
                 {% if usuario_perfil.foto %}
-                    <img src="{{ usuario_perfil.foto.url }}" alt="Foto de perfil">
+                    <img src="{{ usuario_perfil.foto.url|cloudinary_avatar }}" alt="Foto de perfil">
                 {% else %}
                     {{ usuario_perfil.username|slice:":1"|upper }}
                 {% endif %}
@@ -438,7 +439,7 @@ if (posts.length > 0) {
         const comentarios = document.getElementById(`comentarios-${post.dataset.id}`);
 
         postAtualId = post.dataset.id;
-        modalImg.src = img.src;
+        modalImg.src = post.dataset.imagemUrl || img.src;
 
         document.getElementById('modalUsername').innerText = post.dataset.username;
         document.getElementById('modalAdminSelo').classList.toggle('oculto', post.dataset.admin !== 'true');
