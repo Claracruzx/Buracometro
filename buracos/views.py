@@ -153,6 +153,11 @@ def cadastroStore(request):
         except IntegrityError as e:
             msg = f"Erro ao criar buraco: {e}"
             messages.error(request, msg)
+        except Exception:
+            messages.error(
+                request,
+                "Nao foi possivel salvar a imagem. Configure o armazenamento de imagens online e tente novamente."
+            )
 
     return redirect('cadastrarView')
 
