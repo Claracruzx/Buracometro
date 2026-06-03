@@ -71,9 +71,9 @@
         </div>
 
         {% if buraco.imagem %}
-            <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco">
+            <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco" loading="lazy" decoding="async">
         {% elif buraco.url_imagem %}
-            <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco">
+            <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco" loading="lazy" decoding="async">
         {% endif %}
 
         <div class="post-body">

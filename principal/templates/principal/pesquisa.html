@@ -98,11 +98,11 @@ Pesquisa
 
             {% if buraco.imagem %}
                 <a class="resultado-post-imagem" href="{% url 'detalheBuracoView' buraco.id %}">
-                    <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco">
+                    <img class="post-image" src="{{ buraco.imagem.url }}" alt="Imagem do buraco" loading="lazy" decoding="async">
                 </a>
             {% elif buraco.url_imagem %}
                 <a class="resultado-post-imagem" href="{% url 'detalheBuracoView' buraco.id %}">
-                <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco">
+                <img class="post-image" src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="Imagem do buraco" loading="lazy" decoding="async">
                 </a>
             {% endif %}
 

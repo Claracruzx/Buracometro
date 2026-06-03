@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from .models import CustomUser
 from buracos.models import Buraco, Like
 
+PERFIL_LIMIT = 45
+
 
 class LoginView(TemplateView):
     template_name = "usuarios/login.html"
@@ -93,13 +95,26 @@ def logoutAction(request):
 @login_required
 def perfilView(request):
     usuario = request.user
-    buracos = Buraco.objects.filter(usuario=usuario).order_by('-created_at')
+    buracos = Buraco.objects.filter(usuario=usuario).select_related("usuario").prefetch_related(
+        "likes",
+        "comentarios__usuario",
+        "comentarios__likes",
+        "comentarios__respostas__usuario",
+        "comentarios__respostas__likes",
+    ).order_by('-created_at')[:PERFIL_LIMIT]
+
+    buracos = list(buracos)
+    buracos_curtidos = set()
+
+    if buracos:
+        buracos_curtidos = set(
+            Like.objects
+            .filter(usuario=request.user, buraco_id__in=[buraco.id for buraco in buracos])
+            .values_list("buraco_id", flat=True)
+        )
 
     for buraco in buracos:
-        buraco.curtido = Like.objects.filter(
-            usuario=request.user,
-            buraco=buraco
-        ).exists()
+        buraco.curtido = buraco.id in buracos_curtidos
 
     return render(request, 'usuarios/perfil.html', {
         'usuario': usuario,
@@ -109,13 +124,26 @@ def perfilView(request):
 
 def perfilPublicoView(request, username):
     usuario_perfil = get_object_or_404(CustomUser, username=username)
-    buracos = Buraco.objects.filter(usuario=usuario_perfil).order_by('-created_at')
+    buracos = Buraco.objects.filter(usuario=usuario_perfil).select_related("usuario").prefetch_related(
+        "likes",
+        "comentarios__usuario",
+        "comentarios__likes",
+        "comentarios__respostas__usuario",
+        "comentarios__respostas__likes",
+    ).order_by('-created_at')[:PERFIL_LIMIT]
+
+    buracos = list(buracos)
+    buracos_curtidos = set()
+
+    if request.user.is_authenticated and buracos:
+        buracos_curtidos = set(
+            Like.objects
+            .filter(usuario=request.user, buraco_id__in=[buraco.id for buraco in buracos])
+            .values_list("buraco_id", flat=True)
+        )
 
     for buraco in buracos:
-        buraco.curtido = request.user.is_authenticated and Like.objects.filter(
-            usuario=request.user,
-            buraco=buraco
-        ).exists()
+        buraco.curtido = buraco.id in buracos_curtidos
 
     return render(request, 'usuarios/perfil_publico.html', {
         'usuario_perfil': usuario_perfil,

@@ -75,9 +75,9 @@ Perfil
             data-pode-excluir="true">
 
             {% if buraco.imagem %}
-                <img src="{{ buraco.imagem.url }}" alt="{{ buraco.titulo }}">
+                <img src="{{ buraco.imagem.url }}" alt="{{ buraco.titulo }}" loading="lazy" decoding="async">
             {% elif buraco.url_imagem %}
-                <img src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="{{ buraco.titulo }}">
+                <img src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="{{ buraco.titulo }}" loading="lazy" decoding="async">
             {% endif %}
 
             <div class="explorar-overlay">

@@ -65,9 +65,9 @@ Notificações
                     {% if notificacao.buraco %}
                         <a class="notificacao-miniatura" href="{% url 'detalheBuracoView' notificacao.buraco.id %}">
                             {% if notificacao.buraco.imagem %}
-                                <img src="{{ notificacao.buraco.imagem.url }}" alt="Postagem">
+                                <img src="{{ notificacao.buraco.imagem.url }}" alt="Postagem" loading="lazy" decoding="async">
                             {% elif notificacao.buraco.url_imagem %}
-                                <img src="{% static 'image-users/' %}{{ notificacao.buraco.url_imagem }}" alt="Postagem">
+                                <img src="{% static 'image-users/' %}{{ notificacao.buraco.url_imagem }}" alt="Postagem" loading="lazy" decoding="async">
                             {% endif %}
                         </a>
                     {% endif %}

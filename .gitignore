@@ -16,6 +16,7 @@ staticfiles/
 .env
 .env.*
 *.log
+dados-local.json
 
 .DS_Store
 Thumbs.db

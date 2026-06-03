@@ -55,9 +55,9 @@ Popular
                 data-pode-excluir="{% if request.user.id == row.usuario.id %}true{% else %}false{% endif %}">
 
                 {% if row.imagem %}
-                    <img src="{{ row.imagem.url }}" alt="{{ row.titulo }}">
+                    <img src="{{ row.imagem.url }}" alt="{{ row.titulo }}" loading="lazy" decoding="async">
                 {% elif row.url_imagem %}
-                    <img src="{% static 'image-users/' %}{{ row.url_imagem }}" alt="{{ row.titulo }}">
+                    <img src="{% static 'image-users/' %}{{ row.url_imagem }}" alt="{{ row.titulo }}" loading="lazy" decoding="async">
                 {% endif %}
 
                 <div class="explorar-overlay">

@@ -14,6 +14,8 @@ from django.utils import timezone
 from django.db.models import Count, F, IntegerField, ExpressionWrapper
 from principal.models import Notificacao
 
+POPULAR_LIMIT = 45
+
 
 STATUS_FILTROS = [
     ("", "Todos"),
@@ -71,7 +73,13 @@ def cadastroSelecionarLocalView(request):
 
 def popularView(request):
     status_atual = request.GET.get("status", "")
-    buracos = filtrar_buracos_por_status(Buraco.objects.annotate(
+    buracos = filtrar_buracos_por_status(Buraco.objects.select_related("usuario").prefetch_related(
+        "likes",
+        "comentarios__usuario",
+        "comentarios__likes",
+        "comentarios__respostas__usuario",
+        "comentarios__respostas__likes",
+    ).annotate(
         total_likes=Count('likes', distinct=True),
         total_comentarios=Count('comentarios', distinct=True),
     ).annotate(
@@ -79,13 +87,20 @@ def popularView(request):
             F('total_likes') + F('total_comentarios'),
             output_field=IntegerField()
         )
-    ), status_atual).order_by('-engajamento', '-total_likes', '-total_comentarios', '-created_at')
+    ), status_atual).order_by('-engajamento', '-total_likes', '-total_comentarios', '-created_at')[:POPULAR_LIMIT]
+
+    buracos = list(buracos)
+    buracos_curtidos = set()
+
+    if request.user.is_authenticated and buracos:
+        buracos_curtidos = set(
+            Like.objects
+            .filter(usuario=request.user, buraco_id__in=[buraco.id for buraco in buracos])
+            .values_list("buraco_id", flat=True)
+        )
 
     for buraco in buracos:
-        buraco.curtido = request.user.is_authenticated and Like.objects.filter(
-            usuario=request.user,
-            buraco=buraco
-        ).exists()
+        buraco.curtido = buraco.id in buracos_curtidos
 
     variaveis = {
         'rows': buracos,

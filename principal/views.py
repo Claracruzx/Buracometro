@@ -2,12 +2,17 @@ from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 from django.urls import reverse
 from django.contrib.auth import logout
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.auth.decorators import login_required
 
 from buracos.models import Buraco, Like
 from .models import Notificacao
 from usuarios.models import CustomUser
+
+FEED_LIMIT = 30
+MAPA_LIMIT = 120
+PESQUISA_LIMIT = 30
+NOTIFICACOES_LIMIT = 60
 
 
 STATUS_FILTROS = [
@@ -30,15 +35,30 @@ def filtrar_buracos_por_status(queryset, status):
 def inicioView(request):
     status_atual = request.GET.get("status", "")
     buracos = filtrar_buracos_por_status(
-        Buraco.objects.all(),
+        Buraco.objects
+        .select_related("usuario")
+        .prefetch_related(
+            "likes",
+            "comentarios__usuario",
+            "comentarios__likes",
+            "comentarios__respostas__usuario",
+            "comentarios__respostas__likes",
+        ),
         status_atual
-    ).order_by('-created_at')
+    ).order_by('-created_at')[:FEED_LIMIT]
+
+    buracos = list(buracos)
+    buracos_curtidos = set()
+
+    if request.user.is_authenticated and buracos:
+        buracos_curtidos = set(
+            Like.objects
+            .filter(usuario=request.user, buraco_id__in=[buraco.id for buraco in buracos])
+            .values_list("buraco_id", flat=True)
+        )
 
     for buraco in buracos:
-        buraco.curtido = Like.objects.filter(
-            usuario=request.user,
-            buraco=buraco
-        ).exists()
+        buraco.curtido = buraco.id in buracos_curtidos
 
     variaveis = {
         'buracos': buracos,
@@ -61,9 +81,15 @@ class VerNoMapaView(TemplateView):
         zonas = {}
         status_atual = self.request.GET.get("status", "")
         buracos = filtrar_buracos_por_status(
-            Buraco.objects.exclude(local__isnull=True).exclude(local=""),
+            Buraco.objects
+            .exclude(local__isnull=True)
+            .exclude(local="")
+            .annotate(
+                total_likes=Count("likes", distinct=True),
+                total_comentarios=Count("comentarios", distinct=True),
+            ),
             status_atual
-        )
+        ).order_by("-created_at")[:MAPA_LIMIT]
 
         for buraco in buracos:
             coordenadas = [parte.strip() for parte in buraco.local.split(",")]
@@ -89,8 +115,8 @@ class VerNoMapaView(TemplateView):
                 "zona": zona,
                 "status": buraco.status_nome,
                 "status_classe": buraco.status_classe,
-                "likes": buraco.likes.count(),
-                "comentarios": buraco.comentarios.count(),
+                "likes": buraco.total_likes,
+                "comentarios": buraco.total_comentarios,
                 "url": reverse("detalheBuracoView", args=[buraco.id]),
             })
 
@@ -150,14 +176,14 @@ def pesquisaView(request):
     usuarios = CustomUser.objects.filter(
         Q(username__icontains=termo) |
         Q(name__icontains=termo)
-    ) if termo else []
+    )[:PESQUISA_LIMIT] if termo else []
 
     buracos = filtrar_buracos_por_status(Buraco.objects.filter(
         Q(endereco__icontains=termo) |
         Q(local__icontains=termo) |
         Q(titulo__icontains=termo) |
         Q(descricao__icontains=termo)
-    ), status_atual).select_related("usuario").order_by("-created_at") if termo else []
+    ), status_atual).select_related("usuario").prefetch_related("likes", "comentarios").order_by("-created_at")[:PESQUISA_LIMIT] if termo else []
 
     return render(request, 'principal/pesquisa.html', {
         'termo': termo,
@@ -174,7 +200,7 @@ def notificacoesView(request):
         Notificacao.objects
         .filter(destinatario=request.user)
         .select_related("ator", "buraco", "comentario")
-        .order_by("-created_at")
+        .order_by("-created_at")[:NOTIFICACOES_LIMIT]
     )
 
     Notificacao.objects.filter(destinatario=request.user, lida=False).update(lida=True)

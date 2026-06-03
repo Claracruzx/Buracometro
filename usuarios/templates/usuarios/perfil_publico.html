@@ -77,9 +77,9 @@ Perfil de {{ usuario_perfil.username }}
                     data-pode-excluir="{% if request.user.id == buraco.usuario.id %}true{% else %}false{% endif %}">
 
                     {% if buraco.imagem %}
-                        <img src="{{ buraco.imagem.url }}" alt="{{ buraco.titulo }}">
+                        <img src="{{ buraco.imagem.url }}" alt="{{ buraco.titulo }}" loading="lazy" decoding="async">
                     {% elif buraco.url_imagem %}
-                        <img src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="{{ buraco.titulo }}">
+                        <img src="{% static 'image-users/' %}{{ buraco.url_imagem }}" alt="{{ buraco.titulo }}" loading="lazy" decoding="async">
                     {% endif %}
 
                     <div class="explorar-overlay">
