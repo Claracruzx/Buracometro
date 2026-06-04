@@ -254,8 +254,8 @@ div#areaMapaOculto {
 .btn-local{
     border: none;
     padding: 12px 18px;
-    background-color: #cacaca54;
-    color: rgba(29, 29, 29, 0.884);
+    background-color: #dddddde3;
+    color: rgba(0, 0, 0, 0.884);
     cursor: pointer;
     border-radius: 6px;
 }
