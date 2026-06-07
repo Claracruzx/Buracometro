@@ -1575,7 +1575,7 @@ main #conteudo {
     border: 1px solid #eee;
     border-radius: 8px;
     padding: 16px;
-    background: #fafafa;
+    background: #f3f4f6;
 }
 
 .editar-foto-preview {
@@ -1714,19 +1714,63 @@ main #conteudo {
     border-top: 1px solid #eee;
 }
 
-.config-conta-card h2,
-.zona-perigo-conta h2 {
-    margin: 0 0 14px;
-    font-size: 20px;
+.config-conta-card summary,
+.zona-perigo-conta summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
     color: #222;
+    padding: 14px 16px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.config-conta-card summary::-webkit-details-marker,
+.zona-perigo-conta summary::-webkit-details-marker {
+    display: none;
+}
+
+.config-conta-card summary span,
+.zona-perigo-conta summary span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-conta-card summary > i,
+.zona-perigo-conta summary > i {
+    font-size: 24px;
+    transition: transform 0.2s ease;
+}
+
+.config-conta-card[open] summary > i,
+.zona-perigo-conta[open] summary > i {
+    transform: rotate(180deg);
+}
+
+.config-conta-card form,
+.zona-perigo-conta form {
+    margin-top: 18px;
 }
 
 .zona-perigo-conta {
     border-top-color: #fecaca;
 }
 
+.zona-perigo-conta summary {
+    border-color: #fecaca;
+    background: #fff1f2;
+    color: #b91c1c;
+}
+
 .zona-perigo-conta p {
-    margin: 0 0 18px;
+    margin: 16px 0 18px;
     color: #7f1d1d;
     font-size: 14px;
     line-height: 1.5;
@@ -2896,14 +2940,31 @@ html[data-theme="dark"] .form-status-buraco select {
     color: var(--text-color);
 }
 
+html[data-theme="dark"] .editar-foto-area {
+    background: var(--surface-color);
+    border-color: var(--border-color);
+}
+
+html[data-theme="dark"] .editar-foto-acoes strong,
+html[data-theme="dark"] .checkbox-remover {
+    color: var(--heading-color);
+}
+
 html[data-theme="dark"] .config-conta-card,
 html[data-theme="dark"] .zona-perigo-conta {
     border-color: var(--border-color);
 }
 
-html[data-theme="dark"] .config-conta-card h2,
-html[data-theme="dark"] .zona-perigo-conta h2 {
+html[data-theme="dark"] .config-conta-card summary {
+    background: var(--surface-color);
+    border-color: var(--border-color);
     color: var(--heading-color);
+}
+
+html[data-theme="dark"] .zona-perigo-conta summary {
+    background: rgba(127, 29, 29, 0.24);
+    border-color: rgba(248, 113, 113, 0.35);
+    color: #fecaca;
 }
 
 html[data-theme="dark"] .zona-perigo-conta p {

@@ -64,8 +64,11 @@ Editar perfil
         </button>
     </form>
 
-    <div class="config-conta-card">
-        <h2>Alterar senha</h2>
+    <details class="config-conta-card">
+        <summary>
+            <span><i class='bx bx-lock-alt'></i> Alterar senha</span>
+            <i class='bx bx-chevron-down'></i>
+        </summary>
 
         <form class="form-editar-perfil" method="POST">
             {% csrf_token %}
@@ -85,20 +88,21 @@ Editar perfil
                 Alterar senha
             </button>
         </form>
-    </div>
+    </details>
 
-    <div class="zona-perigo-conta">
-        <div>
-            <h2>Excluir conta</h2>
+    <details class="zona-perigo-conta">
+        <summary>
+            <span><i class='bx bx-trash'></i> Excluir conta</span>
+            <i class='bx bx-chevron-down'></i>
+        </summary>
+
+        <div class="zona-perigo-texto">
             <p>Essa acao apaga sua conta e suas postagens. Nao e possivel desfazer.</p>
         </div>
 
         <form class="form-editar-perfil" method="POST">
             {% csrf_token %}
             <input type="hidden" name="acao" value="excluir">
-
-            <label>Digite EXCLUIR para confirmar</label>
-            <input type="text" name="confirmacao" autocomplete="off">
 
             <label>Senha</label>
             <input type="password" name="senha_exclusao" autocomplete="current-password">
@@ -108,7 +112,7 @@ Editar perfil
                 Excluir conta
             </button>
         </form>
-    </div>
+    </details>
 </div>
 
 {% endblock %}

@@ -221,12 +221,7 @@ def editarPerfilView(request):
             return redirect("editarPerfilView")
 
         if acao == "excluir":
-            confirmacao = request.POST.get("confirmacao", "").strip().lower()
             senha = request.POST.get("senha_exclusao", "")
-
-            if confirmacao != "excluir":
-                messages.error(request, "Digite EXCLUIR para confirmar a exclusao da conta.")
-                return redirect("editarPerfilView")
 
             if not request.user.check_password(senha):
                 messages.error(request, "Senha incorreta. A conta nao foi excluida.")
