@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+import re
 
 from .models import CustomUser
 from buracos.models import Buraco, Like
@@ -158,21 +159,86 @@ def perfilPublicoView(request, username):
 @login_required
 def editarPerfilView(request):
     if request.method == "POST":
-        nome = request.POST.get("nome")
-        foto = request.FILES.get("foto")
-        remover_foto = request.POST.get("remover_foto")
+        acao = request.POST.get("acao")
 
-        request.user.name = nome
+        if acao == "perfil":
+            nome = request.POST.get("nome", "").strip()
+            username = request.POST.get("username", "").strip()
+            foto = request.FILES.get("foto")
+            remover_foto = request.POST.get("remover_foto")
 
-        if remover_foto:
-            request.user.foto.delete()
-            request.user.foto = None
+            if not nome or not username:
+                messages.error(request, "Nome e nome de usuario nao podem ficar vazios.")
+                return redirect("editarPerfilView")
 
-        if foto:
-            request.user.foto = foto
+            if len(username) > 150 or not re.fullmatch(r"[\w.@+-]+", username):
+                messages.error(request, "Use apenas letras, numeros, ponto, underline, + ou - no nome de usuario.")
+                return redirect("editarPerfilView")
 
-        request.user.save()
+            username_em_uso = CustomUser.objects.filter(
+                username__iexact=username
+            ).exclude(id=request.user.id).exists()
 
-        return redirect("perfilView")
+            if username_em_uso:
+                messages.error(request, "Esse nome de usuario ja esta em uso.")
+                return redirect("editarPerfilView")
+
+            request.user.name = nome
+            request.user.username = username
+
+            if remover_foto:
+                request.user.foto.delete(save=False)
+                request.user.foto = None
+
+            if foto:
+                request.user.foto = foto
+
+            request.user.save()
+            messages.success(request, "Perfil atualizado com sucesso.")
+            return redirect("perfilView")
+
+        if acao == "senha":
+            senha_atual = request.POST.get("senha_atual", "")
+            nova_senha = request.POST.get("nova_senha", "")
+            confirmar_senha = request.POST.get("confirmar_senha", "")
+
+            if not senha_atual or not nova_senha or not confirmar_senha:
+                messages.error(request, "Preencha todos os campos para alterar a senha.")
+                return redirect("editarPerfilView")
+
+            if not request.user.check_password(senha_atual):
+                messages.error(request, "A senha atual nao esta correta.")
+                return redirect("editarPerfilView")
+
+            if nova_senha != confirmar_senha:
+                messages.error(request, "As novas senhas nao conferem.")
+                return redirect("editarPerfilView")
+
+            request.user.set_password(nova_senha)
+            request.user.save(update_fields=["password"])
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "Senha alterada com sucesso.")
+            return redirect("editarPerfilView")
+
+        if acao == "excluir":
+            confirmacao = request.POST.get("confirmacao", "").strip().lower()
+            senha = request.POST.get("senha_exclusao", "")
+
+            if confirmacao != "excluir":
+                messages.error(request, "Digite EXCLUIR para confirmar a exclusao da conta.")
+                return redirect("editarPerfilView")
+
+            if not request.user.check_password(senha):
+                messages.error(request, "Senha incorreta. A conta nao foi excluida.")
+                return redirect("editarPerfilView")
+
+            usuario = request.user
+            logout(request)
+            usuario.delete()
+            messages.success(request, "Sua conta foi excluida com sucesso.")
+            return redirect("login")
+
+        messages.error(request, "Acao invalida.")
+        return redirect("editarPerfilView")
 
     return render(request, "usuarios/editar_perfil.html")

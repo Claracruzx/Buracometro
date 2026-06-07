@@ -10,8 +10,19 @@ Editar perfil
 <div class="editar-perfil-container">
     <h1>Editar perfil</h1>
 
+    {% if messages %}
+        <div class="editar-perfil-mensagens">
+            {% for message in messages %}
+                <div class="alerta-perfil alerta-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <form class="form-editar-perfil" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+        <input type="hidden" name="acao" value="perfil">
 
         <div class="editar-foto-area">
             <label class="editar-foto-preview" for="inputFotoPerfil">
@@ -42,13 +53,62 @@ Editar perfil
         </div>
 
         <label>Nome</label>
-        <input type="text" name="nome" value="{{ request.user.name }}">
+        <input type="text" name="nome" value="{{ request.user.name|default:'' }}">
+
+        <label>Nome de usuario</label>
+        <input type="text" name="username" value="{{ request.user.username }}" autocomplete="username">
 
         <button type="submit" class="btn-salvar-perfil">
             <i class='bx bx-check'></i>
-            Salvar alterações
+            Salvar alteracoes
         </button>
     </form>
+
+    <div class="config-conta-card">
+        <h2>Alterar senha</h2>
+
+        <form class="form-editar-perfil" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="acao" value="senha">
+
+            <label>Senha atual</label>
+            <input type="password" name="senha_atual" autocomplete="current-password">
+
+            <label>Nova senha</label>
+            <input type="password" name="nova_senha" autocomplete="new-password">
+
+            <label>Confirmar nova senha</label>
+            <input type="password" name="confirmar_senha" autocomplete="new-password">
+
+            <button type="submit" class="btn-salvar-perfil">
+                <i class='bx bx-lock-alt'></i>
+                Alterar senha
+            </button>
+        </form>
+    </div>
+
+    <div class="zona-perigo-conta">
+        <div>
+            <h2>Excluir conta</h2>
+            <p>Essa acao apaga sua conta e suas postagens. Nao e possivel desfazer.</p>
+        </div>
+
+        <form class="form-editar-perfil" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="acao" value="excluir">
+
+            <label>Digite EXCLUIR para confirmar</label>
+            <input type="text" name="confirmacao" autocomplete="off">
+
+            <label>Senha</label>
+            <input type="password" name="senha_exclusao" autocomplete="current-password">
+
+            <button type="submit" class="btn-excluir-conta">
+                <i class='bx bx-trash'></i>
+                Excluir conta
+            </button>
+        </form>
+    </div>
 </div>
 
 {% endblock %}
@@ -68,7 +128,7 @@ inputFotoPerfil.addEventListener('change', function () {
     const leitor = new FileReader();
 
     leitor.onload = function (event) {
-        previewFotoPerfil.innerHTML = `<img src="${event.target.result}" alt="Prévia da foto">`;
+        previewFotoPerfil.innerHTML = `<img src="${event.target.result}" alt="Previa da foto">`;
     };
 
     leitor.readAsDataURL(arquivo);

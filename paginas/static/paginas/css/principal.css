@@ -1681,6 +1681,80 @@ main #conteudo {
     accent-color: #8f0b13;
 }
 
+.editar-perfil-mensagens {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.alerta-perfil {
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.alerta-success {
+    background: #dcfce7;
+    color: #14532d;
+    border: 1px solid #bbf7d0;
+}
+
+.alerta-error {
+    background: #fee2e2;
+    color: #7f1d1d;
+    border: 1px solid #fecaca;
+}
+
+.config-conta-card,
+.zona-perigo-conta {
+    margin-top: 26px;
+    padding-top: 24px;
+    border-top: 1px solid #eee;
+}
+
+.config-conta-card h2,
+.zona-perigo-conta h2 {
+    margin: 0 0 14px;
+    font-size: 20px;
+    color: #222;
+}
+
+.zona-perigo-conta {
+    border-top-color: #fecaca;
+}
+
+.zona-perigo-conta p {
+    margin: 0 0 18px;
+    color: #7f1d1d;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.btn-excluir-conta {
+    margin-top: 12px;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background-color: #dc2626;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-excluir-conta:hover {
+    background-color: #991b1b;
+}
+
+.btn-excluir-conta i {
+    font-size: 22px;
+}
+
 @media (max-width: 560px) {
     .editar-foto-area {
         flex-direction: column;
@@ -2820,6 +2894,32 @@ html[data-theme="dark"] .form-status-buraco select {
     background: var(--surface-color);
     border-color: var(--border-color);
     color: var(--text-color);
+}
+
+html[data-theme="dark"] .config-conta-card,
+html[data-theme="dark"] .zona-perigo-conta {
+    border-color: var(--border-color);
+}
+
+html[data-theme="dark"] .config-conta-card h2,
+html[data-theme="dark"] .zona-perigo-conta h2 {
+    color: var(--heading-color);
+}
+
+html[data-theme="dark"] .zona-perigo-conta p {
+    color: #fca5a5;
+}
+
+html[data-theme="dark"] .alerta-success {
+    background: rgba(20, 83, 45, 0.22);
+    color: #bbf7d0;
+    border-color: rgba(34, 197, 94, 0.32);
+}
+
+html[data-theme="dark"] .alerta-error {
+    background: rgba(127, 29, 29, 0.24);
+    color: #fecaca;
+    border-color: rgba(248, 113, 113, 0.35);
 }
 
 @media (max-width: 640px) {
