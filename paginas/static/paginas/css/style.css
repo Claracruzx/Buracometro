@@ -80,7 +80,7 @@ html {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.274); /* Preto translúcido */
+    background-color: rgba(0, 0, 0, 0.096); /* Preto translúcido */
     z-index: -1; /* Coloca a camada atrás do conteúdo */
 }
 
@@ -160,7 +160,7 @@ p{
 
 #sobre {
     padding: 100px 50px;
-    background-color:  #d8bc1fdc;
+    background-color:  #de9e02;
     text-align: justify;
     text-align: center; /* Centraliza o texto */
     min-height: 70vh;
@@ -221,6 +221,16 @@ p{
     height: 30px;
 }
 
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
 /* Ajustes responsivos da pagina inicial */
 .logo {
     margin-right: 0;
@@ -272,59 +282,66 @@ p{
 }
 
 @media (max-width: 620px) {
+
     .navbar {
-        justify-content: flex-start;
-        gap: 12px;
-        padding: 6px 12px;
-        overflow-x: auto;
-        scrollbar-width: none;
-    }
-
-    .navbar::-webkit-scrollbar {
-        display: none;
-    }
-
-    .navbar ul {
-        flex: 0 0 auto;
-        gap: 18px;
-        white-space: nowrap;
-    }
-
-    .navbar ul li a {
-        font-size: 14px;
+        justify-content: space-between;
+        padding: 6px 20px;
+        overflow: visible;
     }
 
     .logo {
         height: 42px;
     }
 
+    .menu-toggle {
+        display: block;
+    }
+
+    .navbar ul {
+        display: none;
+        position: absolute;
+        top: 58px;
+        right: 20px;
+        background-color: #000000;
+        flex-direction: column;
+        gap: 18px;
+        padding: 20px;
+        border-radius: 10px;
+        width: 160px;
+    }
+
+    .navbar ul.ativo {
+        display: flex;
+    }
+    .navbar ul li a {
+        font-size: 16px;
+    }
+
     #inicio {
-        justify-content: flex-start;
-        padding: 112px 20px 36px;
-        min-height: 72svh;
+        background-image: url('../imgs/backCell3.png');
+        padding: 160px 20px 36px;
+        min-height: 100vh;
         text-align: left;
-        background-position: 58% center;
+        background-position: center;
     }
 
     h1 {
         font-size: 28px;
         line-height: 1.16;
-        max-width: 12ch;
     }
 
     p {
         font-size: 15px;
         line-height: 1.55;
-        max-width: 100%;
     }
 
     .btn {
         width: 100%;
         max-width: 240px;
-        text-align: center;
         font-size: 16px;
         padding: 10px 18px;
     }
+
 
     #sobre,
     #trabalhos,

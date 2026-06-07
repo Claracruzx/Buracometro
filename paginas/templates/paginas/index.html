@@ -10,8 +10,11 @@
 <body>
 
     <nav class="navbar">
-        <img src="{% static 'imgs/logoBura.png' %}" alt="Logo do site" class="logo">
-        <ul>
+        <img src="{% static 'imgs/logo.png' %}" alt="Logo do site" class="logo">
+
+          <button class="menu-toggle" onclick="abrirMenu()">☰</button>
+
+        <ul id="menu">
             <li><a href="#inicio">Início</a></li>
             <li><a href="#trabalhos">Trabalhos</a></li>
             <li><a href="#sobre">Sobre</a></li>
@@ -21,8 +24,12 @@
 
     <div class="conteudoNavBar">
         <section id="inicio">
-            <h1>Buracos de São Luís:<br> Registre e Transforme</h1>
-            <p>Aqui, você pode registrar e acompanhar os<br> buracos nas ruas de São Luís, contribuindo<br> para uma cidade melhor!</p>
+           <h1>Buracos de São Luís: Registre e Transforme</h1>
+            <p>
+            Aqui, você pode registrar e acompanhar os
+            buracos nas ruas de São Luís, contribuindo
+            para uma cidade melhor!
+            </p>
             <form action="/login" method="get">
                 <button class="btn">Comece já!</button>
             </form>
@@ -87,5 +94,13 @@
         </section>
 
     </div>
+
+<script>
+    function abrirMenu() {
+        const menu = document.getElementById("menu");
+        menu.classList.toggle("ativo");
+    }
+</script>
 </body>
+
 </html>
